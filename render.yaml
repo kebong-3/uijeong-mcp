@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: uijeong-mcp
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python uijeong_mcp.py --http
+    envVars:
+      - key: CLIK_API_KEY
+        sync: false
+      - key: UIJEONG_PROFILE
+        value: full
+      - key: PYTHON_VERSION
+        value: 3.12.7
