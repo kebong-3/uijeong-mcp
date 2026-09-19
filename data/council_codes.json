@@ -1,0 +1,1810 @@
+{
+  "schema_version": "1.0",
+  "source_url": "https://clik.nanet.go.kr/potal/guide/resourceCenter.do",
+  "checked_at": "2026-09-17",
+  "current_code_count": 243,
+  "historical_code_count": 2,
+  "scope_note": "CLIK 코드표 확인; 자료 수록·원문 제공·행정구역의 법적 지위를 보증하지 않음. 원문 RASMBLY_NM은 바꾸지 않음.",
+  "councils": [
+    {
+      "council_id": "061008",
+      "name": "전남광주통합특별시 담양군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 담양군의회",
+        "전남 담양군의회"
+      ]
+    },
+    {
+      "council_id": "062004",
+      "name": "전남광주통합특별시 동구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "광주광역시 동구의회",
+        "광주 동구의회"
+      ]
+    },
+    {
+      "council_id": "061009",
+      "name": "전남광주통합특별시 목포시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 목포시의회",
+        "전남 목포시의회"
+      ]
+    },
+    {
+      "council_id": "061010",
+      "name": "전남광주통합특별시 무안군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 무안군의회",
+        "전남 무안군의회"
+      ]
+    },
+    {
+      "council_id": "061011",
+      "name": "전남광주통합특별시 보성군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 보성군의회",
+        "전남 보성군의회"
+      ]
+    },
+    {
+      "council_id": "062005",
+      "name": "전남광주통합특별시 북구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "광주광역시 북구의회",
+        "광주 북구의회"
+      ]
+    },
+    {
+      "council_id": "062006",
+      "name": "전남광주통합특별시 서구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "광주광역시 서구의회",
+        "광주 서구의회"
+      ]
+    },
+    {
+      "council_id": "061012",
+      "name": "전남광주통합특별시 순천시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 순천시의회",
+        "전남 순천시의회"
+      ]
+    },
+    {
+      "council_id": "061013",
+      "name": "전남광주통합특별시 신안군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 신안군의회",
+        "전남 신안군의회"
+      ]
+    },
+    {
+      "council_id": "061014",
+      "name": "전남광주통합특별시 여수시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 여수시의회",
+        "전남 여수시의회"
+      ]
+    },
+    {
+      "council_id": "061015",
+      "name": "전남광주통합특별시 영광군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 영광군의회",
+        "전남 영광군의회"
+      ]
+    },
+    {
+      "council_id": "061016",
+      "name": "전남광주통합특별시 영암군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 영암군의회",
+        "전남 영암군의회"
+      ]
+    },
+    {
+      "council_id": "061017",
+      "name": "전남광주통합특별시 완도군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 완도군의회",
+        "전남 완도군의회"
+      ]
+    },
+    {
+      "council_id": "061018",
+      "name": "전남광주통합특별시 장성군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 장성군의회",
+        "전남 장성군의회"
+      ]
+    },
+    {
+      "council_id": "061019",
+      "name": "전남광주통합특별시 장흥군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 장흥군의회",
+        "전남 장흥군의회"
+      ]
+    },
+    {
+      "council_id": "061020",
+      "name": "전남광주통합특별시 진도군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 진도군의회",
+        "전남 진도군의회"
+      ]
+    },
+    {
+      "council_id": "061021",
+      "name": "전남광주통합특별시 함평군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 함평군의회",
+        "전남 함평군의회"
+      ]
+    },
+    {
+      "council_id": "061022",
+      "name": "전남광주통합특별시 해남군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 해남군의회",
+        "전남 해남군의회"
+      ]
+    },
+    {
+      "council_id": "061023",
+      "name": "전남광주통합특별시 화순군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 화순군의회",
+        "전남 화순군의회"
+      ]
+    },
+    {
+      "council_id": "051002",
+      "name": "부산광역시 강서구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "051003",
+      "name": "부산광역시 금정구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "051004",
+      "name": "부산광역시 기장군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "051005",
+      "name": "부산광역시 남구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "051006",
+      "name": "부산광역시 동구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "051007",
+      "name": "부산광역시 동래구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "051008",
+      "name": "부산광역시 부산진구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "051009",
+      "name": "부산광역시 북구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "051010",
+      "name": "부산광역시 사상구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "051011",
+      "name": "부산광역시 사하구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "051012",
+      "name": "부산광역시 서구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "051013",
+      "name": "부산광역시 수영구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "051014",
+      "name": "부산광역시 연제구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "051015",
+      "name": "부산광역시 영도구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "051016",
+      "name": "부산광역시 중구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "051017",
+      "name": "부산광역시 해운대구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "053010",
+      "name": "대구광역시 군위군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "053002",
+      "name": "대구광역시 남구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "053003",
+      "name": "대구광역시 달서구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "053004",
+      "name": "대구광역시 달성군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "053005",
+      "name": "대구광역시 동구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "053006",
+      "name": "대구광역시 북구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "053007",
+      "name": "대구광역시 서구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "053008",
+      "name": "대구광역시 수성구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "053009",
+      "name": "대구광역시 중구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "032002",
+      "name": "인천광역시 강화군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "032015",
+      "name": "인천광역시 검단구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "032003",
+      "name": "인천광역시 계양구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "032005",
+      "name": "인천광역시 남동구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "032004",
+      "name": "인천광역시 미추홀구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "032007",
+      "name": "인천광역시 부평구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "032008",
+      "name": "인천광역시 서해구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "032009",
+      "name": "인천광역시 연수구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "032013",
+      "name": "인천광역시 영종구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "032010",
+      "name": "인천광역시 옹진군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "032012",
+      "name": "인천광역시 제물포구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "042002",
+      "name": "대전광역시 대덕구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "042003",
+      "name": "대전광역시 동구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "042004",
+      "name": "대전광역시 서구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "042005",
+      "name": "대전광역시 유성구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "042006",
+      "name": "대전광역시 중구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "052002",
+      "name": "울산광역시 남구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "052003",
+      "name": "울산광역시 동구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "052004",
+      "name": "울산광역시 북구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "052005",
+      "name": "울산광역시 울주군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "052006",
+      "name": "울산광역시 중구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031002",
+      "name": "경기도 가평군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031003",
+      "name": "경기도 고양시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031004",
+      "name": "경기도 과천시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031005",
+      "name": "경기도 광명시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031006",
+      "name": "경기도 광주시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031007",
+      "name": "경기도 구리시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031008",
+      "name": "경기도 군포시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031009",
+      "name": "경기도 김포시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031010",
+      "name": "경기도 남양주시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031011",
+      "name": "경기도 동두천시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031012",
+      "name": "경기도 부천시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031013",
+      "name": "경기도 성남시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031014",
+      "name": "경기도 수원시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031015",
+      "name": "경기도 시흥시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031016",
+      "name": "경기도 안산시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031017",
+      "name": "경기도 안성시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031018",
+      "name": "경기도 안양시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031019",
+      "name": "경기도 양주시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031020",
+      "name": "경기도 양평군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031021",
+      "name": "경기도 여주시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031022",
+      "name": "경기도 연천군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031023",
+      "name": "경기도 오산시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031024",
+      "name": "경기도 용인시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031025",
+      "name": "경기도 의왕시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031026",
+      "name": "경기도 의정부시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031027",
+      "name": "경기도 이천시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031028",
+      "name": "경기도 파주시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031029",
+      "name": "경기도 평택시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031030",
+      "name": "경기도 포천시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031031",
+      "name": "경기도 하남시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031032",
+      "name": "경기도 화성시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "033002",
+      "name": "강원특별자치도 강릉시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "033003",
+      "name": "강원특별자치도 고성군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "033004",
+      "name": "강원특별자치도 동해시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "033005",
+      "name": "강원특별자치도 삼척시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "033006",
+      "name": "강원특별자치도 속초시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "033007",
+      "name": "강원특별자치도 양구군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "033008",
+      "name": "강원특별자치도 양양군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "033009",
+      "name": "강원특별자치도 영월군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "033010",
+      "name": "강원특별자치도 원주시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "033011",
+      "name": "강원특별자치도 인제군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "033012",
+      "name": "강원특별자치도 정선군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "033013",
+      "name": "강원특별자치도 철원군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "033014",
+      "name": "강원특별자치도 춘천시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "033015",
+      "name": "강원특별자치도 태백시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "033016",
+      "name": "강원특별자치도 평창군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "033017",
+      "name": "강원특별자치도 홍천군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "033018",
+      "name": "강원특별자치도 화천군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "033019",
+      "name": "강원특별자치도 횡성군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "043002",
+      "name": "충청북도 괴산군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "043003",
+      "name": "충청북도 단양군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "043004",
+      "name": "충청북도 보은군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "043005",
+      "name": "충청북도 영동군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "043006",
+      "name": "충청북도 옥천군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "043007",
+      "name": "충청북도 음성군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "043008",
+      "name": "충청북도 제천시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "043009",
+      "name": "충청북도 증평군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "043010",
+      "name": "충청북도 진천군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "043012",
+      "name": "충청북도 청주시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "043013",
+      "name": "충청북도 충주시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "041002",
+      "name": "충청남도 계룡시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "041003",
+      "name": "충청남도 공주시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "041004",
+      "name": "충청남도 금산군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "041005",
+      "name": "충청남도 논산시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "041006",
+      "name": "충청남도 당진시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "041007",
+      "name": "충청남도 보령시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "041008",
+      "name": "충청남도 부여군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "041009",
+      "name": "충청남도 서산시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "041010",
+      "name": "충청남도 서천군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "041011",
+      "name": "충청남도 아산시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "041012",
+      "name": "충청남도 예산군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "041013",
+      "name": "충청남도 천안시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "041014",
+      "name": "충청남도 청양군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "041015",
+      "name": "충청남도 태안군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "041016",
+      "name": "충청남도 홍성군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "063002",
+      "name": "전북특별자치도 고창군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "063003",
+      "name": "전북특별자치도 군산시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "063004",
+      "name": "전북특별자치도 김제시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "063005",
+      "name": "전북특별자치도 남원시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "063006",
+      "name": "전북특별자치도 무주군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "063007",
+      "name": "전북특별자치도 부안군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "063008",
+      "name": "전북특별자치도 순창군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "063009",
+      "name": "전북특별자치도 완주군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "063010",
+      "name": "전북특별자치도 익산시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "063011",
+      "name": "전북특별자치도 임실군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "063012",
+      "name": "전북특별자치도 장수군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "063013",
+      "name": "전북특별자치도 전주시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "063014",
+      "name": "전북특별자치도 정읍시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "063015",
+      "name": "전북특별자치도 진안군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054002",
+      "name": "경상북도 경산시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054003",
+      "name": "경상북도 경주시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054004",
+      "name": "경상북도 고령군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054005",
+      "name": "경상북도 구미시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054007",
+      "name": "경상북도 김천시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054008",
+      "name": "경상북도 문경시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054009",
+      "name": "경상북도 봉화군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054010",
+      "name": "경상북도 상주시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054011",
+      "name": "경상북도 성주군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054012",
+      "name": "경상북도 안동시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054013",
+      "name": "경상북도 영덕군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054014",
+      "name": "경상북도 영양군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054015",
+      "name": "경상북도 영주시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054016",
+      "name": "경상북도 영천시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054017",
+      "name": "경상북도 예천군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054018",
+      "name": "경상북도 울릉군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054019",
+      "name": "경상북도 울진군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054020",
+      "name": "경상북도 의성군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054021",
+      "name": "경상북도 청도군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054022",
+      "name": "경상북도 청송군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054023",
+      "name": "경상북도 칠곡군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054024",
+      "name": "경상북도 포항시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "055002",
+      "name": "경상남도 거제시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "055003",
+      "name": "경상남도 거창군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "055004",
+      "name": "경상남도 고성군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "055005",
+      "name": "경상남도 김해시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "055006",
+      "name": "경상남도 남해군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "055007",
+      "name": "경상남도 밀양시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "055008",
+      "name": "경상남도 사천시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "055009",
+      "name": "경상남도 산청군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "055010",
+      "name": "경상남도 양산시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "055011",
+      "name": "경상남도 의령군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "055012",
+      "name": "경상남도 진주시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "055013",
+      "name": "경상남도 창녕군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "055019",
+      "name": "경상남도 창원시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "055014",
+      "name": "경상남도 통영시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "055015",
+      "name": "경상남도 하동군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "055016",
+      "name": "경상남도 함안군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "055017",
+      "name": "경상남도 함양군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "055018",
+      "name": "경상남도 합천군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002001",
+      "name": "서울특별시의회",
+      "level": "metropolitan",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "065001",
+      "name": "전남광주통합특별시의회",
+      "level": "metropolitan",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "051001",
+      "name": "부산광역시의회",
+      "level": "metropolitan",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "053001",
+      "name": "대구광역시의회",
+      "level": "metropolitan",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "032001",
+      "name": "인천광역시의회",
+      "level": "metropolitan",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "042001",
+      "name": "대전광역시의회",
+      "level": "metropolitan",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "052001",
+      "name": "울산광역시의회",
+      "level": "metropolitan",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "044001",
+      "name": "세종특별자치시의회",
+      "level": "metropolitan",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "031001",
+      "name": "경기도의회",
+      "level": "metropolitan",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "033001",
+      "name": "강원특별자치도의회",
+      "level": "metropolitan",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "043001",
+      "name": "충청북도의회",
+      "level": "metropolitan",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "041001",
+      "name": "충청남도의회",
+      "level": "metropolitan",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "063001",
+      "name": "전북특별자치도의회",
+      "level": "metropolitan",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "054001",
+      "name": "경상북도의회",
+      "level": "metropolitan",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "055001",
+      "name": "경상남도의회",
+      "level": "metropolitan",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "064001",
+      "name": "제주특별자치도의회",
+      "level": "metropolitan",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002002",
+      "name": "서울특별시 강남구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002003",
+      "name": "서울특별시 강동구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002004",
+      "name": "서울특별시 강북구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002005",
+      "name": "서울특별시 강서구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002006",
+      "name": "서울특별시 관악구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002007",
+      "name": "서울특별시 광진구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002008",
+      "name": "서울특별시 구로구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002009",
+      "name": "서울특별시 금천구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002010",
+      "name": "서울특별시 노원구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002011",
+      "name": "서울특별시 도봉구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002012",
+      "name": "서울특별시 동대문구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002013",
+      "name": "서울특별시 동작구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002014",
+      "name": "서울특별시 마포구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002015",
+      "name": "서울특별시 서대문구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002016",
+      "name": "서울특별시 서초구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002017",
+      "name": "서울특별시 성동구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002018",
+      "name": "서울특별시 성북구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002019",
+      "name": "서울특별시 송파구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002020",
+      "name": "서울특별시 양천구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002021",
+      "name": "서울특별시 영등포구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002022",
+      "name": "서울특별시 용산구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002023",
+      "name": "서울특별시 은평구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002024",
+      "name": "서울특별시 종로구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002025",
+      "name": "서울특별시 중구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "002026",
+      "name": "서울특별시 중랑구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": []
+    },
+    {
+      "council_id": "061002",
+      "name": "전남광주통합특별시 강진군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 강진군의회",
+        "전남 강진군의회"
+      ]
+    },
+    {
+      "council_id": "061003",
+      "name": "전남광주통합특별시 고흥군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 고흥군의회",
+        "전남 고흥군의회"
+      ]
+    },
+    {
+      "council_id": "061004",
+      "name": "전남광주통합특별시 곡성군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 곡성군의회",
+        "전남 곡성군의회"
+      ]
+    },
+    {
+      "council_id": "062002",
+      "name": "전남광주통합특별시 광산구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "광주광역시 광산구의회",
+        "광주 광산구의회"
+      ]
+    },
+    {
+      "council_id": "061005",
+      "name": "전남광주통합특별시 광양시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 광양시의회",
+        "전남 광양시의회"
+      ]
+    },
+    {
+      "council_id": "061006",
+      "name": "전남광주통합특별시 구례군의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 구례군의회",
+        "전남 구례군의회"
+      ]
+    },
+    {
+      "council_id": "061007",
+      "name": "전남광주통합특별시 나주시의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "전라남도 나주시의회",
+        "전남 나주시의회"
+      ]
+    },
+    {
+      "council_id": "062003",
+      "name": "전남광주통합특별시 남구의회",
+      "level": "local",
+      "status": "current_code_table",
+      "aliases": [
+        "광주광역시 남구의회",
+        "광주 남구의회"
+      ]
+    },
+    {
+      "council_id": "062001",
+      "name": "광주광역시의회",
+      "level": "metropolitan",
+      "status": "historical_code_table",
+      "aliases": [
+        "광주광역시의회(통합 전)"
+      ]
+    },
+    {
+      "council_id": "061001",
+      "name": "전라남도의회",
+      "level": "metropolitan",
+      "status": "historical_code_table",
+      "aliases": [
+        "전라남도의회(통합 전)"
+      ]
+    }
+  ]
+}

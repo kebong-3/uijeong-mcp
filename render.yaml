@@ -8,7 +8,21 @@ services:
     envVars:
       - key: CLIK_API_KEY
         sync: false
+      # work = 14 tools for practical preparation; core = 5, lite = 22, full = 34.
       - key: UIJEONG_PROFILE
-        value: full
+        value: work
       - key: PYTHON_VERSION
         value: 3.12.7
+      - key: UIJEONG_BIND_HOST
+        value: 0.0.0.0
+      - key: UIJEONG_ALLOWED_HOSTS
+        sync: false
+      - key: UIJEONG_BEARER_TOKEN
+        generateValue: true
+      # Keep one tool result inside the model's context window.
+      - key: UIJEONG_MAX_RESPONSE_CHARS
+        value: "30000"
+# For durability, provision persistent storage and set UIJEONG_STATE_DB.
+# Without it the free plan's ephemeral disk loses snapshots and the call budget
+# on every redeploy; evidence paging then needs a fresh search.
+# This template has no OAuth. Your client must support a Bearer header.

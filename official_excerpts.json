@@ -1,0 +1,27 @@
+{
+  "scope": "실제 공개 회의록의 짧은 발췌 2건. 웹 렌더링 텍스트이며 원본 HTML DOM·전국 정확도 검증이 아님. 문맥은 원문으로 재확인.",
+  "excerpts": [
+    {
+      "id": "seogu-20260903-procedure",
+      "source_url": "https://www.gjsc.or.kr/record/recordView.do?key=2201923ca2215f9b8f96f5a7dbf00b495303c84009b109bcd97d239c00d530e9968d9c0a3d2e2bb1",
+      "observed_at": "2026-09-17",
+      "meeting_date": "2026-09-03",
+      "source_format": "web-rendered excerpt, not original HTML",
+      "selection": "제342회 의회운영위원회 제3차, 의사진행 발언. 이 회의에서 집행부 답변 묶음을 확인하지 못해 임의 추가하지 않음.",
+      "text": "○위원장 김유안\n상정된 안건에 대해 의견이 있으신 위원님께서는 발언하여 주시기 바랍니다.",
+      "expected_labels": ["위원장 김유안"],
+      "expected_roles": ["chair"]
+    },
+    {
+      "id": "seogu-20260728-budget-education",
+      "source_url": "https://www.gjsc.or.kr/record/recordView.do?key=a97e7bb3a2e6bb5fe2cc292666f40882628e5cda93147c25b2dafd68a88fd4d571a513bf3dd26beb",
+      "observed_at": "2026-09-17",
+      "meeting_date": "2026-07-28",
+      "source_format": "web-rendered excerpt, not original HTML",
+      "selection": "제342회 기획총무위원회 제7차, 보건행정과 자동심장충격기 교육 관련 문답 일부. 교육 실시 완료의 증빙이 아님.",
+      "text": "○고기담 위원\n그래서 예산이 없어서 혹시 그런……\n○보건행정과장 이상용\n예산이 없지는 않습니다. 그쪽 부분에도 한 번 교육 프로그램을 만들도록 하겠습니다.",
+      "expected_labels": ["고기담 위원", "보건행정과장 이상용"],
+      "expected_roles": ["member", "executive"]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+.env
+__pycache__/
+*.pyc
+venv/
+.venv/
+minutes_archive/
+
+state/
+*.sqlite3
+*.sqlite3-*
+.pytest_cache/
+.env.*
+!.env.example

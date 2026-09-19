@@ -1,0 +1,47 @@
+{
+  "checked_at": "2026-09-17 UTC / 2026-09-18 KST",
+  "connected_service_version": "not provided by existing connected tool",
+  "attached_baseline_version": "1.1.0",
+  "new_package_version": "2.0.0",
+  "existing_service_readonly_status": {
+    "clik_key_configured": true,
+    "councils": [
+      {
+        "code": "062006",
+        "name": "전남광주통합특별시 서구의회",
+        "minutes_count": 4299,
+        "latest_meeting_date": "2026-06-12"
+      },
+      {
+        "code": "065001",
+        "name": "전남광주통합특별시의회",
+        "minutes_count": 65,
+        "latest_meeting_date": "2026-09-11"
+      },
+      {
+        "code": "062001",
+        "name": "광주광역시의회(통합 전)",
+        "minutes_count": 6433,
+        "latest_meeting_date": "2026-06-22"
+      }
+    ],
+    "seogu_recent_list_count": 10,
+    "seogu_latest_meeting_date": "2026-09-03"
+  },
+  "new_source_local_live_fetch": {
+    "status": "UNAVAILABLE",
+    "reason": "Local official-site automatic fetch could not complete; returned guarded error. No authentication bypass or TLS disabling."
+  },
+  "new_source_clik_live_fetch": {
+    "status": "NOT_RUN",
+    "reason": "Existing remote connector key is not available as a local secret; no key extraction attempted."
+  },
+  "actual_public_excerpts": {
+    "count": 2,
+    "format": "web-rendered short excerpts, NOT original HTML DOM"
+  },
+  "limits": [
+    "Existing remote service success does not verify deployment of this new package.",
+    "No national precision/recall/latency benchmark performed."
+  ]
+}
