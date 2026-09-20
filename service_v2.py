@@ -1,5 +1,6 @@
 """Evidence-first application services. Source collection is bounded and auditable."""
 from __future__ import annotations
+import asyncio
 import datetime as dt
 import copy
 import hashlib
@@ -26,7 +27,7 @@ LIMITS = ['확인 범위의 결과이며 전국 전체 회의록 전수조사 �
 
 
 def install(U):
-    U.SERVER_VERSION = '2.3.0'
+    U.SERVER_VERSION = '2.3.1'
     U.COUNCILS = S.council_code_map()
     U.resolve_council = lambda query: [(r['council_id'],r['name']) for r in S.resolve_councils(query)]
     U.parse_turns = E.parse_turns
@@ -77,7 +78,9 @@ def install(U):
             if error or not detail:
                 errors.append({'source':'CLIK','stage':'detail','ref':docid,'message':error or '본문 응답 없음'})
                 continue
-            turns = E.parse_turns(detail.get('MINTS_HTML',''))
+            # 긴 회의록 파싱은 CPU 작업이다. 이벤트 루프를 붙잡으면 같은 시간에
+            # 들어온 연결과 상태점검이 함께 밀리므로 별도 스레드로 넘긴다.
+            turns = await asyncio.to_thread(E.parse_turns, detail.get('MINTS_HTML',''))
             if not turns:
                 errors.append({'source':'CLIK','stage':'parse','ref':docid,'message':'본문 미제공 또는 지원하지 않는 발언 형식'})
                 continue

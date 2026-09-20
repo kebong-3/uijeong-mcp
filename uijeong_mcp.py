@@ -49,14 +49,18 @@ from mcp.types import ToolAnnotations
 # ════════════════════════════════════════════════════════════
 # 1. 설정
 # ════════════════════════════════════════════════════════════
-SERVER_VERSION = "2.3.0"
+SERVER_VERSION = "2.3.1"
 BASE = "https://clik.nanet.go.kr/openapi"
 API_KEY = os.environ.get("CLIK_API_KEY", "").strip()
 VERIFY_SSL = True  # TLS certificate validation is always enabled
 DAILY_LIMIT = int(os.environ.get("CLIK_DAILY_LIMIT", "1000"))
 DAILY_RESERVE = 50            # 한도 근처에서 무거운 도구를 막기 위한 여유분
 CACHE_TTL = 6 * 3600          # 6시간
-CACHE_MAX = 800
+# 캐시 한 항목은 회의록 본문 전체다. 512MB급 무료 인스턴스에서 한도가 크면
+# 오래 쓸수록 메모리가 차올라 프로세스가 점검 요청에 응답하지 못한다.
+CACHE_MAX = max(20, int(os.environ.get("UIJEONG_CACHE_MAX_ENTRIES") or 200))
+SITE_LIST_CACHE_MAX = 60
+SITE_DETAIL_CACHE_MAX = max(10, int(os.environ.get("UIJEONG_SITE_CACHE_MAX_ENTRIES") or 60))
 MAX_DETAIL_DOCS = 10          # 한 번의 도구 호출에서 열어볼 회의록 최대 수
 
 CLIK_ERRORS = {
@@ -294,11 +298,21 @@ class ClikClient:
         code = str(obj.get("RESULT_CODE", "MALFORMED_RESPONSE"))
         if code != "SUCCESS":
             raise ClikError(CLIK_ERRORS.get(code, f"CLIK 오류: {code}"))
-        if len(self._cache) >= CACHE_MAX:
-            for k in sorted(self._cache, key=lambda k: self._cache[k][0])[: CACHE_MAX // 4]:
-                self._cache.pop(k, None)
+        _trim_cache(self._cache, CACHE_MAX)
         self._cache[ck] = (time.time(), obj)
         return obj
+
+
+def _trim_cache(cache: dict, limit: int) -> None:
+    """한도에 닿으면 가장 오래 전에 담은 항목부터 4분의 1을 비운다.
+
+    캐시는 같은 회의록을 다시 받지 않기 위한 것이지 보관소가 아니다. 상한이 없으면
+    회의록을 열수록 메모리가 늘고, 작은 인스턴스에서는 프로세스가 멈춘 것처럼 보인다.
+    """
+    if len(cache) < limit:
+        return
+    for key in sorted(cache, key=lambda k: cache[k][0])[: max(1, limit // 4)]:
+        cache.pop(key, None)
 
 
 def _unwrap(data: Any) -> dict:
@@ -1826,6 +1840,7 @@ class CouncilSite:
         rows = parse_site_list(raw)
         if not rows and not re.search(r"등록된.*없|검색된.*없|자료가.*없|조회된.*없|<table[^>]*>\s*</table>", raw, re.I):
             raise SiteBlocked("최근회의록 목록 형식을 해석하지 못했습니다. 자료 없음으로 판단하지 않습니다.")
+        _trim_cache(self._list_cache, SITE_LIST_CACHE_MAX)
         self._list_cache[page] = (time.time(), rows)
         return rows
 
@@ -1837,9 +1852,17 @@ class CouncilSite:
             return hit[1]
         url = f"{SITE_BASE}/record/recordView.do?key={key}"
         raw = await self.get(url)
-        body = _site_body(raw)
-        plain = re.sub(r"[ \t]+", " ", _html_to_marked_text(body).replace("\x01", "").replace("\x02", ""))
-        doc = {"key": key, "url": url, "turns": parse_turns(body), "meta": parse_title_meta(plain), "plain_head": plain[:400]}
+
+        def build() -> dict:
+            body = _site_body(raw)
+            plain = re.sub(r"[ \t]+", " ", _html_to_marked_text(body).replace("\x01", "").replace("\x02", ""))
+            return {"key": key, "url": url, "turns": parse_turns(body),
+                    "meta": parse_title_meta(plain), "plain_head": plain[:400]}
+
+        # 긴 회의록 파싱은 CPU를 오래 쓴다. 작은 인스턴스에서 이벤트 루프를 붙잡으면
+        # 그 사이 들어온 연결·상태점검이 모두 대기하므로 별도 스레드에서 처리한다.
+        doc = await asyncio.to_thread(build)
+        _trim_cache(self._detail_cache, SITE_DETAIL_CACHE_MAX)
         self._detail_cache[key] = (time.time(), doc)
         return doc
 
