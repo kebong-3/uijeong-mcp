@@ -82,12 +82,12 @@ def test_profiles_are_nested(monkeypatch):
     lite, _ = _tools("lite", monkeypatch)
     full, _ = _tools("full", monkeypatch)
     assert core < lite < full, "좁은 프로필의 도구는 넓은 프로필에도 있어야 한다"
-    assert len(lite) == 26 and len(full) == 38
+    assert len(lite) == 22 and len(full) == 34
 
 
 def test_unknown_profile_falls_back_to_full(monkeypatch):
     names, _ = _tools("존재하지않는프로필", monkeypatch)
-    assert len(names) == 38
+    assert len(names) == 34
 
 
 # ── MCP 경계: 전송량과 오류 표시 ───────────────────────────────────────────

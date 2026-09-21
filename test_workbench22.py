@@ -148,7 +148,7 @@ def test_end_to_end_issue_and_followup_through_mcp(monkeypatch):
 def test_work_profile_is_core_plus_practice_tools(monkeypatch):
  from test_final_hardening import _tools
  names,U=_tools('work',monkeypatch)
- assert names==U.CORE_TOOLS|U.WORKBENCH_TOOLS|U.DEPARTMENT_TOOLS and len(names)==18
+ assert names==U.CORE_TOOLS|U.WORKBENCH_TOOLS|U.DEPARTMENT_TOOLS and len(names)==14
 
 def test_negative_value_is_not_silently_positive():
  r=C.review_answer('총100명, 감소액 -10억원입니다.',[{'id':'F','text':'100명, 10억원'}],[])

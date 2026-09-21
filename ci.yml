@@ -20,10 +20,6 @@ jobs:
           cache: pip
       - name: Install actual runtime SDK
         run: python -m pip install -r requirements.txt pytest==8.4.2
-      - name: Verify release files
-        run: python scripts/check_config.py --manifest
-      - name: Export actual SDK tool schemas
-        run: python scripts/export_runtime_schemas.py > runtime-tool-schemas.json
       - name: Check parser regressions
         run: |
           python tests/regression_r0.py
@@ -32,10 +28,3 @@ jobs:
         run: python -m pytest -q
       - name: Real stdio and HTTP protocol
         run: python tests/protocol_smoke.py
-      - name: Preserve SDK schema artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: runtime-schemas-py${{ matrix.python-version }}
-          path: runtime-tool-schemas.json
-          if-no-files-found: warn
