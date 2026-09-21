@@ -1,0 +1,11 @@
+{
+  "checked_on": "2026-09-20",
+  "check_method": "Official web pages read during development; not a runtime fetch",
+  "council_id": "062006",
+  "documents": [
+    {"purpose": "행정사무감사 결과·시정요구 원문 대조", "title": "서구의회 행정사무감사·조사결과", "url": "https://www.gjsc.or.kr/kr/dataroom/bbsInvestigation.do", "verified_scope": "목록 및 2025년도 결과보고서 게시물 확인", "attachment_parsed": false},
+    {"purpose": "예산·결산 심사 자료 준비", "title": "서구의회 예산안심의 안내", "url": "https://www.gjsc.or.kr/kr/intro/cmsFunction2.do", "verified_scope": "안내 페이지 열람; 법정기한 자동판정 근거로 사용하지 않음", "attachment_parsed": false},
+    {"purpose": "행정사무감사·질문응답·결과보고 업무 안내", "title": "서구의회 행정사무감사 및 조사 안내", "url": "https://www.gjsc.or.kr/kr/intro/cmsFunction3.do", "verified_scope": "안내 페이지 열람; 현행 법령 자체 검증과 구분", "attachment_parsed": false}
+  ],
+  "limitations": ["이 링크는 추가 확인 경로입니다. 이번 검색에 해당 문서 본문이 수집·분석됐다는 뜻이 아닙니다.", "자료 제목·게시물 공개와 후속조치 이행 증명은 다릅니다."]
+}

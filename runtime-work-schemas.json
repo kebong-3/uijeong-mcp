@@ -1,0 +1,1500 @@
+{
+  "generation_method": "ACTUAL_INSTALLED_MCP_SDK",
+  "version": "2.5.0-rc.1",
+  "profile": "work",
+  "tool_count": 18,
+  "tools": [
+    {
+      "name": "council_audit_claims",
+      "title": null,
+      "description": "답변 문장별 원문 대조. 숫자가 없는 미연결 주장도 찾고 변형 인용·현재/과거 혼용을 표시.\n        claims=[{text,kind:direct_quote|historical_summary|current_statement,citation_id,support_excerpt,start_char(선택)}].\n        citation_id는 council_prepare_response 결과 citations의 E:... 또는 제공자료 F:<id>를 사용.\n        facts=[{id,text,document_ref,as_of:'YYYY-MM-DD',unit,fiscal_year}]. snapshot_ids 최대4개.\n        정확한 문자열·위치만 검증하고 의미적 입증·최종승인은 하지 않는다. 내부 입력 저장 없음.\n        ",
+      "inputSchema": {
+        "properties": {
+          "draft": {
+            "title": "Draft",
+            "type": "string"
+          },
+          "claims": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Claims",
+            "type": "array"
+          },
+          "snapshot_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Snapshot Ids"
+          },
+          "facts": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Facts"
+          },
+          "as_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "As Of"
+          },
+          "max_age_days": {
+            "default": 180,
+            "title": "Max Age Days",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "draft",
+          "claims"
+        ],
+        "title": "council_audit_claimsArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "council_audit_claimsDictOutput",
+        "type": "object"
+      },
+      "icons": null,
+      "annotations": {
+        "title": null,
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "meta": null,
+      "execution": null
+    },
+    {
+      "name": "council_build_issue_card",
+      "title": null,
+      "description": "실제 검색 근거(event_id 1~8개)에 현재 자료를 붙여 쟁점별 답변카드를 만든다.\n  facts=[{id,text,document_ref,as_of:'YYYY-MM-DD',unit,fiscal_year}]. facts는 담당자 제공자료로 표시하며 공식검증으로 승격하지 않는다.\n  자동 답변 확정 없이 확인된 원문과 빈 답변 작성칸·누락자료를 제공한다. 비공개 입력은 저장하지 않는다.",
+      "inputSchema": {
+        "properties": {
+          "snapshot_id": {
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "event_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Event Ids",
+            "type": "array"
+          },
+          "topic": {
+            "title": "Topic",
+            "type": "string"
+          },
+          "department": {
+            "title": "Department",
+            "type": "string"
+          },
+          "meeting_type": {
+            "default": "행정사무감사",
+            "title": "Meeting Type",
+            "type": "string"
+          },
+          "facts": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Facts"
+          }
+        },
+        "required": [
+          "snapshot_id",
+          "event_ids",
+          "topic",
+          "department"
+        ],
+        "title": "council_build_issue_cardArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "council_build_issue_cardDictOutput",
+        "type": "object"
+      },
+      "icons": null,
+      "annotations": {
+        "title": null,
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "meta": null,
+      "execution": null
+    },
+    {
+      "name": "council_check_figures",
+      "title": null,
+      "description": "답변자료의 증감액·증감률·집행잔액·집행률 산술검사(최대30행).\n  data=[{name,unit,current,previous,reported_change(선택),fiscal_year,previous_year,current_basis,previous_basis,\n  budget(선택),executed(선택)}]. 금액은 쉼표 없는 숫자 문자열 또는 정수. 동일 행 동일 단위.\n  현재와 전년 또는 예산과 집행액 쌍 필요. 0 기준 비율은 null; 원자료 검증·법률판정 없음.",
+      "inputSchema": {
+        "properties": {
+          "data": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Data",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "council_check_figuresArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "council_check_figuresDictOutput",
+        "type": "object"
+      },
+      "icons": null,
+      "annotations": {
+        "title": null,
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "meta": null,
+      "execution": null
+    },
+    {
+      "name": "council_compare_evidence",
+      "title": null,
+      "description": "과거 답변·다른 회의 발언을 원문 그대로 나란히 대조한다.\n        pairs=[{left:{citation_id,excerpt},right:{citation_id,excerpt}}], 1~12쌍.\n        citation_id는 council_prepare_response의 citations에서 선택. snapshot_ids 최대4개.\n        원문에 없는 발췌 거부, 숫자·조건·부정 표현 단서를 표시하되 모순·미이행을 확정하지 않는다.\n        ",
+      "inputSchema": {
+        "properties": {
+          "snapshot_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Snapshot Ids",
+            "type": "array"
+          },
+          "pairs": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Pairs",
+            "type": "array"
+          }
+        },
+        "required": [
+          "snapshot_ids",
+          "pairs"
+        ],
+        "title": "council_compare_evidenceArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "council_compare_evidenceDictOutput",
+        "type": "object"
+      },
+      "icons": null,
+      "annotations": {
+        "title": null,
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "meta": null,
+      "execution": null
+    },
+    {
+      "name": "council_compare_metrics",
+      "title": null,
+      "description": "비교 기준이 같은 예산·성과 수치만 계산(1~30행). 금액 단위 환산·%p·0분모 처리.\n        data=[{name,mode:year_over_year|same_period,previous:{value,unit,fiscal_year,metric,entity,population,\n        period_basis,accounting_basis,document_ref},current:{동일 필드}}].\n        단위=원/천원/만원/백만원/억원/명/건/개/개소/%/회. value는 정수 또는 숫자 문자열.\n        period_basis 예 연간/1~8월누적, accounting_basis 예 최종예산/본예산/실인원.\n        필수 비교기준 누락·불일치 시 계산값을 비워 잘못된 비교를 차단. 제공자료 진위 검증 없음.\n        ",
+      "inputSchema": {
+        "properties": {
+          "data": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Data",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "council_compare_metricsArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "council_compare_metricsDictOutput",
+        "type": "object"
+      },
+      "icons": null,
+      "annotations": {
+        "title": null,
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "meta": null,
+      "execution": null
+    },
+    {
+      "name": "council_department_brief",
+      "title": null,
+      "description": "【부서 기준 진입】 검색어 없이 소관 부서만으로 그 부서가 의회에서 받은 질의·답변·후속조치를 모은다.\n        실무 단위는 주제어가 아니라 소관 부서이므로, 사업명을 모를 때 여기서 시작한다.\n        부서명(예: '기획실', '노인복지과')을 검색어로 회의록을 찾은 뒤 답변자 직함으로 우리 부서 건을 가려내며,\n        같은 부서의 팀장 표기도 후보로 포함한다. 과거 명칭은 department_aliases=[{name,valid_from,valid_to,basis}].\n        별칭은 검색과 최종분류 모두에 사용하며 사용자 제공 이력으로 표시한다(최대2개).\n        extra_terms는 적용기간 없는 과거 명칭의 호환 인자다. source_offset/site_start_page로 이어검색한다.\n        answered=우리 부서가 답한 질의, unanswered=부서가 거론됐으나 이번 범위에서 답변 미연결,\n        other_mention=다른 발언자가 답한 거론 건. 의원 개인 단위 집계는 하지 않는다.",
+      "inputSchema": {
+        "properties": {
+          "department": {
+            "title": "Department",
+            "type": "string"
+          },
+          "council": {
+            "default": "광주 서구",
+            "title": "Council",
+            "type": "string"
+          },
+          "date_from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Date From"
+          },
+          "date_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Date To"
+          },
+          "committee": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Committee"
+          },
+          "extra_terms": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Extra Terms"
+          },
+          "max_docs": {
+            "default": 6,
+            "title": "Max Docs",
+            "type": "integer"
+          },
+          "source": {
+            "default": "auto",
+            "title": "Source",
+            "type": "string"
+          },
+          "limit": {
+            "default": 8,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "department_aliases": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Department Aliases"
+          },
+          "source_offset": {
+            "default": 0,
+            "title": "Source Offset",
+            "type": "integer"
+          },
+          "site_start_page": {
+            "default": 1,
+            "title": "Site Start Page",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "department"
+        ],
+        "title": "council_department_briefArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "council_department_briefDictOutput",
+        "type": "object"
+      },
+      "icons": null,
+      "annotations": {
+        "title": null,
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "meta": null,
+      "execution": null
+    },
+    {
+      "name": "council_evidence_bundle",
+      "title": null,
+      "description": "근거 중심 통합검색. source=auto|clik|site. 네 검색모드에 동일한 발언 규칙 적용.\n        max_docs=출처·검색어별 최대 상세 건수(1~15); search_terms=사용자가 승인한 추가 검색어 최대2개.\n        snapshot_id+item_offset으로 동일 결과를 재조회 없이 이어보기. 원래 검색조건도 그대로 전달.\n        coverage.next_offset/source_offset, next_page/site_start_page로 미조회 목록을 계속 검색.\n        검색 결과의 PARTIAL·오류·미확인 범위를 최종 답변에 반드시 포함한다.\n        ",
+      "inputSchema": {
+        "properties": {
+          "keyword": {
+            "title": "Keyword",
+            "type": "string"
+          },
+          "council": {
+            "default": "광주 서구",
+            "title": "Council",
+            "type": "string"
+          },
+          "mode": {
+            "default": "질의답변",
+            "title": "Mode",
+            "type": "string"
+          },
+          "answerer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Answerer"
+          },
+          "committee": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Committee"
+          },
+          "date_from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Date From"
+          },
+          "date_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Date To"
+          },
+          "max_docs": {
+            "default": 6,
+            "title": "Max Docs",
+            "type": "integer"
+          },
+          "source": {
+            "default": "auto",
+            "title": "Source",
+            "type": "string"
+          },
+          "search_terms": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Search Terms"
+          },
+          "snapshot_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Snapshot Id"
+          },
+          "item_offset": {
+            "default": 0,
+            "title": "Item Offset",
+            "type": "integer"
+          },
+          "limit": {
+            "default": 10,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "source_offset": {
+            "default": 0,
+            "title": "Source Offset",
+            "type": "integer"
+          },
+          "site_start_page": {
+            "default": 1,
+            "title": "Site Start Page",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "keyword"
+        ],
+        "title": "council_evidence_bundleArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "council_evidence_bundleDictOutput",
+        "type": "object"
+      },
+      "icons": null,
+      "annotations": {
+        "title": null,
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "meta": null,
+      "execution": null
+    },
+    {
+      "name": "council_find_council",
+      "title": null,
+      "description": "지방의회 이름으로 CLIK 의회 ID를 찾습니다(API 호출 없음).\n    예: '광주 서구', '광주광역시 서구의회', '수원시의회', '경기도의회', '062006'.\n    광주·전남 기관은 현 명칭 '전남광주통합특별시 ○○의회'로 등록돼 있고,\n    통합 전 광역의회 회의록은 '광주광역시의회(통합 전) 062001', '전라남도의회(통합 전) 061001'로 조회합니다.",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "council_find_councilArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "council_find_councilOutput",
+        "type": "object"
+      },
+      "icons": null,
+      "annotations": {
+        "title": null,
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "meta": null,
+      "execution": null
+    },
+    {
+      "name": "council_format_worksheet",
+      "title": null,
+      "description": "확인된 근거와 제공자료를 기관 회의자료 서식 칸에 배치하고 붙여넣을 본문(plain_text)을 만든다.\n  form=5분자유발언_회의자료/구정질문_답변서/행정사무감사_답변카드/1페이지_검토보고.\n  snapshot_id+event_ids를 주면 실제 발언을 개요·질의요지 칸에, facts는 현황 칸에 넣는다.\n  검토의견·답변요지처럼 판단이 필요한 칸은 비운 채 담당자 확인 대상으로 남기며 문장을 만들어 넣지 않는다.\n  두 글자 항목명은 네 글자 폭으로 벌려 표기한다. 기관마다 서식이 다르므로 제출 전 소속 양식과 대조한다.",
+      "inputSchema": {
+        "properties": {
+          "form": {
+            "title": "Form",
+            "type": "string"
+          },
+          "topic": {
+            "title": "Topic",
+            "type": "string"
+          },
+          "department": {
+            "title": "Department",
+            "type": "string"
+          },
+          "council": {
+            "default": "광주 서구",
+            "title": "Council",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Snapshot Id"
+          },
+          "event_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Event Ids"
+          },
+          "facts": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Facts"
+          },
+          "prepared_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Prepared On"
+          },
+          "department_aliases": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Department Aliases"
+          }
+        },
+        "required": [
+          "form",
+          "topic",
+          "department"
+        ],
+        "title": "council_format_worksheetArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "council_format_worksheetDictOutput",
+        "type": "object"
+      },
+      "icons": null,
+      "annotations": {
+        "title": null,
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "meta": null,
+      "execution": null
+    },
+    {
+      "name": "council_get_evidence",
+      "title": null,
+      "description": "검색 결과의 snapshot_id만으로 원래 근거를 이어보기. collection=items 또는 followup_items.\n  후속조치 검토에 쓸 event_id를 얻는다. 실제 저장 결과를 재사용하며 외부 API를 호출하지 않는다.",
+      "inputSchema": {
+        "properties": {
+          "snapshot_id": {
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "collection": {
+            "default": "items",
+            "title": "Collection",
+            "type": "string"
+          },
+          "item_offset": {
+            "default": 0,
+            "title": "Item Offset",
+            "type": "integer"
+          },
+          "limit": {
+            "default": 5,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "snapshot_id"
+        ],
+        "title": "council_get_evidenceArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "council_get_evidenceDictOutput",
+        "type": "object"
+      },
+      "icons": null,
+      "annotations": {
+        "title": null,
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "meta": null,
+      "execution": null
+    },
+    {
+      "name": "council_plan_session",
+      "title": null,
+      "description": "회기 전 준비표. topics 1~10개, 용도=행정사무감사/예산심사/결산심사/조례심사/구정질문/5분자유발언/업무보고.\n  council은 시·도와 시·군·구를 함께 지정한다(기본 광주 서구). 제안 일정과 준비질문·필요자료를 만든다. 법정 기한 또는 실제 의원 질문을 예측하지 않는다. 입력은 저장하지 않는다.",
+      "inputSchema": {
+        "properties": {
+          "department": {
+            "title": "Department",
+            "type": "string"
+          },
+          "topics": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Topics",
+            "type": "array"
+          },
+          "meeting_type": {
+            "default": "행정사무감사",
+            "title": "Meeting Type",
+            "type": "string"
+          },
+          "meeting_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Meeting Date"
+          },
+          "council": {
+            "default": "광주 서구",
+            "title": "Council",
+            "type": "string"
+          }
+        },
+        "required": [
+          "department",
+          "topics"
+        ],
+        "title": "council_plan_sessionArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "council_plan_sessionDictOutput",
+        "type": "object"
+      },
+      "icons": null,
+      "annotations": {
+        "title": null,
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "meta": null,
+      "execution": null
+    },
+    {
+      "name": "council_prepare_pack",
+      "title": null,
+      "description": "근거 있는 답변준비 자료 묶음: 실무검토 초안·질문 후보·후속조치 확인표.\n        의회 요구를 회피하거나 의원 성향을 분석하지 않는다. 현황·수치·이행은 담당자 확인칸으로 남긴다.\n        snapshot_id 사용 시 같은 검색조건의 질의답변 bundle(기본 source=auto)을 지정한다.\n        각 절은 한 번만 제공하며 max_evidence(1~50)로 인용 행수를 조절한다.\n        생략된 근거는 evidence_totals와 response_budget에 건수·회수경로로 남는다.",
+      "inputSchema": {
+        "properties": {
+          "keyword": {
+            "title": "Keyword",
+            "type": "string"
+          },
+          "council": {
+            "default": "광주 서구",
+            "title": "Council",
+            "type": "string"
+          },
+          "date_from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Date From"
+          },
+          "date_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Date To"
+          },
+          "committee": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Committee"
+          },
+          "answerer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Answerer"
+          },
+          "max_docs": {
+            "default": 6,
+            "title": "Max Docs",
+            "type": "integer"
+          },
+          "snapshot_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Snapshot Id"
+          },
+          "max_evidence": {
+            "default": 12,
+            "title": "Max Evidence",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "keyword"
+        ],
+        "title": "council_prepare_packArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "council_prepare_packDictOutput",
+        "type": "object"
+      },
+      "icons": null,
+      "annotations": {
+        "title": null,
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "meta": null,
+      "execution": null
+    },
+    {
+      "name": "council_prepare_response",
+      "title": null,
+      "description": "의회 답변 준비의 기본 진입. 기간별 검색→인용ID→과거질답·현황·준비질문·확인사항을 한 번에 작성.\n        topic은 사업명·쟁점어, department는 작성부서(소관 확정 또는 부서 필터가 아님).\n        date_from/date_to는 YYYY-MM-DD. source=auto|clik|site, max_docs=1~15(출처별).\n        facts=[{id,text,document_ref,as_of,unit,fiscal_year}], 담당자 제공자료이며 서버 미검증.\n        같은 조건+snapshot_id+event_offset으로 검색 재호출 없이 이어보기. next_actions는 남은 수집 경로.\n        plain_text는 출처를 붙인 서구 보고서형 준비자료. 정책 판단·현재 답변을 지어내지 않는다.\n        ",
+      "inputSchema": {
+        "properties": {
+          "topic": {
+            "title": "Topic",
+            "type": "string"
+          },
+          "department": {
+            "title": "Department",
+            "type": "string"
+          },
+          "date_from": {
+            "title": "Date From",
+            "type": "string"
+          },
+          "date_to": {
+            "title": "Date To",
+            "type": "string"
+          },
+          "council": {
+            "default": "광주 서구",
+            "title": "Council",
+            "type": "string"
+          },
+          "meeting_type": {
+            "default": "행정사무감사",
+            "title": "Meeting Type",
+            "type": "string"
+          },
+          "committee": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Committee"
+          },
+          "source": {
+            "default": "auto",
+            "title": "Source",
+            "type": "string"
+          },
+          "max_docs": {
+            "default": 6,
+            "title": "Max Docs",
+            "type": "integer"
+          },
+          "facts": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Facts"
+          },
+          "as_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "As Of"
+          },
+          "snapshot_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Snapshot Id"
+          },
+          "event_offset": {
+            "default": 0,
+            "title": "Event Offset",
+            "type": "integer"
+          },
+          "max_events": {
+            "default": 6,
+            "title": "Max Events",
+            "type": "integer"
+          },
+          "source_offset": {
+            "default": 0,
+            "title": "Source Offset",
+            "type": "integer"
+          },
+          "site_start_page": {
+            "default": 1,
+            "title": "Site Start Page",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "topic",
+          "department",
+          "date_from",
+          "date_to"
+        ],
+        "title": "council_prepare_responseArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "council_prepare_responseDictOutput",
+        "type": "object"
+      },
+      "icons": null,
+      "annotations": {
+        "title": null,
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "meta": null,
+      "execution": null
+    },
+    {
+      "name": "council_read_source",
+      "title": null,
+      "description": "CLIK docid, site:key 또는 서구의회 공식 URL에서 원문 발언을 끝까지 이어읽기.\n        next_start_turn/next_start_char를 그대로 전달한다. body_hash가 바뀌면 원문이 갱신된 것이다.",
+      "inputSchema": {
+        "properties": {
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "keyword": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Keyword"
+          },
+          "start_turn": {
+            "default": 0,
+            "title": "Start Turn",
+            "type": "integer"
+          },
+          "start_char": {
+            "default": 0,
+            "title": "Start Char",
+            "type": "integer"
+          },
+          "max_turns": {
+            "default": 30,
+            "title": "Max Turns",
+            "type": "integer"
+          },
+          "max_chars": {
+            "default": 12000,
+            "title": "Max Chars",
+            "type": "integer"
+          },
+          "whole_agenda": {
+            "default": false,
+            "title": "Whole Agenda",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ref"
+        ],
+        "title": "council_read_sourceArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "council_read_sourceDictOutput",
+        "type": "object"
+      },
+      "icons": null,
+      "annotations": {
+        "title": null,
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "meta": null,
+      "execution": null
+    },
+    {
+      "name": "council_recurring_issues",
+      "title": null,
+      "description": "반복 주제어 후보를 찾는다. 같은 요구·요구방향·미이행을 자동 판정하지 않는다.\n        department 또는 keyword 중 하나만 지정한다. 최근2년은 years=2, period_mode=rolling_years;\n        명시기간은 date_from+date_to. 기본 calendar_years는 완료된 달력연도(기존 호환).\n        부서 별칭은 department_aliases=[{name,valid_from,valid_to,basis}], 최대2개.\n        반대 문면 단서와 원문을 함께 보여주고 동일 요구 여부는 담당자가 확인한다.",
+      "inputSchema": {
+        "properties": {
+          "department": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Department"
+          },
+          "keyword": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Keyword"
+          },
+          "council": {
+            "default": "광주 서구",
+            "title": "Council",
+            "type": "string"
+          },
+          "years": {
+            "default": 3,
+            "title": "Years",
+            "type": "integer"
+          },
+          "include_current_year": {
+            "default": false,
+            "title": "Include Current Year",
+            "type": "boolean"
+          },
+          "as_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "As Of"
+          },
+          "committee": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Committee"
+          },
+          "min_years": {
+            "default": 2,
+            "title": "Min Years",
+            "type": "integer"
+          },
+          "top": {
+            "default": 12,
+            "title": "Top",
+            "type": "integer"
+          },
+          "max_docs_per_year": {
+            "default": 4,
+            "title": "Max Docs Per Year",
+            "type": "integer"
+          },
+          "period_mode": {
+            "default": "calendar_years",
+            "title": "Period Mode",
+            "type": "string"
+          },
+          "date_from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Date From"
+          },
+          "date_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Date To"
+          },
+          "department_aliases": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Department Aliases"
+          },
+          "extra_terms": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Extra Terms"
+          },
+          "source": {
+            "default": "auto",
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "title": "council_recurring_issuesArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "council_recurring_issuesDictOutput",
+        "type": "object"
+      },
+      "icons": null,
+      "annotations": {
+        "title": null,
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "meta": null,
+      "execution": null
+    },
+    {
+      "name": "council_review_answer",
+      "title": null,
+      "description": "답변 초안의 숫자·단위·근거 연결·확약·설명 부족 표현을 점검한다(승인·법률판정 아님).\n  facts=[{id,text,document_ref,as_of,unit,fiscal_year}]. claims=[{text,fact_id,support_excerpt,start_char(선택)}].\n  같은 숫자가 발견돼도 사업·연도·분모가 같다는 뜻이 아니다. 원문 자동변경 없음. 입력 저장·외부 전송 없음.",
+      "inputSchema": {
+        "properties": {
+          "draft": {
+            "title": "Draft",
+            "type": "string"
+          },
+          "facts": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Facts"
+          },
+          "claims": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Claims"
+          },
+          "snapshot_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Snapshot Id"
+          },
+          "event_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Event Ids"
+          }
+        },
+        "required": [
+          "draft"
+        ],
+        "title": "council_review_answerArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "council_review_answerDictOutput",
+        "type": "object"
+      },
+      "icons": null,
+      "annotations": {
+        "title": null,
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "meta": null,
+      "execution": null
+    },
+    {
+      "name": "council_review_followups",
+      "title": null,
+      "description": "회의 후 후속조치 증빙 확인표. get_evidence(collection='followup_items')의 event_id로 연결한다.\n  updates=[{event_id,reported_status:미확인/검토중/추진중/완료보고/보류,owner_department,due_date,due_basis,\n  evidence:[{document_ref,excerpt,reviewer,checked_at}]}]. as_of=YYYY-MM-DD.\n  완료보고와 증빙 구비를 구분하며 실제 이행완료를 자동 판정하지 않는다. 입력 저장 없음.",
+      "inputSchema": {
+        "properties": {
+          "snapshot_id": {
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "updates": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Updates",
+            "type": "array"
+          },
+          "as_of": {
+            "title": "As Of",
+            "type": "string"
+          }
+        },
+        "required": [
+          "snapshot_id",
+          "updates",
+          "as_of"
+        ],
+        "title": "council_review_followupsArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "council_review_followupsDictOutput",
+        "type": "object"
+      },
+      "icons": null,
+      "annotations": {
+        "title": null,
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "meta": null,
+      "execution": null
+    },
+    {
+      "name": "council_status",
+      "title": null,
+      "description": "버전·코드·도구명세 해시·저장방식·API 설정 점검. live=True일 때만 실제 CLIK 1회·홈페이지 목록 조회.\n        키 자체를 출력하지 않는다. 배포 커밋과 해시를 배포 패키지 manifest와 대조한다.",
+      "inputSchema": {
+        "properties": {
+          "test_council": {
+            "default": "광주 서구",
+            "title": "Test Council",
+            "type": "string"
+          },
+          "live": {
+            "default": false,
+            "title": "Live",
+            "type": "boolean"
+          }
+        },
+        "title": "council_statusArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "council_statusDictOutput",
+        "type": "object"
+      },
+      "icons": null,
+      "annotations": {
+        "title": null,
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "meta": null,
+      "execution": null
+    }
+  ]
+}

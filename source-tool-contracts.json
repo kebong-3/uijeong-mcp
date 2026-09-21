@@ -1,0 +1,1379 @@
+{
+  "generation_method": "AST_SOURCE_NOT_RUNTIME_SDK",
+  "version": "2.5.0-rc.1",
+  "note": "SDK가 반환하는 JSON Schema의 실제 형식은 export_runtime_schemas.py 및 CI로 별도 확인.",
+  "profiles": {
+    "core": [
+      "council_evidence_bundle",
+      "council_find_council",
+      "council_prepare_pack",
+      "council_read_source",
+      "council_status"
+    ],
+    "work": [
+      "council_audit_claims",
+      "council_build_issue_card",
+      "council_check_figures",
+      "council_compare_evidence",
+      "council_compare_metrics",
+      "council_department_brief",
+      "council_evidence_bundle",
+      "council_find_council",
+      "council_format_worksheet",
+      "council_get_evidence",
+      "council_plan_session",
+      "council_prepare_pack",
+      "council_prepare_response",
+      "council_read_source",
+      "council_recurring_issues",
+      "council_review_answer",
+      "council_review_followups",
+      "council_status"
+    ],
+    "lite": [
+      "council_analyze_text",
+      "council_audit_claims",
+      "council_build_issue_card",
+      "council_check_figures",
+      "council_compare_evidence",
+      "council_compare_metrics",
+      "council_data_sources",
+      "council_department_brief",
+      "council_evidence_bundle",
+      "council_evidence_search",
+      "council_find_commitments",
+      "council_find_council",
+      "council_format_worksheet",
+      "council_get_evidence",
+      "council_issue_radar",
+      "council_open_record",
+      "council_period_review",
+      "council_plan_session",
+      "council_prepare_briefing",
+      "council_prepare_pack",
+      "council_prepare_response",
+      "council_read_source",
+      "council_recurring_issues",
+      "council_review_answer",
+      "council_review_followups",
+      "council_status"
+    ],
+    "full": [
+      "council_analyze_text",
+      "council_audit_claims",
+      "council_build_issue_card",
+      "council_check_figures",
+      "council_compare_evidence",
+      "council_compare_metrics",
+      "council_data_sources",
+      "council_department_brief",
+      "council_discover_minutes_links",
+      "council_evidence_bundle",
+      "council_evidence_search",
+      "council_find_commitments",
+      "council_find_council",
+      "council_find_qa",
+      "council_format_worksheet",
+      "council_get_bill",
+      "council_get_evidence",
+      "council_issue_radar",
+      "council_open_record",
+      "council_period_review",
+      "council_plan_session",
+      "council_prepare_briefing",
+      "council_prepare_pack",
+      "council_prepare_response",
+      "council_read_minutes",
+      "council_read_source",
+      "council_recurring_issues",
+      "council_review_answer",
+      "council_review_followups",
+      "council_search_bills",
+      "council_search_local",
+      "council_search_minutes",
+      "council_search_policy",
+      "council_status",
+      "council_topic_history",
+      "seogu_council_read",
+      "seogu_council_recent",
+      "seogu_council_search"
+    ]
+  },
+  "tools": [
+    {
+      "name": "council_analyze_text",
+      "parameters": {
+        "minutes_text": {
+          "annotation": "str"
+        },
+        "keyword": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "title": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "source_kind": {
+          "annotation": "str",
+          "default": "사용자 제공"
+        }
+      },
+      "required": [
+        "minutes_text"
+      ],
+      "description": "의회 홈페이지에서 담당자가 직접 복사한 회의록 원문(텍스트 또는 HTML)을 분석합니다(API 호출 없음).\n최신 회의록이 CLIK에 아직 올라오지 않았거나, 특정 회의를 바로 정리하고 싶을 때 씁니다.\n발언자 분해 → 5분자유발언 · 제안·질의↔답변 묶음 · 후속조치 약속 문장을 뽑습니다.\nArgs:\n  minutes_text: 회의록 본문(예: 서구의회 '제342회 의회운영위원회 제3차(2026.09.03.)' 화면 전체 복사)\n  keyword: 특정 주제만 보고 싶을 때(선택)\n  title: 회의명(선택, 본문 첫머리에 없을 때)\n  source_kind: '사용자 제공'(기본) | '합성·시험'. 서버는 붙여넣은 글이 공식 원문인지 검증할 수 없으므로\n               어떤 경우에도 '공식 회의록'으로 표시하지 않습니다.\n※ 의원 개인 평가 없이, 회의 정보와 함께 인용하세요."
+    },
+    {
+      "name": "council_audit_claims",
+      "parameters": {
+        "draft": {
+          "annotation": "str"
+        },
+        "claims": {
+          "annotation": "list[dict[str, Any]]"
+        },
+        "snapshot_ids": {
+          "annotation": "Optional[list[str]]",
+          "default": null
+        },
+        "facts": {
+          "annotation": "Optional[list[dict[str, Any]]]",
+          "default": null
+        },
+        "as_of": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "max_age_days": {
+          "annotation": "int",
+          "default": 180
+        }
+      },
+      "required": [
+        "draft",
+        "claims"
+      ],
+      "description": "답변 문장별 원문 대조. 숫자가 없는 미연결 주장도 찾고 변형 인용·현재/과거 혼용을 표시.\nclaims=[{text,kind:direct_quote|historical_summary|current_statement,citation_id,support_excerpt,start_char(선택)}].\ncitation_id는 council_prepare_response 결과 citations의 E:... 또는 제공자료 F:<id>를 사용.\nfacts=[{id,text,document_ref,as_of:'YYYY-MM-DD',unit,fiscal_year}]. snapshot_ids 최대4개.\n정확한 문자열·위치만 검증하고 의미적 입증·최종승인은 하지 않는다. 내부 입력 저장 없음."
+    },
+    {
+      "name": "council_build_issue_card",
+      "parameters": {
+        "snapshot_id": {
+          "annotation": "str"
+        },
+        "event_ids": {
+          "annotation": "list[str]"
+        },
+        "topic": {
+          "annotation": "str"
+        },
+        "department": {
+          "annotation": "str"
+        },
+        "meeting_type": {
+          "annotation": "str",
+          "default": "행정사무감사"
+        },
+        "facts": {
+          "annotation": "Optional[list[dict[str, Any]]]",
+          "default": null
+        }
+      },
+      "required": [
+        "snapshot_id",
+        "event_ids",
+        "topic",
+        "department"
+      ],
+      "description": "실제 검색 근거(event_id 1~8개)에 현재 자료를 붙여 쟁점별 답변카드를 만든다.\nfacts=[{id,text,document_ref,as_of:'YYYY-MM-DD',unit,fiscal_year}]. facts는 담당자 제공자료로 표시하며 공식검증으로 승격하지 않는다.\n자동 답변 확정 없이 확인된 원문과 빈 답변 작성칸·누락자료를 제공한다. 비공개 입력은 저장하지 않는다."
+    },
+    {
+      "name": "council_check_figures",
+      "parameters": {
+        "data": {
+          "annotation": "list[dict[str, Any]]"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "description": "답변자료의 증감액·증감률·집행잔액·집행률 산술검사(최대30행).\ndata=[{name,unit,current,previous,reported_change(선택),fiscal_year,previous_year,current_basis,previous_basis,\nbudget(선택),executed(선택)}]. 금액은 쉼표 없는 숫자 문자열 또는 정수. 동일 행 동일 단위.\n현재와 전년 또는 예산과 집행액 쌍 필요. 0 기준 비율은 null; 원자료 검증·법률판정 없음."
+    },
+    {
+      "name": "council_compare_evidence",
+      "parameters": {
+        "snapshot_ids": {
+          "annotation": "list[str]"
+        },
+        "pairs": {
+          "annotation": "list[dict[str, Any]]"
+        }
+      },
+      "required": [
+        "snapshot_ids",
+        "pairs"
+      ],
+      "description": "과거 답변·다른 회의 발언을 원문 그대로 나란히 대조한다.\npairs=[{left:{citation_id,excerpt},right:{citation_id,excerpt}}], 1~12쌍.\ncitation_id는 council_prepare_response의 citations에서 선택. snapshot_ids 최대4개.\n원문에 없는 발췌 거부, 숫자·조건·부정 표현 단서를 표시하되 모순·미이행을 확정하지 않는다."
+    },
+    {
+      "name": "council_compare_metrics",
+      "parameters": {
+        "data": {
+          "annotation": "list[dict[str, Any]]"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "description": "비교 기준이 같은 예산·성과 수치만 계산(1~30행). 금액 단위 환산·%p·0분모 처리.\ndata=[{name,mode:year_over_year|same_period,previous:{value,unit,fiscal_year,metric,entity,population,\nperiod_basis,accounting_basis,document_ref},current:{동일 필드}}].\n단위=원/천원/만원/백만원/억원/명/건/개/개소/%/회. value는 정수 또는 숫자 문자열.\nperiod_basis 예 연간/1~8월누적, accounting_basis 예 최종예산/본예산/실인원.\n필수 비교기준 누락·불일치 시 계산값을 비워 잘못된 비교를 차단. 제공자료 진위 검증 없음."
+    },
+    {
+      "name": "council_data_sources",
+      "parameters": {
+        "query": {
+          "annotation": "str",
+          "default": ""
+        },
+        "region": {
+          "annotation": "str",
+          "default": ""
+        },
+        "direct_only": {
+          "annotation": "bool",
+          "default": false
+        },
+        "offset": {
+          "annotation": "int",
+          "default": 0
+        },
+        "limit": {
+          "annotation": "int",
+          "default": 20
+        }
+      },
+      "required": [],
+      "description": "공식 의회 코드·홈페이지·회의록 진입주소와 현재 지원 어댑터를 조회한다.\n등록된 사이트 수와 자동 원문 수집 지원 수는 다르다. next_offset으로 전체 목록 확인."
+    },
+    {
+      "name": "council_department_brief",
+      "parameters": {
+        "department": {
+          "annotation": "str"
+        },
+        "council": {
+          "annotation": "str",
+          "default": "광주 서구"
+        },
+        "date_from": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "date_to": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "committee": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "extra_terms": {
+          "annotation": "Optional[list[str]]",
+          "default": null
+        },
+        "max_docs": {
+          "annotation": "int",
+          "default": 6
+        },
+        "source": {
+          "annotation": "str",
+          "default": "auto"
+        },
+        "limit": {
+          "annotation": "int",
+          "default": 8
+        },
+        "department_aliases": {
+          "annotation": "Optional[list[dict[str, Any]]]",
+          "default": null
+        },
+        "source_offset": {
+          "annotation": "int",
+          "default": 0
+        },
+        "site_start_page": {
+          "annotation": "int",
+          "default": 1
+        }
+      },
+      "required": [
+        "department"
+      ],
+      "description": "【부서 기준 진입】 검색어 없이 소관 부서만으로 그 부서가 의회에서 받은 질의·답변·후속조치를 모은다.\n실무 단위는 주제어가 아니라 소관 부서이므로, 사업명을 모를 때 여기서 시작한다.\n부서명(예: '기획실', '노인복지과')을 검색어로 회의록을 찾은 뒤 답변자 직함으로 우리 부서 건을 가려내며,\n같은 부서의 팀장 표기도 후보로 포함한다. 과거 명칭은 department_aliases=[{name,valid_from,valid_to,basis}].\n별칭은 검색과 최종분류 모두에 사용하며 사용자 제공 이력으로 표시한다(최대2개).\nextra_terms는 적용기간 없는 과거 명칭의 호환 인자다. source_offset/site_start_page로 이어검색한다.\nanswered=우리 부서가 답한 질의, unanswered=부서가 거론됐으나 이번 범위에서 답변 미연결,\nother_mention=다른 발언자가 답한 거론 건. 의원 개인 단위 집계는 하지 않는다."
+    },
+    {
+      "name": "council_discover_minutes_links",
+      "parameters": {
+        "page_html": {
+          "annotation": "str"
+        },
+        "base_url": {
+          "annotation": "str"
+        },
+        "limit": {
+          "annotation": "int",
+          "default": 30
+        }
+      },
+      "required": [
+        "page_html",
+        "base_url"
+      ],
+      "description": "담당자가 제공한 공식 홈페이지 HTML에서 회의록 진입 링크를 찾는다(네트워크 호출 없음).\n링크 발견은 회의록 원문 열람·연동 완료를 의미하지 않는다."
+    },
+    {
+      "name": "council_evidence_bundle",
+      "parameters": {
+        "keyword": {
+          "annotation": "str"
+        },
+        "council": {
+          "annotation": "str",
+          "default": "광주 서구"
+        },
+        "mode": {
+          "annotation": "str",
+          "default": "질의답변"
+        },
+        "answerer": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "committee": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "date_from": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "date_to": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "max_docs": {
+          "annotation": "int",
+          "default": 6
+        },
+        "source": {
+          "annotation": "str",
+          "default": "auto"
+        },
+        "search_terms": {
+          "annotation": "Optional[list[str]]",
+          "default": null
+        },
+        "snapshot_id": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "item_offset": {
+          "annotation": "int",
+          "default": 0
+        },
+        "limit": {
+          "annotation": "int",
+          "default": 10
+        },
+        "source_offset": {
+          "annotation": "int",
+          "default": 0
+        },
+        "site_start_page": {
+          "annotation": "int",
+          "default": 1
+        }
+      },
+      "required": [
+        "keyword"
+      ],
+      "description": "근거 중심 통합검색. source=auto|clik|site. 네 검색모드에 동일한 발언 규칙 적용.\nmax_docs=출처·검색어별 최대 상세 건수(1~15); search_terms=사용자가 승인한 추가 검색어 최대2개.\nsnapshot_id+item_offset으로 동일 결과를 재조회 없이 이어보기. 원래 검색조건도 그대로 전달.\ncoverage.next_offset/source_offset, next_page/site_start_page로 미조회 목록을 계속 검색.\n검색 결과의 PARTIAL·오류·미확인 범위를 최종 답변에 반드시 포함한다."
+    },
+    {
+      "name": "council_evidence_search",
+      "parameters": {
+        "keyword": {
+          "annotation": "str"
+        },
+        "council": {
+          "annotation": "str",
+          "default": "광주 서구"
+        },
+        "mode": {
+          "annotation": "str",
+          "default": "질의답변"
+        },
+        "answerer": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "committee": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "date_from": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "compare_councils": {
+          "annotation": "Optional[list[str]]",
+          "default": null
+        },
+        "depth": {
+          "annotation": "str",
+          "default": "보통"
+        },
+        "date_to": {
+          "annotation": "Optional[str]",
+          "default": null
+        }
+      },
+      "required": [
+        "keyword"
+      ],
+      "description": "통합 검색 호환 도구. 구조화 결과·안정된 근거 이어보기는 council_evidence_bundle 사용."
+    },
+    {
+      "name": "council_find_commitments",
+      "parameters": {
+        "council": {
+          "annotation": "str"
+        },
+        "keyword": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "meeting_type": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "date_from": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "max_docs": {
+          "annotation": "int",
+          "default": 6
+        },
+        "date_to": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "answerer": {
+          "annotation": "Optional[str]",
+          "default": null
+        }
+      },
+      "required": [
+        "council"
+      ],
+      "description": "질의에 대한 집행부 답변 중 후속조치 '후보'(자료제출·검토의사·조건부 추진·시행의사)를 기한과 함께 뽑습니다.\n현재 보고·전문위원 검토보고·부정·과거 인용은 제외하며, 이행 여부는 판정하지 않습니다.\nArgs:\n  council: 의회명(필수)\n  keyword: 주제어(선택, 비우면 최근 회의 전반)\n  meeting_type: '행정사무감사·조사' 등(선택)\n  date_from/date_to: 기간(선택)\n  max_docs: 열어볼 회의록 수(1~10)\n  answerer: 답변자 직함·부서(선택, 같은 부서 팀장 대리답변 포함)"
+    },
+    {
+      "name": "council_find_council",
+      "parameters": {
+        "query": {
+          "annotation": "str"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "description": "지방의회 이름으로 CLIK 의회 ID를 찾습니다(API 호출 없음).\n예: '광주 서구', '광주광역시 서구의회', '수원시의회', '경기도의회', '062006'.\n광주·전남 기관은 현 명칭 '전남광주통합특별시 ○○의회'로 등록돼 있고,\n통합 전 광역의회 회의록은 '광주광역시의회(통합 전) 062001', '전라남도의회(통합 전) 061001'로 조회합니다."
+    },
+    {
+      "name": "council_find_qa",
+      "parameters": {
+        "keyword": {
+          "annotation": "str"
+        },
+        "councils": {
+          "annotation": "Optional[list[str]]",
+          "default": null
+        },
+        "meeting_type": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "date_from": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "max_docs": {
+          "annotation": "int",
+          "default": 5
+        },
+        "max_pairs": {
+          "annotation": "int",
+          "default": 12
+        },
+        "answerer": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "date_to": {
+          "annotation": "Optional[str]",
+          "default": null
+        }
+      },
+      "required": [
+        "keyword"
+      ],
+      "description": "주제어가 담긴 '의원 제안·질의 ↔ 집행부 답변' 묶음을 찾아줍니다.\n같은 주제를 다른 지자체 집행부는 어떻게 답했는지 비교할 때 councils에 여러 의회를 넣으세요.\nArgs:\n  keyword: 주제어(예: '경로당 냉방비', '청년 월세')\n  councils: 의회명 목록(예: ['광주 서구','광주 북구','수원시']). 비우면 전국\n  meeting_type: '본회의' | '상임위원회' | '행정사무감사·조사' | '예산·결산' (선택)\n  date_from: 이 날짜 이후 회의만(선택)\n  max_docs: 열어볼 회의록 수(1~10, 회의록 1건 = API 1회)\n  max_pairs: 최대 표시 묶음 수\n  answerer: 답변자 직함·부서(선택, 예: '미래전략과장') — 같은 부서 팀장 대리답변도 함께 찾음\n  date_to: 이 날짜 이전 회의만(선택)\n※ '찾지 못함'은 확인한 회의록 범위의 결과이지 전체 부재가 아닙니다.\n※ 요약 시 의원 개인 평가·순위화 금지. 회의 정보와 docid를 함께 인용하세요."
+    },
+    {
+      "name": "council_format_worksheet",
+      "parameters": {
+        "form": {
+          "annotation": "str"
+        },
+        "topic": {
+          "annotation": "str"
+        },
+        "department": {
+          "annotation": "str"
+        },
+        "council": {
+          "annotation": "str",
+          "default": "광주 서구"
+        },
+        "snapshot_id": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "event_ids": {
+          "annotation": "Optional[list[str]]",
+          "default": null
+        },
+        "facts": {
+          "annotation": "Optional[list[dict[str, Any]]]",
+          "default": null
+        },
+        "prepared_on": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "department_aliases": {
+          "annotation": "Optional[list[dict[str, Any]]]",
+          "default": null
+        }
+      },
+      "required": [
+        "form",
+        "topic",
+        "department"
+      ],
+      "description": "확인된 근거와 제공자료를 기관 회의자료 서식 칸에 배치하고 붙여넣을 본문(plain_text)을 만든다.\nform=5분자유발언_회의자료/구정질문_답변서/행정사무감사_답변카드/1페이지_검토보고.\nsnapshot_id+event_ids를 주면 실제 발언을 개요·질의요지 칸에, facts는 현황 칸에 넣는다.\n검토의견·답변요지처럼 판단이 필요한 칸은 비운 채 담당자 확인 대상으로 남기며 문장을 만들어 넣지 않는다.\n두 글자 항목명은 네 글자 폭으로 벌려 표기한다. 기관마다 서식이 다르므로 제출 전 소속 양식과 대조한다."
+    },
+    {
+      "name": "council_get_bill",
+      "parameters": {
+        "docid": {
+          "annotation": "str"
+        }
+      },
+      "required": [
+        "docid"
+      ],
+      "description": "의안 1건의 처리경과(위원회·본회의 일자와 결과, 이송·공포)와 의안요지를 보여줍니다."
+    },
+    {
+      "name": "council_get_evidence",
+      "parameters": {
+        "snapshot_id": {
+          "annotation": "str"
+        },
+        "collection": {
+          "annotation": "str",
+          "default": "items"
+        },
+        "item_offset": {
+          "annotation": "int",
+          "default": 0
+        },
+        "limit": {
+          "annotation": "int",
+          "default": 5
+        }
+      },
+      "required": [
+        "snapshot_id"
+      ],
+      "description": "검색 결과의 snapshot_id만으로 원래 근거를 이어보기. collection=items 또는 followup_items.\n후속조치 검토에 쓸 event_id를 얻는다. 실제 저장 결과를 재사용하며 외부 API를 호출하지 않는다."
+    },
+    {
+      "name": "council_issue_radar",
+      "parameters": {
+        "council": {
+          "annotation": "str",
+          "default": "광주 서구"
+        },
+        "committee": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "date_from": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "max_meetings": {
+          "annotation": "int",
+          "default": 15
+        },
+        "top": {
+          "annotation": "int",
+          "default": 12
+        },
+        "date_to": {
+          "annotation": "Optional[str]",
+          "default": null
+        }
+      },
+      "required": [],
+      "description": "위원회별로 최근 의원 제안·질의에서 반복해서 등장한 주제어를 모아 '관심 현안 레이더'를 만듭니다.\n집계 단위는 위원회(회의명)이며 의원 개인별 집계·순위는 하지 않습니다.\nArgs:\n  council: 의회(기본 '광주 서구' — 홈페이지 최근 회의록 사용, 그 외는 CLIK 최근 회의록)\n  committee: 위원회명 일부(선택, 예: '사회도시')\n  date_from: 이 날짜 이후(선택)\n  max_meetings: 분석할 회의록 수(3~30)\n  top: 위원회별 표시 주제어 수\n※ 자동 추출 키워드이므로 해석 전에 council_evidence_search로 실제 발언을 확인하세요."
+    },
+    {
+      "name": "council_open_record",
+      "parameters": {
+        "ref": {
+          "annotation": "str"
+        },
+        "keyword": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "start_turn": {
+          "annotation": "int",
+          "default": 0
+        },
+        "start_char": {
+          "annotation": "int",
+          "default": 0
+        },
+        "max_chars": {
+          "annotation": "int",
+          "default": 12000
+        },
+        "whole_agenda": {
+          "annotation": "bool",
+          "default": false
+        }
+      },
+      "required": [
+        "ref"
+      ],
+      "description": "원문 열기 호환 도구. 정확한 이어읽기 위치는 결과의 next 값을 사용한다."
+    },
+    {
+      "name": "council_period_review",
+      "parameters": {
+        "keyword": {
+          "annotation": "str"
+        },
+        "council": {
+          "annotation": "str",
+          "default": "광주 서구"
+        },
+        "years": {
+          "annotation": "int",
+          "default": 3
+        },
+        "include_current_year": {
+          "annotation": "bool",
+          "default": true
+        },
+        "as_of": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "mode": {
+          "annotation": "str",
+          "default": "질의답변"
+        },
+        "committee": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "answerer": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "max_docs_per_year": {
+          "annotation": "int",
+          "default": 5
+        },
+        "period_mode": {
+          "annotation": "str",
+          "default": "calendar_years"
+        },
+        "date_from": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "date_to": {
+          "annotation": "Optional[str]",
+          "default": null
+        }
+      },
+      "required": [
+        "keyword"
+      ],
+      "description": "기간을 회의연도별로 나눠 동일 한도로 검색한다.\n최근 N년은 period_mode=rolling_years, 최근 N개 회의연도는 calendar_years.\ndate_from+date_to를 모두 주면 명시기간이 우선한다. 양 끝 날짜 포함, 한국시간 기준.\n반환된 period와 각 연도의 coverage·이어보기 정보를 확인한다."
+    },
+    {
+      "name": "council_plan_session",
+      "parameters": {
+        "department": {
+          "annotation": "str"
+        },
+        "topics": {
+          "annotation": "list[str]"
+        },
+        "meeting_type": {
+          "annotation": "str",
+          "default": "행정사무감사"
+        },
+        "meeting_date": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "council": {
+          "annotation": "str",
+          "default": "광주 서구"
+        }
+      },
+      "required": [
+        "department",
+        "topics"
+      ],
+      "description": "회기 전 준비표. topics 1~10개, 용도=행정사무감사/예산심사/결산심사/조례심사/구정질문/5분자유발언/업무보고.\ncouncil은 시·도와 시·군·구를 함께 지정한다(기본 광주 서구). 제안 일정과 준비질문·필요자료를 만든다. 법정 기한 또는 실제 의원 질문을 예측하지 않는다. 입력은 저장하지 않는다."
+    },
+    {
+      "name": "council_prepare_briefing",
+      "parameters": {
+        "council": {
+          "annotation": "str"
+        },
+        "keyword": {
+          "annotation": "str"
+        },
+        "purpose": {
+          "annotation": "str",
+          "default": "5분자유발언"
+        },
+        "compare_councils": {
+          "annotation": "Optional[list[str]]",
+          "default": null
+        },
+        "max_docs": {
+          "annotation": "int",
+          "default": 5
+        }
+      },
+      "required": [
+        "council",
+        "keyword"
+      ],
+      "description": "의회 대응자료의 '근거 묶음 + 서식 뼈대'를 한 번에 만듭니다.\n우리 의회의 논의 이력·질의답변 사례·후속조치 약속, 타 의회 답변 사례, 관련 의안을 모아\n선택한 서식(5분자유발언/행정사무감사/구정질문/업무보고) 뼈대와 답변 톤 원칙을 함께 돌려줍니다.\nArgs:\n  council: 우리 의회(예: '광주 서구')\n  keyword: 현안 주제어\n  purpose: '5분자유발언' | '행정사무감사' | '구정질문' | '업무보고'\n  compare_councils: 비교할 타 의회 목록(선택, 최대 3)\n  max_docs: 우리 의회에서 열어볼 회의록 수(1~8)\n※ 이 결과를 바탕으로 초안을 쓸 때 의원 개인 평가 표현을 넣지 마세요."
+    },
+    {
+      "name": "council_prepare_pack",
+      "parameters": {
+        "keyword": {
+          "annotation": "str"
+        },
+        "council": {
+          "annotation": "str",
+          "default": "광주 서구"
+        },
+        "date_from": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "date_to": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "committee": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "answerer": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "max_docs": {
+          "annotation": "int",
+          "default": 6
+        },
+        "snapshot_id": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "max_evidence": {
+          "annotation": "int",
+          "default": 12
+        }
+      },
+      "required": [
+        "keyword"
+      ],
+      "description": "근거 있는 답변준비 자료 묶음: 실무검토 초안·질문 후보·후속조치 확인표.\n의회 요구를 회피하거나 의원 성향을 분석하지 않는다. 현황·수치·이행은 담당자 확인칸으로 남긴다.\nsnapshot_id 사용 시 같은 검색조건의 질의답변 bundle(기본 source=auto)을 지정한다.\n각 절은 한 번만 제공하며 max_evidence(1~50)로 인용 행수를 조절한다.\n생략된 근거는 evidence_totals와 response_budget에 건수·회수경로로 남는다."
+    },
+    {
+      "name": "council_prepare_response",
+      "parameters": {
+        "topic": {
+          "annotation": "str"
+        },
+        "department": {
+          "annotation": "str"
+        },
+        "date_from": {
+          "annotation": "str"
+        },
+        "date_to": {
+          "annotation": "str"
+        },
+        "council": {
+          "annotation": "str",
+          "default": "광주 서구"
+        },
+        "meeting_type": {
+          "annotation": "str",
+          "default": "행정사무감사"
+        },
+        "committee": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "source": {
+          "annotation": "str",
+          "default": "auto"
+        },
+        "max_docs": {
+          "annotation": "int",
+          "default": 6
+        },
+        "facts": {
+          "annotation": "Optional[list[dict[str, Any]]]",
+          "default": null
+        },
+        "as_of": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "snapshot_id": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "event_offset": {
+          "annotation": "int",
+          "default": 0
+        },
+        "max_events": {
+          "annotation": "int",
+          "default": 6
+        },
+        "source_offset": {
+          "annotation": "int",
+          "default": 0
+        },
+        "site_start_page": {
+          "annotation": "int",
+          "default": 1
+        }
+      },
+      "required": [
+        "topic",
+        "department",
+        "date_from",
+        "date_to"
+      ],
+      "description": "의회 답변 준비의 기본 진입. 기간별 검색→인용ID→과거질답·현황·준비질문·확인사항을 한 번에 작성.\ntopic은 사업명·쟁점어, department는 작성부서(소관 확정 또는 부서 필터가 아님).\ndate_from/date_to는 YYYY-MM-DD. source=auto|clik|site, max_docs=1~15(출처별).\nfacts=[{id,text,document_ref,as_of,unit,fiscal_year}], 담당자 제공자료이며 서버 미검증.\n같은 조건+snapshot_id+event_offset으로 검색 재호출 없이 이어보기. next_actions는 남은 수집 경로.\nplain_text는 출처를 붙인 서구 보고서형 준비자료. 정책 판단·현재 답변을 지어내지 않는다."
+    },
+    {
+      "name": "council_read_minutes",
+      "parameters": {
+        "docid": {
+          "annotation": "str"
+        },
+        "keyword": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "speaker_role": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "speaker_name": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "context_turns": {
+          "annotation": "int",
+          "default": 1
+        },
+        "whole_agenda": {
+          "annotation": "bool",
+          "default": false
+        },
+        "start_turn": {
+          "annotation": "int",
+          "default": 0
+        },
+        "max_turns": {
+          "annotation": "int",
+          "default": 30
+        },
+        "full_text": {
+          "annotation": "bool",
+          "default": false
+        },
+        "start_char": {
+          "annotation": "int",
+          "default": 0
+        }
+      },
+      "required": [
+        "docid"
+      ],
+      "description": "회의록 1건을 열어 발언 단위로 보여줍니다(원문 확인·끝까지 읽기).\nArgs:\n  docid: council_search_minutes 등에서 받은 회의록 ID\n  keyword: 지정하면 해당 단어가 들어간 발언 주변만 표시\n  speaker_role: '의원' | '집행부' | '의장·위원장' | '의회사무국' (선택)\n  speaker_name: 발언자 표기에 포함된 이름(원문 검색 필터로만 사용, 선택)\n  context_turns: 키워드 발언 앞뒤로 함께 보여줄 발언 수(0~3)\n  whole_agenda: True면 키워드가 나온 안건 구간을 처음부터 끝까지 표시(부서 구간 완독용)\n  start_turn: 이어읽기 시작 발언 번호(이전 결과의 '다음 start_turn')\n  max_turns: 한 번에 표시할 발언 수(1~80)\n  full_text: True면 순차 전문 표시. 한 번에 24,000자까지, next start_turn/start_char로 끝까지 이어읽기\n  start_char: 시작 발언 내 문자 위치(0 이상)"
+    },
+    {
+      "name": "council_read_source",
+      "parameters": {
+        "ref": {
+          "annotation": "str"
+        },
+        "keyword": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "start_turn": {
+          "annotation": "int",
+          "default": 0
+        },
+        "start_char": {
+          "annotation": "int",
+          "default": 0
+        },
+        "max_turns": {
+          "annotation": "int",
+          "default": 30
+        },
+        "max_chars": {
+          "annotation": "int",
+          "default": 12000
+        },
+        "whole_agenda": {
+          "annotation": "bool",
+          "default": false
+        }
+      },
+      "required": [
+        "ref"
+      ],
+      "description": "CLIK docid, site:key 또는 서구의회 공식 URL에서 원문 발언을 끝까지 이어읽기.\nnext_start_turn/next_start_char를 그대로 전달한다. body_hash가 바뀌면 원문이 갱신된 것이다."
+    },
+    {
+      "name": "council_recurring_issues",
+      "parameters": {
+        "department": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "keyword": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "council": {
+          "annotation": "str",
+          "default": "광주 서구"
+        },
+        "years": {
+          "annotation": "int",
+          "default": 3
+        },
+        "include_current_year": {
+          "annotation": "bool",
+          "default": false
+        },
+        "as_of": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "committee": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "min_years": {
+          "annotation": "int",
+          "default": 2
+        },
+        "top": {
+          "annotation": "int",
+          "default": 12
+        },
+        "max_docs_per_year": {
+          "annotation": "int",
+          "default": 4
+        },
+        "period_mode": {
+          "annotation": "str",
+          "default": "calendar_years"
+        },
+        "date_from": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "date_to": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "department_aliases": {
+          "annotation": "Optional[list[dict[str, Any]]]",
+          "default": null
+        },
+        "extra_terms": {
+          "annotation": "Optional[list[str]]",
+          "default": null
+        },
+        "source": {
+          "annotation": "str",
+          "default": "auto"
+        }
+      },
+      "required": [],
+      "description": "반복 주제어 후보를 찾는다. 같은 요구·요구방향·미이행을 자동 판정하지 않는다.\ndepartment 또는 keyword 중 하나만 지정한다. 최근2년은 years=2, period_mode=rolling_years;\n명시기간은 date_from+date_to. 기본 calendar_years는 완료된 달력연도(기존 호환).\n부서 별칭은 department_aliases=[{name,valid_from,valid_to,basis}], 최대2개.\n반대 문면 단서와 원문을 함께 보여주고 동일 요구 여부는 담당자가 확인한다."
+    },
+    {
+      "name": "council_review_answer",
+      "parameters": {
+        "draft": {
+          "annotation": "str"
+        },
+        "facts": {
+          "annotation": "Optional[list[dict[str, Any]]]",
+          "default": null
+        },
+        "claims": {
+          "annotation": "Optional[list[dict[str, Any]]]",
+          "default": null
+        },
+        "snapshot_id": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "event_ids": {
+          "annotation": "Optional[list[str]]",
+          "default": null
+        }
+      },
+      "required": [
+        "draft"
+      ],
+      "description": "답변 초안의 숫자·단위·근거 연결·확약·설명 부족 표현을 점검한다(승인·법률판정 아님).\nfacts=[{id,text,document_ref,as_of,unit,fiscal_year}]. claims=[{text,fact_id,support_excerpt,start_char(선택)}].\n같은 숫자가 발견돼도 사업·연도·분모가 같다는 뜻이 아니다. 원문 자동변경 없음. 입력 저장·외부 전송 없음."
+    },
+    {
+      "name": "council_review_followups",
+      "parameters": {
+        "snapshot_id": {
+          "annotation": "str"
+        },
+        "updates": {
+          "annotation": "list[dict[str, Any]]"
+        },
+        "as_of": {
+          "annotation": "str"
+        }
+      },
+      "required": [
+        "snapshot_id",
+        "updates",
+        "as_of"
+      ],
+      "description": "회의 후 후속조치 증빙 확인표. get_evidence(collection='followup_items')의 event_id로 연결한다.\nupdates=[{event_id,reported_status:미확인/검토중/추진중/완료보고/보류,owner_department,due_date,due_basis,\nevidence:[{document_ref,excerpt,reviewer,checked_at}]}]. as_of=YYYY-MM-DD.\n완료보고와 증빙 구비를 구분하며 실제 이행완료를 자동 판정하지 않는다. 입력 저장 없음."
+    },
+    {
+      "name": "council_search_bills",
+      "parameters": {
+        "keyword": {
+          "annotation": "str"
+        },
+        "council": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "search_in": {
+          "annotation": "str",
+          "default": "전체"
+        },
+        "status": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "date_from": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "date_to": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "limit": {
+          "annotation": "int",
+          "default": 20
+        },
+        "offset": {
+          "annotation": "int",
+          "default": 0
+        }
+      },
+      "required": [
+        "keyword"
+      ],
+      "description": "지방의회 의안(조례안·예산안·건의안·결의안·청원 등)을 검색합니다.\nArgs:\n  keyword: 검색어\n  council: 의회명 또는 ID(선택)\n  search_in: '전체' | '제목' | '제안자' | '요지'\n  status: '원안가결' | '수정가결' | '부결(폐기)' | '미처리(계류)' | '철회' 등(선택)\n  date_from/date_to: 제안일 범위(선택)\n  limit: 1~100"
+    },
+    {
+      "name": "council_search_local",
+      "parameters": {
+        "keyword": {
+          "annotation": "str"
+        },
+        "meeting_type": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "committee": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "date_from": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "mode": {
+          "annotation": "str",
+          "default": "질의답변"
+        },
+        "limit": {
+          "annotation": "int",
+          "default": 12
+        },
+        "date_to": {
+          "annotation": "Optional[str]",
+          "default": null
+        }
+      },
+      "required": [
+        "keyword"
+      ],
+      "description": "로컬 회의록 보관함(minutes_archive 폴더 또는 COUNCIL_LOCAL_DIR)에서 검색합니다(API 호출 없음).\n의회사무국에서 제공받거나 담당자가 저장한 회의록(.html/.txt)을 대상으로 합니다.\nArgs:\n  keyword: 주제어\n  meeting_type: '본회의' | '상임위원회' | '행정사무감사·조사' | '예산·결산' | '특별위원회' (선택)\n  committee: 위원회명 일부(예: '사회도시', '기획총무', '의회운영') (선택)\n  date_from: 이 날짜 이후(선택)\n  mode: '질의답변' | '5분자유발언' | '약속' | '발언'\n  limit: 최대 표시 건수"
+    },
+    {
+      "name": "council_search_minutes",
+      "parameters": {
+        "keyword": {
+          "annotation": "str"
+        },
+        "council": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "search_in": {
+          "annotation": "str",
+          "default": "전체"
+        },
+        "meeting_type": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "date_from": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "date_to": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "sort": {
+          "annotation": "str",
+          "default": "최신순"
+        },
+        "limit": {
+          "annotation": "int",
+          "default": 20
+        },
+        "cursor": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "offset": {
+          "annotation": "int",
+          "default": 0
+        }
+      },
+      "required": [
+        "keyword"
+      ],
+      "description": "지방의회 회의록을 키워드로 검색해 목록(회의 단위)을 돌려줍니다.\nArgs:\n  keyword: 검색어(예: '주민참여예산', '빈집', '반도체')\n  council: 의회명 또는 ID. 비우면 전국 검색\n  search_in: '전체' | '내용' | '안건' | '위원회' | '의회명'\n  meeting_type: '본회의' | '상임위원회' | '행정사무감사·조사' | '예산·결산' | '특별위원회' (선택)\n  date_from/date_to: 'YYYY-MM-DD' (선택, 시작일이 종료일보다 늦으면 입력 오류)\n  sort: '최신순' | '과거순' | '정확도순'\n  limit: 1~50\n  cursor: 이전 결과의 '다음 cursor' 값(권장). 표시하지 않은 결과를 건너뛰지 않고 이어서 보여줍니다\n  offset: 상류 결과 위치(구버전 호환용)\n반환: 회의 정보와 docid 목록. 내용 확인은 council_read_minutes(docid)."
+    },
+    {
+      "name": "council_search_policy",
+      "parameters": {
+        "keyword": {
+          "annotation": "str"
+        },
+        "region": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "limit": {
+          "annotation": "int",
+          "default": 10
+        },
+        "docid": {
+          "annotation": "Optional[str]",
+          "default": null
+        }
+      },
+      "required": [
+        "keyword"
+      ],
+      "description": "타 지자체·공공기관 정책자료(지방정책정보: 연구용역·출장보고·감사자료 등)를 검색합니다.\n검토결과 작성 시 벤치마킹 근거로 활용하세요. docid를 주면 해당 자료 본문을 엽니다.\nArgs:\n  keyword: 검색어\n  region: 광역 지역명(예: '서울','경기','광주') — 선택\n  limit: 1~50\n  docid: 상세 조회할 자료 ID(선택)"
+    },
+    {
+      "name": "council_status",
+      "parameters": {
+        "test_council": {
+          "annotation": "str",
+          "default": "광주 서구"
+        },
+        "live": {
+          "annotation": "bool",
+          "default": false
+        }
+      },
+      "required": [],
+      "description": "버전·코드·도구명세 해시·저장방식·API 설정 점검. live=True일 때만 실제 CLIK 1회·홈페이지 목록 조회.\n키 자체를 출력하지 않는다. 배포 커밋과 해시를 배포 패키지 manifest와 대조한다."
+    },
+    {
+      "name": "council_topic_history",
+      "parameters": {
+        "keyword": {
+          "annotation": "str"
+        },
+        "councils": {
+          "annotation": "Optional[list[str]]",
+          "default": null
+        },
+        "date_from": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "include_bills": {
+          "annotation": "bool",
+          "default": true
+        },
+        "date_to": {
+          "annotation": "Optional[str]",
+          "default": null
+        }
+      },
+      "required": [
+        "keyword"
+      ],
+      "description": "현안(주제어)이 의회에서 언제·어떤 회의에서 다뤄졌는지 연도별 흐름을 보여줍니다.\n집계 단위는 의회·연도·회의유형뿐이며 의원 개인 단위 집계는 하지 않습니다.\nArgs:\n  keyword: 현안 주제어(예: '복합쇼핑몰', '생활인구')\n  councils: 의회명 목록(비우면 전국). 의회당 API 약 1~3회\n  date_from: 시작일(선택, 기본 최근 4년)\n  include_bills: 관련 의안(조례안·건의안 등)도 함께 볼지\n  date_to: 종료일(선택)"
+    },
+    {
+      "name": "seogu_council_read",
+      "parameters": {
+        "key": {
+          "annotation": "str"
+        },
+        "keyword": {
+          "annotation": "Optional[str]",
+          "default": null
+        }
+      },
+      "required": [
+        "key"
+      ],
+      "description": "서구의회 회의록 1건(key)을 열어 발언 분해·질의답변·약속 문장을 정리합니다.\nArgs:\n  key: seogu_council_recent 결과의 key 또는 recordView 주소 전체\n  keyword: 특정 주제만 볼 때(선택)"
+    },
+    {
+      "name": "seogu_council_recent",
+      "parameters": {
+        "pages": {
+          "annotation": "int",
+          "default": 1
+        },
+        "committee": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "date_from": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "date_to": {
+          "annotation": "Optional[str]",
+          "default": null
+        }
+      },
+      "required": [],
+      "description": "서구의회 홈페이지 '최근회의록' 목록을 가져옵니다(한 페이지 10건, 최신순).\nArgs:\n  pages: 가져올 페이지 수(1~10)\n  committee: '본회의' | '의회운영' | '기획총무' | '사회도시' | '예산결산' 등 회의명 일부(선택)\n  date_from: 이 날짜 이후만(선택)"
+    },
+    {
+      "name": "seogu_council_search",
+      "parameters": {
+        "keyword": {
+          "annotation": "str"
+        },
+        "mode": {
+          "annotation": "str",
+          "default": "질의답변"
+        },
+        "committee": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "answerer": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "date_from": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "pages": {
+          "annotation": "int",
+          "default": 2
+        },
+        "max_meetings": {
+          "annotation": "int",
+          "default": 15
+        },
+        "date_to": {
+          "annotation": "Optional[str]",
+          "default": null
+        }
+      },
+      "required": [
+        "keyword"
+      ],
+      "description": "서구의회 홈페이지 최근 회의록을 자동으로 열어 주제어를 찾습니다(CLIK 반영 전 최신 회의 대응).\nArgs:\n  keyword: 주제어(예: '결산', '경로당', '주차')\n  mode: '질의답변' | '5분자유발언' | '약속' | '발언'\n  committee: 회의명 일부(선택, 예: '사회도시')\n  answerer: 답변자 직함 일부(선택, 예: '노인복지과장', '복지국장') — 우리 부서 답변 이력만 볼 때\n  date_from: 이 날짜 이후(선택)\n  pages: 목록 페이지 수(1~10, 페이지당 10회의)\n  max_meetings: 열어볼 회의록 수(1~40). 첫 조회는 회의록당 약 1.5초, 이후 7일 캐시\n반환 결과마다 회의록 원문 주소(recordView)가 붙습니다. 원문에 없는 내용은 답하지 마세요."
+    }
+  ]
+}

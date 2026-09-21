@@ -1,0 +1,11 @@
+{
+  "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+  "packages": {
+    "httpx": "0.28.1",
+    "uvicorn": "0.48.0",
+    "pytest": "9.0.2",
+    "mcp": "NOT_INSTALLED",
+    "pydantic": "2.13.4",
+    "starlette": "0.50.0"
+  }
+}

@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/mnt/data/mcp_upgrade/uijeong-mcp/tests/protocol_smoke.py", line 18, in <module>
+    from mcp import ClientSession, StdioServerParameters
+ModuleNotFoundError: No module named 'mcp'
