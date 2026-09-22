@@ -66,8 +66,16 @@ def safe_error(exc: BaseException) -> str:
 
 class SecretFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
-        record.msg = redact_secrets(record.getMessage())
-        record.args = ()
+        # Uvicorn's AccessFormatter unpacks these five arguments. Preserve
+        # their shape and numeric status code while redacting string fields.
+        if (record.name == "uvicorn.access" and isinstance(record.args, tuple)
+                and len(record.args) == 5):
+            record.msg = redact_secrets(record.msg)
+            record.args = tuple(redact_secrets(value) if isinstance(value, str)
+                                else value for value in record.args)
+        else:
+            record.msg = redact_secrets(record.getMessage())
+            record.args = ()
         # Traceback exception text may carry a URL; transport logs need only type.
         if record.exc_info:
             record.msg += " [" + record.exc_info[0].__name__ + "]"
