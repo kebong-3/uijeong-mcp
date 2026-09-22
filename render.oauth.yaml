@@ -1,0 +1,40 @@
+# OAuth RESOURCE SERVER template. External authorization server NOT included.
+# Copy/adapt as the active Blueprint only after external issuer setup.
+services:
+  - type: web
+    name: uijeong-mcp-oauth
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python scripts/check_config.py --http --manifest && python uijeong_mcp.py --http
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: UIJEONG_PROFILE
+        value: work
+      - key: UIJEONG_BIND_HOST
+        value: 0.0.0.0
+      - key: UIJEONG_ALLOWED_HOSTS
+        sync: false
+      - key: UIJEONG_AUTH_MODE
+        value: oauth
+      - key: UIJEONG_RESOURCE_URL
+        sync: false
+      - key: UIJEONG_OAUTH_ISSUER
+        sync: false
+      - key: UIJEONG_OAUTH_INTROSPECTION_URL
+        sync: false
+      - key: UIJEONG_OAUTH_CLIENT_ID
+        sync: false
+      - key: UIJEONG_OAUTH_CLIENT_SECRET
+        sync: false
+      - key: UIJEONG_OAUTH_SCOPES
+        value: council:read
+      - key: UIJEONG_OAUTH_CACHE_SECONDS
+        value: "0"
+      - key: CLIK_API_KEY
+        sync: false
+# Do not also set UIJEONG_BEARER_TOKEN. Enforce approved users in your AS.
+# Optional UIJEONG_OAUTH_ALLOWED_SUBJECTS: actual sub values, comma separated.
+# Optional persistent volume + UIJEONG_STATE_DB; not provisioned here.

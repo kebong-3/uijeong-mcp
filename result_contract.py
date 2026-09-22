@@ -11,7 +11,6 @@ Thresholds come from response_budget and are environment-tunable.
 import functools
 import json
 import re
-from mcp.types import CallToolResult, TextContent
 import response_budget as B
 import runtime_security as R
 
@@ -19,6 +18,7 @@ import runtime_security as R
 def wire_result(fn):
     @functools.wraps(fn)
     async def wrapped(*args, **kwargs):
+        from mcp.types import CallToolResult, TextContent
         result = await fn(*args, **kwargs)
         if isinstance(result, dict):
             bounded = B.apply_budget(result)

@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any,Optional
 import council_workbench as C
 import dept_core as D
+import department_aliases as A
 from result_contract import wire_result
 
 
@@ -82,7 +83,8 @@ def install(U,store):
  @register
  async def council_format_worksheet(form:str,topic:str,department:str,council:str='광주 서구',
    snapshot_id:Optional[str]=None,event_ids:Optional[list[str]]=None,
-   facts:Optional[list[dict[str,Any]]]=None,prepared_on:Optional[str]=None)->dict[str,Any]:
+   facts:Optional[list[dict[str,Any]]]=None,prepared_on:Optional[str]=None,
+   department_aliases:Optional[list[dict[str,Any]]]=None)->dict[str,Any]:
   """확인된 근거와 제공자료를 기관 회의자료 서식 칸에 배치하고 붙여넣을 본문(plain_text)을 만든다.
   form=5분자유발언_회의자료/구정질문_답변서/행정사무감사_답변카드/1페이지_검토보고.
   snapshot_id+event_ids를 주면 실제 발언을 개요·질의요지 칸에, facts는 현황 칸에 넣는다.
@@ -90,18 +92,24 @@ def install(U,store):
   두 글자 항목명은 네 글자 폭으로 벌려 표기한다. 기관마다 서식이 다르므로 제출 전 소속 양식과 대조한다."""
   try:
    evidence=[];commitments=[]
+   aliases=A.normalize_aliases(department,department_aliases)
+   if event_ids and not snapshot_id:raise ValueError('event_ids에는 snapshot_id가 필요합니다.')
+   if event_ids is not None and (not isinstance(event_ids,list) or any(not isinstance(i,str) for i in event_ids) or len(event_ids)>8):
+    raise ValueError('event_ids는 문자열 최대8개입니다.')
    if snapshot_id:
     payload=fetch(snapshot_id)
     wanted=set(event_ids or [])
     chosen=[e for e in payload.get('items',[]) if not wanted or e.get('event_id') in wanted]
-    if wanted and not chosen:raise ValueError('event_id가 이 근거 묶음에 없습니다. council_get_evidence로 확인하세요.')
-    evidence=D.classify_department_events(chosen,department)
+    if wanted-set(e.get('event_id') for e in chosen):raise ValueError('일부 event_id가 이 근거 묶음에 없습니다. 모두 확인하세요.')
+    evidence=D.classify_department_events(chosen,department,aliases)
     evidence=evidence['answered']+evidence['unanswered']+evidence['other_mention'] or [
      {'metadata':e.get('metadata'),'docid':e.get('docid'),'event_id':e.get('event_id'),
       'question':{'speaker':(e.get('question') or {}).get('speaker'),
                   'text':(e.get('question') or {}).get('text')} if e.get('question') else None}
      for e in chosen]
-    commitments=D.department_commitments(payload.get('followup_items',[]),department)
+    chosen_keys={(e.get('record_id'),(e.get('question') or {}).get('turn_index')) for e in chosen}
+    commitments=D.department_commitments([e for e in payload.get('followup_items',[]) if
+      (e.get('record_id'),(e.get('question') or {}).get('turn_index')) in chosen_keys],department,aliases)
    return D.build_worksheet(form,topic=topic,department=department,council=council,
                             evidence=evidence,facts=facts or [],commitments=commitments,
                             prepared_on=prepared_on)

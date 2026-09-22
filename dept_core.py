@@ -11,6 +11,10 @@
 from __future__ import annotations
 
 import datetime as dt
+import copy
+import hashlib
+import department_aliases as A
+import recurrence_core as Q
 import re
 import unicodedata
 from typing import Any, Callable, Iterable, Optional
@@ -80,9 +84,8 @@ def _meta(event: dict) -> dict:
 
 def meeting_year(event: dict) -> Optional[str]:
     """회의연도. 회계연도가 아니며, 원문에 회의일이 없으면 None으로 둔다."""
-    raw = str((event.get("metadata") or {}).get("meeting_date") or "")
-    digits = re.sub(r"\D", "", raw)
-    return digits[:4] if len(digits) >= 4 and digits[:4].isdigit() else None
+    day = A.event_date(event)
+    return str(day.year) if day else None
 
 
 def format_meeting_date(raw: Any) -> str:
@@ -97,48 +100,59 @@ def format_meeting_date(raw: Any) -> str:
 def _citation(event: dict) -> dict:
     return {"event_id": event.get("event_id"), "record_id": event.get("record_id"),
             "docid": event.get("docid"), "source_kind": event.get("source_kind"),
+            "provenance": copy.deepcopy(event.get("provenance", {})),
             "metadata": _meta(event),
             "retrieval": "council_read_source(ref=docid)로 원문을 확인합니다."}
 
 
-def classify_department_events(events: Iterable[dict], department: str) -> dict:
-    """근거 event를 부서 관점 세 갈래로 나눈다.
+def _preserve_quote(node: dict) -> dict:
+    # Do not discard turn indexes, character offsets, or source URLs.
+    return {**copy.deepcopy(node), "speaker": _speaker(node), "text": _text_of(node)}
 
-    answered      우리 부서(대리답변 포함)가 답한 질의
-    unanswered    부서가 거론됐으나 이번 확인 범위에서 답변이 연결되지 않은 질의
-    other_mention 다른 부서가 답한, 우리 부서 언급 건
-    """
-    answered, unanswered, other = [], [], []
+
+def classify_department_events(events: Iterable[dict], department: str,
+                               aliases: Optional[list[dict]] = None) -> dict:
+    """분류에 사용한 명칭을 기록하고, 날짜가 불명확한 유효기간 별칭은 보류한다."""
+    answered, unanswered, other, unresolved = [], [], [], []
     for event in events:
         if not isinstance(event, dict):
             continue
+        names, pending = A.applicable_names(event, department, aliases or [])
         answers = [a for a in (event.get("answers") or []) if _quote_of(a)]
-        mine = [a for a in answers if matches_department(_speaker(a), department)]
+        mine = [a for a in answers if any(matches_department(_speaker(a), n) for n in names)]
+        matched_names = [n for n in names if any(matches_department(_speaker(a), n) for a in mine)]
         question = event.get("question") or event.get("speech")
-        mentioned = matches_department(_text_of(question), department) or bool(mine)
+        mentioned_names = [n for n in names if matches_department(_text_of(question), n)]
         row = {**_citation(event),
-               "question": {"speaker": _speaker(question), "text": _text_of(question)} if question else None,
-               "answers": [{"speaker": _speaker(a), "text": _text_of(a)} for a in (mine or answers)][:2],
-               "answer_link_status": "LINKED_IN_SCOPE" if answers else "NOT_LINKED_IN_SCOPE"}
+               "question": _preserve_quote(question) if question else None,
+               "answers": [_preserve_quote(a) for a in (mine or answers)],
+               "answer_link_status": "LINKED_IN_SCOPE" if answers else "NOT_LINKED_IN_SCOPE",
+               "matched_department_names": list(dict.fromkeys(matched_names + mentioned_names)),
+               "alias_basis": "USER_PROVIDED_NOT_INDEPENDENTLY_VERIFIED" if
+                   any(n != department for n in matched_names + mentioned_names) else "PRIMARY_LABEL"}
         if mine:
-            row["matched_by"] = "답변자 직함이 부서와 일치(대리답변 포함)"
+            row["matched_by"] = "답변자 직함이 지정 부서 또는 적용기간 내 사용자 지정 별칭과 일치"
             answered.append(row)
-        elif mentioned and not answers:
+        elif mentioned_names and not answers:
             row["matched_by"] = "질의 본문에서 부서 거론, 확인 범위에 답변 미연결"
             unanswered.append(row)
-        elif mentioned:
+        elif mentioned_names:
             row["matched_by"] = "부서 거론, 다른 발언자가 답변"
             other.append(row)
-    return {"answered": answered, "unanswered": unanswered, "other_mention": other}
+        elif pending and any(matches_department(_text_of(question), n) or
+                             any(matches_department(_speaker(a), n) for a in answers) for n in pending):
+            row.update(matched_by="회의일 미확인: 별칭 적용기간 판단 보류", pending_aliases=pending)
+            unresolved.append(row)
+    return {"answered": answered, "unanswered": unanswered, "other_mention": other,
+            "alias_date_unresolved": unresolved}
 
 
-def event_touches_department(event: dict, department: str) -> bool:
-    """질의 본문이 부서를 거론했거나 그 부서가 답한 event인지."""
+def event_touches_department(event: dict, department: str, aliases: Optional[list[dict]] = None) -> bool:
     if not isinstance(event, dict) or not department:
         return False
-    if matches_department(_text_of(event.get("question") or event.get("speech")), department):
-        return True
-    return any(matches_department(_speaker(a), department) for a in (event.get("answers") or []))
+    names, _ = A.applicable_names(event, department, aliases or [])
+    return any(matches_department(_text_of(event.get("question") or event.get("speech")), n) or
+               any(matches_department(_speaker(a), n) for a in event.get("answers", [])) for n in names)
 
 
 # 반복 쟁점 집계에서 걸러낼 내용 없는 말. 주제어가 아니라 서술어에 가깝다.
@@ -146,11 +160,12 @@ GENERIC_TERMS = ("원인", "규모", "현황", "실적", "이유", "상황", "�
                  "대상", "관리", "운영", "조치", "개선", "지적")
 
 
-def department_commitments(events: Iterable[dict], department: str) -> list[dict]:
+def department_commitments(events: Iterable[dict], department: str,
+                           aliases: Optional[list[dict]] = None) -> list[dict]:
     """우리 부서 답변에서 나온 후속조치 '후보'. 이행 여부는 판정하지 않는다.
 
     같은 발언이 여러 회의록 사본에 실리면 문면이 같은 항목이 겹친다. 유형·문면·기한이
-    같으면 한 번만 싣되, 유형이 다르면(자료제출과 조건부 추진) 각각 남긴다.
+    같은 회의 안에서 같으면 한 번만 싣되, 다른 회의·유형이면 각각 남긴다.
     """
     out = []
     seen: set[tuple] = set()
@@ -159,10 +174,16 @@ def department_commitments(events: Iterable[dict], department: str) -> list[dict
         if not commitment:
             continue
         answers = [a for a in (event.get("answers") or []) if _quote_of(a)]
-        mine = [a for a in answers if matches_department(_speaker(a), department)]
+        names, _ = A.applicable_names(event, department, aliases or [])
+        mine = [a for a in answers if any(matches_department(_speaker(a), n) for n in names)]
         if not mine:
             continue
-        mark = (commitment.get("type"), normalize(_text_of(mine[0]))[:120],
+        meta = event.get("metadata") or {}
+        # Same wording in a later meeting is a distinct follow-up candidate.
+        meeting = tuple(meta.get(k) for k in ("council_id", "meeting_date", "session", "meeting_name"))
+        if not meta.get("meeting_date"):
+            meeting = (event.get("record_id") or event.get("docid"),)
+        mark = (meeting, commitment.get("type"), hashlib.sha256(normalize(_text_of(mine[0])).encode()).hexdigest(),
                 normalize(commitment.get("deadline")))
         if mark in seen:
             continue
@@ -172,6 +193,7 @@ def department_commitments(events: Iterable[dict], department: str) -> list[dict
                     "condition_verbatim": commitment.get("condition"),
                     "deadline_verbatim": commitment.get("deadline"),
                     "answerer": _speaker(mine[0]),
+                    "answer_evidence": _preserve_quote(mine[0]),
                     "excerpt": _text_of(mine[0])[:400],
                     "fulfillment_status": "EVIDENCE_NOT_VERIFIED",
                     "fulfillment_note": "후속 증빙 미확인이며 미이행 판정이 아닙니다."})
@@ -212,12 +234,14 @@ def recurring_terms(events: Iterable[dict], extract: Callable[[str], list[str]],
         for term in dict.fromkeys(extract(body)):
             if normalize(term) in skip or len(term) < 2:
                 continue
-            row = table.setdefault(term, {"years": set(), "documents": set(), "citations": []})
+            row = table.setdefault(term, {"years": set(), "documents": set(), "citations": [], "cue_types": set()})
+            cues = Q.request_cues(body, term)
+            row["cue_types"].update(cues["cue_types"])
             row["years"].add(year)
             row["documents"].add(doc)
             if len(row["citations"]) < 3 and not any(c["record_id"] == event.get("record_id")
                                                      for c in row["citations"]):
-                row["citations"].append({**_citation(event), "excerpt": body[:200]})
+                row["citations"].append({**_citation(event), "excerpt": body[:200], "request_cues": cues})
     ranked = sorted(
         ((term, row) for term, row in table.items() if len(row["years"]) >= min_years),
         key=lambda kv: (-len(kv[1]["years"]), -len(kv[1]["documents"]), kv[0]))
@@ -225,11 +249,21 @@ def recurring_terms(events: Iterable[dict], extract: Callable[[str], list[str]],
               "year_count": len(row["years"]),
               "years": sorted(row["years"]),
               "document_count": len(row["documents"]),
-              "citations": row["citations"]}
+              "citations": row["citations"],
+              "citation_documents_total": len(row["documents"]),
+              "citation_documents_omitted": max(0, len(row["documents"])-len(row["citations"])),
+              "classification": "REPEATED_TOPIC_CANDIDATE",
+              "same_request_confirmed": False,
+              "review_status": "MANUAL_CONTEXT_REVIEW_REQUIRED",
+              "cue_types": sorted(row["cue_types"]),
+              "contrasting_cues_detected": {"EXPAND_OR_START_CUE", "DEFER_OR_STOP_CUE"} <= row["cue_types"],
+              "interpretation_warning": "같은 단어의 재등장은 같은 방향의 요구 반복을 입증하지 않습니다."}
              for term, row in ranked[:top]]
     return {"items": items, "observed_years": sorted(years_seen), "undated_events": undated,
+            "total_candidate_terms": len(ranked), "omitted_candidate_terms": max(0, len(ranked)-len(items)),
             "counting_basis": "질의 성격 발언의 주제어를 회의연도·문서 단위로 셉니다. 답변 발언은 세지 않습니다.",
             "limitations": [
+                "결과는 반복 주제어 후보이며 동일 요구·요구 방향의 일치를 자동 확정하지 않습니다.",
                 "확인한 회의록 범위의 반복이며 해당 의회 전체의 반복 빈도가 아닙니다.",
                 "형태소 분석기 없이 조사·어미를 규칙으로 제거한 주제어라 잡음이 섞일 수 있습니다.",
                 "반복 확인이며 다음 회기의 질문 예측이나 질문 확률이 아닙니다.",

@@ -17,6 +17,10 @@ import sources as S
 import runtime_security as R
 import response_budget as B
 import dept_core as D
+import department_aliases as A
+import period_core as P
+import coverage_core as C
+import release_info as RELEASE
 from result_contract import wire_result
 
 MODES = ('질의답변', '5분자유발언', '약속', '발언')
@@ -27,7 +31,7 @@ LIMITS = ['확인 범위의 결과이며 전국 전체 회의록 전수조사 �
 
 
 def install(U):
-    U.SERVER_VERSION = '2.3.1'
+    U.SERVER_VERSION = RELEASE.VERSION
     U.COUNCILS = S.council_code_map()
     U.resolve_council = lambda query: [(r['council_id'],r['name']) for r in S.resolve_councils(query)]
     U.parse_turns = E.parse_turns
@@ -38,7 +42,7 @@ def install(U):
     state_path = os.environ.get('UIJEONG_STATE_DB', str(Path(__file__).parent / 'state' / 'uijeong.sqlite3'))
     # 공유 배포에서는 24시간 안에 한도에 닿으면 모든 이용자의 이어보기가 멈춘다.
     # 가장 오래된 묶음부터 비우고, 비운 사실을 응답 warnings에 남긴다(무성 축출 금지).
-    snapshots = R.SnapshotStore(state_path, scope='official-evidence-v2', evict_oldest=True,
+    snapshots = R.SnapshotStore(state_path, scope='official-evidence-v2', evict_oldest=True, bind_request_scope=True,
                                 max_entries=int(os.environ.get('UIJEONG_SNAPSHOT_MAX_ENTRIES') or 2000),
                                 max_total_bytes=int(os.environ.get('UIJEONG_SNAPSHOT_MAX_TOTAL_BYTES') or 256 * 1024 * 1024))
 
@@ -61,7 +65,11 @@ def install(U):
         return {'status':'INVALID_INPUT','message':message,'items':[]}
 
     def safe_failure(source, stage, exc, ref=None):
-        return {'source':source,'stage':stage,'ref':ref,'message':R.safe_error(exc)}
+        result={'source':source,'stage':stage,'ref':ref,'message':R.safe_error(exc)}
+        code=getattr(exc,'reason_code',None)
+        if code in ('ROBOTS_UNAVAILABLE','ROBOTS_DISALLOWED','SITE_UNAVAILABLE'):
+            result['code']=code
+        return result
 
     def params_for(keyword,council,mode,answerer,committee,date_from,date_to,max_docs,source,search_terms):
         return dict(keyword=keyword,council=council,mode=mode,answerer=answerer,committee=committee,
@@ -143,11 +151,15 @@ def install(U):
         coverage.next_offset/source_offset, next_page/site_start_page로 미조회 목록을 계속 검색.
         검색 결과의 PARTIAL·오류·미확인 범위를 최종 답변에 반드시 포함한다.
         """
-        if not keyword.strip() or len(keyword)>200: return invalid('검색어는 1~200자로 입력하세요.')
+        if not isinstance(keyword,str) or not keyword.strip() or len(keyword)>200: return invalid('검색어는 1~200자로 입력하세요.')
         if mode not in MODES or source not in ('auto','clik','site'): return invalid('지원하지 않는 mode 또는 source입니다.')
+        if any(type(v) is not int for v in (max_docs,limit,item_offset,source_offset,site_start_page)):
+            return invalid('건수·위치 인자는 정수입니다.')
         if not (1<=max_docs<=15 and 1<=limit<=30 and 0<=item_offset and 0<=source_offset and 1<=site_start_page<=10000):
             return invalid('max_docs 1~15, limit 1~30, offset 0 이상, site_start_page 1~10000이 필요합니다.')
-        terms=[keyword]+list(dict.fromkeys(search_terms or []))
+        if search_terms is not None and (not isinstance(search_terms,list) or any(not isinstance(t,str) for t in search_terms)):
+            return invalid('search_terms는 문자열 목록입니다.')
+        terms=list(dict.fromkeys([keyword]+(search_terms or [])))
         if len(terms)>3 or any(not x.strip() or len(x)>200 for x in terms): return invalid('추가 검색어는 1~200자, 최대 2개입니다.')
         cid,cname,error=U.pick_council(council)
         if error:return invalid(error)
@@ -192,7 +204,8 @@ def install(U):
             status=('ERROR' if errors and not succeeded and not source_ok else 'PARTIAL' if partial else 'COMPLETE' if events else 'EMPTY')
             payload={'status':status,'parameters':parameters,'items':events,'followup_items':followups,'coverage':coverage,'errors':errors,
                      'records':[dict((k,v) for k,v in r.items() if k!='turns') for r in records],
-                     'created_at':dt.datetime.now(dt.timezone.utc).isoformat(),'limitations':LIMITS}
+                     'created_at':dt.datetime.now(dt.timezone.utc).isoformat(),'limitations':LIMITS,
+                     'coverage_summary':C.summarize_coverage(coverage,errors)}
             try:
                 before=snapshots.evicted
                 snapshot_id=snapshots.put(payload,source_kind='OFFICIAL_FETCHED')
@@ -242,33 +255,41 @@ def install(U):
     @register
     async def council_period_review(keyword:str,council:str='광주 서구',years:int=3,
             include_current_year:bool=True,as_of:Optional[str]=None,mode:str='질의답변',
-            committee:Optional[str]=None,answerer:Optional[str]=None,max_docs_per_year:int=5)->dict[str, Any]:
-        """최근 N개년을 연도별로 나눠 동일 한도로 검색한다. 회의연도 기준, 회계연도 자동 추정 없음.
-        include_current_year=False이면 완료된 연도만 조회. 각 연도의 coverage와 이어보기 정보를 확인한다."""
-        if not 1<=years<=5:return invalid('years는 1~5입니다.')
-        today=dt.datetime.now(dt.timezone(dt.timedelta(hours=9))).date()
-        try: day=dt.date.fromisoformat(as_of) if as_of else today
-        except ValueError:return invalid('as_of는 YYYY-MM-DD입니다.')
-        if day>today:return invalid('as_of는 미래 날짜일 수 없습니다.')
-        end=day.year if include_current_year else day.year-1
+            committee:Optional[str]=None,answerer:Optional[str]=None,max_docs_per_year:int=5,
+            period_mode:str='calendar_years',date_from:Optional[str]=None,date_to:Optional[str]=None)->dict[str, Any]:
+        """기간을 회의연도별로 나눠 동일 한도로 검색한다.
+        최근 N년은 period_mode=rolling_years, 최근 N개 회의연도는 calendar_years.
+        date_from+date_to를 모두 주면 명시기간이 우선한다. 양 끝 날짜 포함, 한국시간 기준.
+        반환된 period와 각 연도의 coverage·이어보기 정보를 확인한다."""
+        if type(max_docs_per_year) is not int or not 1<=max_docs_per_year<=15:
+            return invalid('max_docs_per_year는 1~15의 정수입니다.')
+        try:
+            period=P.resolve_period(years=years,include_current_year=include_current_year,as_of=as_of,
+                                    period_mode=period_mode,date_from=date_from,date_to=date_to)
+        except ValueError as exc:return invalid(str(exc))
         results=[]
-        for y in range(end-years+1,end+1):
-            r=await council_evidence_bundle(keyword,council,mode,answerer,committee,f'{y}-01-01',
-                     day.isoformat() if y==day.year else f'{y}-12-31',max_docs_per_year)
-            results.append({'meeting_year':y,**r})
-        codes=[r['status'] for r in results]
-        status='INVALID_INPUT' if 'INVALID_INPUT' in codes else 'ERROR' if all(c=='ERROR' for c in codes) else 'PARTIAL' if any(c in ('ERROR','PARTIAL') for c in codes) else 'COMPLETE'
-        return {'status':status,'as_of':day.isoformat(),'year_basis':'회의연도','include_current_year':include_current_year,
+        for window in period['windows']:
+            r=await council_evidence_bundle(keyword,council,mode,answerer,committee,
+                    window['date_from'],window['date_to'],max_docs_per_year)
+            results.append({**window,**r})
+            if r['status']=='INVALID_INPUT':return r
+        count=sum(r.get('total_items',0) for r in results)
+        return {'status':C.combine_statuses([r['status'] for r in results],count),
+                'as_of':period['as_of'],'period':period,'year_basis':'회의연도',
+                'include_current_year':include_current_year,'observed_items':count,
                 'results':results,'limitations':LIMITS}
 
     @register
     async def council_department_brief(department:str,council:str='광주 서구',date_from:Optional[str]=None,
             date_to:Optional[str]=None,committee:Optional[str]=None,extra_terms:Optional[list[str]]=None,
-            max_docs:int=6,source:str='auto',limit:int=8)->dict[str, Any]:
+            max_docs:int=6,source:str='auto',limit:int=8,
+            department_aliases:Optional[list[dict[str,Any]]]=None,source_offset:int=0,site_start_page:int=1)->dict[str, Any]:
         """【부서 기준 진입】 검색어 없이 소관 부서만으로 그 부서가 의회에서 받은 질의·답변·후속조치를 모은다.
         실무 단위는 주제어가 아니라 소관 부서이므로, 사업명을 모를 때 여기서 시작한다.
         부서명(예: '기획실', '노인복지과')을 검색어로 회의록을 찾은 뒤 답변자 직함으로 우리 부서 건을 가려내며,
-        같은 부서의 팀장 대리답변도 함께 포함한다. extra_terms로 과거 부서명·약칭을 최대 2개 더한다.
+        같은 부서의 팀장 표기도 후보로 포함한다. 과거 명칭은 department_aliases=[{name,valid_from,valid_to,basis}].
+        별칭은 검색과 최종분류 모두에 사용하며 사용자 제공 이력으로 표시한다(최대2개).
+        extra_terms는 적용기간 없는 과거 명칭의 호환 인자다. source_offset/site_start_page로 이어검색한다.
         answered=우리 부서가 답한 질의, unanswered=부서가 거론됐으나 이번 범위에서 답변 미연결,
         other_mention=다른 발언자가 답한 거론 건. 의원 개인 단위 집계는 하지 않는다."""
         if not isinstance(department,str) or not department.strip() or len(department)>100:
@@ -284,17 +305,21 @@ def install(U):
         if error:return invalid(error)
         if source=='site' and cid!='062006':
             return invalid('직접 목록 자동수집 어댑터는 현재 서구의회만 지원합니다. 다른 의회는 clik을 사용하세요.')
-        terms=[department.strip()]+[x for x in (extra_terms or []) if isinstance(x,str) and x.strip()][:2]
+        if type(source_offset) is not int or source_offset<0 or type(site_start_page) is not int or not 1<=site_start_page<=10000:
+            return invalid('source_offset은 0 이상 정수, site_start_page는 1~10000의 정수입니다.')
+        try:aliases=A.normalize_aliases(department,department_aliases,extra_terms)
+        except ValueError as exc:return invalid(str(exc))
+        terms=[department.strip()]+[a['name'] for a in aliases]
         # 부서명은 질의 본문이 아니라 발언자 직함에 나타난다. 부서명으로 회의록을 찾되
         # event 단계에서는 주제어 필터를 걸지 않고, 발언자 직함으로 소관을 가른다.
         records=[];errors=[];coverage=[]
         if source in ('auto','site') and cid=='062006':
-            rec,errs,cov=await collect_site(df,dto,committee,max_docs)
+            rec,errs,cov=await collect_site(df,dto,committee,max_docs,site_start_page)
             records.extend(rec);errors.extend(errs);coverage.append(cov)
         if source in ('auto','clik'):
             for term in terms:
                 try:
-                    rec,errs,cov=await collect_clik(term,cid,df,dto,committee,max_docs)
+                    rec,errs,cov=await collect_clik(term,cid,df,dto,committee,max_docs,source_offset)
                     cov['query']=term;records.extend(rec);errors.extend(errs);coverage.append(cov)
                 except Exception as exc:
                     errors.append(safe_failure('CLIK','list',exc))
@@ -309,108 +334,129 @@ def install(U):
             followups.extend(E.record_events(record,'','약속',None))
         followups=list({e['event_id']:e for e in followups}.values())
         succeeded=sum(c.get('parsed',0) for c in coverage)
-        source_ok=any(not c.get('failed') for c in coverage)
+        source_ok=any(not c.get('failed') and not(c.get('selected',0) and not c.get('parsed',0)) for c in coverage)
         if errors and not succeeded and not source_ok:
             return {'status':'ERROR','workflow':'department_brief','department':department,
                     'coverage':coverage,'errors':errors,'items':[],'limitations':LIMITS}
         snapshot=None
-        payload={'status':'PARTIAL','parameters':params_for(department.strip(),cid,'질의답변',None,committee,
+        scope_summary=C.summarize_coverage(coverage,errors)
+        collection_status=C.observed_status(len(events),incomplete=not scope_summary['all_selected_sources_exhausted'])
+        payload={'status':collection_status,'parameters':params_for(department.strip(),cid,'질의답변',None,committee,
                                                             df,dto,max_docs,source,terms),
                  'items':events,'followup_items':followups,'coverage':coverage,'errors':errors,
                  'records':[dict((k,v) for k,v in r.items() if k!='turns') for r in records],
-                 'created_at':dt.datetime.now(dt.timezone.utc).isoformat(),'limitations':LIMITS}
+                 'created_at':dt.datetime.now(dt.timezone.utc).isoformat(),'limitations':LIMITS,
+                 'department_aliases':aliases,'coverage_summary':scope_summary}
         try:
+            before=snapshots.evicted
             snapshot=snapshots.put(payload,source_kind='OFFICIAL_FETCHED')
+            if snapshots.evicted>before:
+                payload.setdefault('warnings',[]).append({'code':'SNAPSHOT_EVICTED','evicted':snapshots.evicted-before,
+                    'message':'보관 한도로 오래된 묶음을 비웠습니다. 만료된 참조는 다시 검색하세요.'})
         except (R.SecurityError,OSError):
             snapshot=None
-        groups=D.classify_department_events(events,department)
-        commitments=D.department_commitments(payload.get('followup_items',[]),department)
+        groups=D.classify_department_events(events,department,aliases)
+        commitments=D.department_commitments(payload.get('followup_items',[]),department,aliases)
         matched=len(groups['answered'])+len(groups['unanswered'])+len(groups['other_mention'])
-        status='EMPTY' if not matched else payload.get('status','PARTIAL')
+        shown_total=sum(min(len(groups[k]),limit if k!='other_mention' else max(1,limit//2)) for k in ('answered','unanswered','other_mention'))
+        status=C.observed_status(matched,upstream=payload['status'],
+                    incomplete=snapshot is None or bool(groups['alias_date_unresolved']) or shown_total<matched or len(commitments)>limit)
+        if snapshot is None:
+            payload.setdefault('warnings',[]).append({'code':'SNAPSHOT_UNAVAILABLE',
+                'message':'근거 저장에 실패했습니다. 반환한 docid를 council_read_source로 확인하세요.'})
         return {'status':status,'workflow':'department_brief','snapshot_id':snapshot,
                 'department':department,'department_stem':D.department_stem(department),
                 'council':cname,
-                'search_terms':terms,'period':{'date_from':date_from,'date_to':date_to},
+                'search_terms':terms,'department_aliases':aliases,'period':{'date_from':date_from,'date_to':date_to},
                 'totals':{'events_examined':len(events),'department_matched':matched,
                           'answered':len(groups['answered']),'unanswered':len(groups['unanswered']),
-                          'other_mention':len(groups['other_mention']),'followup_candidates':len(commitments)},
+                          'other_mention':len(groups['other_mention']),'alias_date_unresolved':len(groups['alias_date_unresolved']),
+                          'followup_candidates':len(commitments)},
                 'answered_items':groups['answered'][:limit],
                 'unanswered_questions':groups['unanswered'][:limit],
                 'other_mention_items':groups['other_mention'][:max(1,limit//2)],
                 'followup_candidates':commitments[:limit],
+                'alias_date_unresolved':groups['alias_date_unresolved'][:limit],
+                'coverage_summary':scope_summary,'warnings':payload.get('warnings',[]),
+                'display_omissions':{'matched_events':matched-shown_total,'followups':max(0,len(commitments)-limit),
+                    'alias_date_unresolved':max(0,len(groups['alias_date_unresolved'])-limit)},
+                'recovery':{'snapshot_id':snapshot,'tool':'council_get_evidence','collections':['items','followup_items'],
+                    'note':'items에는 이번 수집의 전체 질의 근거가 있습니다. 별칭 조건으로 다시 분류하세요.'},
                 'coverage':payload.get('coverage',[]),'errors':payload.get('errors',[]),
                 'next_step':{'tool':'council_recurring_issues',
                              'arguments':{'department':department,'council':council},
-                             'why':'여러 회의연도에 반복된 요구를 확인합니다.'},
+                             'why':'여러 회의연도에 반복된 주제어 후보를 확인합니다. 동일 요구로 단정하지 않습니다.'},
                 'matching_basis':'부서명을 검색어로 회의록을 찾고 답변자 직함의 부서 어간으로 분류했습니다. '
-                                 '조직개편 이력은 반영하지 않으므로 과거 부서명은 extra_terms로 지정하세요.',
+                                 '사용자가 지정한 부서 별칭과 적용기간을 함께 반영하며 조직개편 사실을 독립 검증하지 않습니다.',
                 'limitations':LIMITS+['부서 분류는 발언자 표기 기준이며 실제 소관 사무 분장과 다를 수 있습니다.',
                                       '답변 미연결은 이번 확인 범위의 결과이며 답변하지 않았다는 판정이 아닙니다.'],
-                'stored':False}
+                'stored':False,'public_evidence_snapshot_stored':snapshot is not None}
 
     @register
     async def council_recurring_issues(department:Optional[str]=None,keyword:Optional[str]=None,
             council:str='광주 서구',years:int=3,include_current_year:bool=False,as_of:Optional[str]=None,
-            committee:Optional[str]=None,min_years:int=2,top:int=12,max_docs_per_year:int=4)->dict[str, Any]:
-        """여러 회의연도에 걸쳐 반복된 요구·쟁점을 집계한다. 행정사무감사·업무보고 준비의 출발점.
-        department 또는 keyword 중 하나는 지정한다. 연도마다 같은 한도로 조회한 뒤 주제어의 등장 연도를 센다.
-        질의 성격 발언만 세며 답변은 세지 않는다. 집계 단위는 연도·회의이고 의원 개인이 아니다.
-        결과는 '반복 확인'이며 다음 회기 질문의 예측이나 확률이 아니다."""
+            committee:Optional[str]=None,min_years:int=2,top:int=12,max_docs_per_year:int=4,
+            period_mode:str='calendar_years',date_from:Optional[str]=None,date_to:Optional[str]=None,
+            department_aliases:Optional[list[dict[str,Any]]]=None,extra_terms:Optional[list[str]]=None,
+            source:str='auto')->dict[str, Any]:
+        """반복 주제어 후보를 찾는다. 같은 요구·요구방향·미이행을 자동 판정하지 않는다.
+        department 또는 keyword 중 하나만 지정한다. 최근2년은 years=2, period_mode=rolling_years;
+        명시기간은 date_from+date_to. 기본 calendar_years는 완료된 달력연도(기존 호환).
+        부서 별칭은 department_aliases=[{name,valid_from,valid_to,basis}], 최대2개.
+        반대 문면 단서와 원문을 함께 보여주고 동일 요구 여부는 담당자가 확인한다."""
+        if bool(department)==bool(keyword):return invalid('department 또는 keyword 중 하나만 지정하세요.')
         anchor=(department or keyword or '').strip()
-        if not anchor or len(anchor)>200:return invalid('department 또는 keyword를 1~200자로 지정하세요.')
-        if isinstance(years,bool) or not isinstance(years,int) or not 2<=years<=5:
-            return invalid('years는 2~5입니다. 반복 확인에는 최소 두 개 연도가 필요합니다.')
-        if isinstance(min_years,bool) or not isinstance(min_years,int) or not 2<=min_years<=years:
-            return invalid(f'min_years는 2~{years}입니다.')
-        today=dt.datetime.now(dt.timezone(dt.timedelta(hours=9))).date()
-        try:day=dt.date.fromisoformat(as_of) if as_of else today
-        except ValueError:return invalid('as_of는 YYYY-MM-DD입니다.')
-        if day>today:return invalid('as_of는 미래 날짜일 수 없습니다.')
-        if isinstance(max_docs_per_year,bool) or not isinstance(max_docs_per_year,int) or not 1<=max_docs_per_year<=10:
+        if not anchor or len(anchor)>200:return invalid('부서명 또는 주제어를 1~200자로 지정하세요.')
+        if type(top) is not int or not 1<=top<=60:return invalid('top은 1~60의 정수입니다.')
+        if type(max_docs_per_year) is not int or not 1<=max_docs_per_year<=10:
             return invalid('max_docs_per_year는 1~10의 정수입니다.')
-        end=day.year if include_current_year else day.year-1
-        events=[];per_year=[];snapshot_ids=[];codes=[]
-        for year in range(end-years+1,end+1):
-            df=f'{year}-01-01';dto=day.isoformat() if year==day.year else f'{year}-12-31'
+        if source not in ('auto','clik','site'):return invalid('source는 auto|clik|site입니다.')
+        if not department and (department_aliases or extra_terms):return invalid('부서 별칭은 department 조회에만 사용합니다.')
+        try:
+            period=P.resolve_period(years=years,include_current_year=include_current_year,as_of=as_of,
+                period_mode=period_mode,date_from=date_from,date_to=date_to)
+            aliases=A.normalize_aliases(department or '',department_aliases,extra_terms)
+            if type(min_years) is not int or not 2<=min_years<=len(period['windows']):
+                raise ValueError('min_years는 2 이상이며 실제 조회 회의연도 수 이하여야 합니다.')
+        except ValueError as exc:return invalid(str(exc))
+        events=[];per_year=[];snapshot_ids=[];codes=[];missing_snapshots=False;all_errors=[]
+        for window in period['windows']:
+            df,dto=window['date_from'],window['date_to']
             if department:
-                # 부서 기준에서는 본문 주제어로 거르지 않는다. 부서명은 질의 본문이 아니라 직함에 나타난다.
-                result=await council_department_brief(department,council,df,dto,committee,None,
-                                                      max_docs_per_year,'auto',1)
+                # Raw snapshots retain all questions; final match uses the same alias rules.
+                result=await council_department_brief(department=department,council=council,date_from=df,date_to=dto,
+                    committee=committee,max_docs=max_docs_per_year,source=source,limit=30,
+                    department_aliases=department_aliases,extra_terms=extra_terms)
             else:
                 result=await council_evidence_bundle(anchor,council,'질의답변',None,committee,df,dto,
-                                                     max_docs_per_year)
+                                                     max_docs_per_year,source=source,limit=30)
             if result['status']=='INVALID_INPUT':return result
-            codes.append(result['status'])
+            codes.append(result['status']);all_errors.extend(result.get('errors',[]))
             snapshot=result.get('snapshot_id')
             payload=snapshots.get(snapshot) if snapshot else None
+            if payload is None and result['status'] not in ('ERROR','EMPTY'):
+                missing_snapshots=True
             rows=payload.get('items',[]) if payload else []
-            if department:
-                rows=[e for e in rows if D.event_touches_department(e,department)]
+            if department:rows=[e for e in rows if D.event_touches_department(e,department,aliases)]
             events.extend(rows)
             if snapshot:snapshot_ids.append(snapshot)
-            per_year.append({'meeting_year':year,'status':result['status'],
-                             'events':len(rows),'snapshot_id':snapshot})
-        if codes and all(c=='ERROR' for c in codes):
-            return {'status':'ERROR','workflow':'recurring_issues','anchor':anchor,'per_year':per_year,
-                    'recurring':[],'limitations':LIMITS}
-        review={'status':'PARTIAL' if any(c in ('ERROR','PARTIAL') for c in codes) else 'COMPLETE',
-                'as_of':day.isoformat()}
-        try:
-            table=D.recurring_terms(events,U.extract_terms,min_years=min_years,top=top,
-                                    stopwords=[anchor,council,*D.GENERIC_TERMS])
-        except ValueError as exc:
-            return invalid(str(exc))
-        status='EMPTY' if not table['items'] else review['status']
-        return {'status':status,'workflow':'recurring_issues','anchor':anchor,
+            per_year.append({**window,'status':result['status'],'events':len(rows),'snapshot_id':snapshot,
+                             'coverage':result.get('coverage',[]),'errors':result.get('errors',[]),
+                             'snapshot_readable':payload is not None})
+        table=D.recurring_terms(events,U.extract_terms,min_years=min_years,top=top,
+                                stopwords=[anchor,council,*[a['name'] for a in aliases],*D.GENERIC_TERMS])
+        status=C.combine_statuses(codes,len(table['items']),incomplete=missing_snapshots or bool(table['undated_events']) or bool(table['omitted_candidate_terms']))
+        return {'status':status,'workflow':'recurring_issues','classification':'REPEATED_TOPIC_CANDIDATES',
+                'same_request_confirmed':False,'anchor':anchor,
                 'anchor_kind':'department' if department else 'keyword','council':council,
-                'as_of':review.get('as_of'),'include_current_year':include_current_year,
-                'years_requested':years,'min_years':min_years,'per_year':per_year,
-                'events_examined':len(events),'snapshot_ids':snapshot_ids,
-                'recurring':table['items'],'observed_years':table['observed_years'],
-                'undated_events':table['undated_events'],'counting_basis':table['counting_basis'],
-                'next_step':{'tool':'council_format_worksheet',
-                             'arguments':{'form':'행정사무감사_답변카드','topic':'(반복 쟁점 중 하나)'},
-                             'why':'반복 쟁점을 골라 답변카드 서식으로 배치합니다.'},
+                'as_of':period['as_of'],'period':period,'include_current_year':include_current_year,
+                'department_aliases':aliases,'years_requested':years,'min_years':min_years,'per_year':per_year,
+                'events_examined':len(events),'snapshot_ids':snapshot_ids,'errors':all_errors,
+                'recurring':table['items'],'observed_repeat_candidates':len(table['items']),
+                'total_candidate_terms':table['total_candidate_terms'],'omitted_candidate_terms':table['omitted_candidate_terms'],
+                'evidence_recovery':'snapshot_ids의 items를 council_get_evidence로 이어 읽어 생략된 인용을 확인하세요.',
+                'observed_years':table['observed_years'],'undated_events':table['undated_events'],
+                'counting_basis':table['counting_basis'],'snapshot_unavailable':missing_snapshots,
                 'limitations':LIMITS+table['limitations'],'stored':False}
 
     @register
@@ -480,7 +526,7 @@ def install(U):
             if origin=='site':
                 doc=await U.site.detail(key);turns=doc['turns'];meta=doc['meta'];url=doc['url']
             else:
-                meta=await U.minutes_detail(key);turns=E.parse_turns(meta.get('MINTS_HTML',''));url=meta.get('ORGINL_FILE_URL')
+                meta=await U.minutes_detail(key);turns=await asyncio.to_thread(E.parse_turns,meta.get('MINTS_HTML',''));url=meta.get('ORGINL_FILE_URL')
         except Exception as exc:return {'status':'ERROR','message':R.safe_error(exc),'items':[]}
         if not turns:return {'status':'PARTIAL','reason':'BODY_UNAVAILABLE_OR_FORMAT_UNSUPPORTED','ref':ref,'source_url':E.make_record(dict(meta,DOCID=key),[],source=origin,source_url=url)['provenance']['source_url'],'items':[]}
         keep=None
@@ -535,7 +581,11 @@ def install(U):
                 'deployment_commit':os.environ.get('RENDER_GIT_COMMIT') or os.environ.get('GIT_COMMIT') or 'unknown',
                 'module_sha256':hashes,'tool_schema_sha256':hashlib.sha256(json.dumps(schema,sort_keys=True).encode()).hexdigest(),
                 'tool_count':len(schema),'profile':U.PROFILE,'clik_key_configured':bool(U.API_KEY),
-                'profile_note':'core=5개 / work=실무 14개 / lite=22개 / full=전체 34개',
+                'profile_note':'도구 수만으로 버전을 판단하지 말고 module_sha256·tool_schema_sha256을 대조하세요.',
+                'capabilities':RELEASE.CAPABILITIES,'runtime_fingerprint':RELEASE.runtime_fingerprint(root),
+                'release_verification':RELEASE.verify_manifest(root),
+                'auth_configuration':R.auth_diagnostics(),
+                'deployment_validation':'REMOTE_RUNTIME_STATUS_NOT_END_TO_END_AUTH_PROOF',
                 'budget':U.clik._budget.status(),
                 'response_budget':{'max_chars':B.max_chars(),'text_json_max_chars':B.text_json_max_chars(),
                     'note':'구조화 결과는 이 한도 안으로 축약되며, 축약분은 response_budget.reduced에 남습니다.'},

@@ -4,7 +4,8 @@ services:
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: python uijeong_mcp.py --http
+    startCommand: python scripts/check_config.py --http --manifest && python uijeong_mcp.py --http
+    healthCheckPath: /healthz
     envVars:
       - key: CLIK_API_KEY
         sync: false
@@ -17,13 +18,15 @@ services:
         value: 0.0.0.0
       - key: UIJEONG_ALLOWED_HOSTS
         sync: false
+      - key: UIJEONG_AUTH_MODE
+        value: bearer
       - key: UIJEONG_BEARER_TOKEN
         generateValue: true
       # Keep one tool result inside the model's context window.
       - key: UIJEONG_MAX_RESPONSE_CHARS
         value: "30000"
-      # Memory guard. A free instance has ~512MB; each cache entry is a whole
-      # meeting record. Raise only on a plan with more memory.
+      # Memory guard: every cache entry can contain a whole meeting record.
+      # Size for the actual instance memory and measured workload.
       - key: UIJEONG_CACHE_MAX_ENTRIES
         value: "200"
       - key: UIJEONG_SITE_CACHE_MAX_ENTRIES
@@ -31,4 +34,5 @@ services:
 # For durability, provision persistent storage and set UIJEONG_STATE_DB.
 # Without it the free plan's ephemeral disk loses snapshots and the call budget
 # on every redeploy; evidence paging then needs a fresh search.
-# This template has no OAuth. Your client must support a Bearer header.
+# Compatibility template: static Bearer only. It is not direct ChatGPT OAuth.
+# See render.oauth.yaml for resource-server settings; external AS required.

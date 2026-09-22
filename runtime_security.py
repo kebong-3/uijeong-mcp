@@ -1,7 +1,7 @@
 """Bounded network access, local persistence and HTTP guards for 의정소통 MCP.
 
-Static bearer authentication is for a trusted single-organization deployment. It
-is not an OAuth authorization server or per-user authorization implementation.
+Static bearer is a legacy single-organization path. OAuth mode verifies tokens
+with a separately administered authorization server; it does not issue tokens.
 SQLite coordinates processes sharing one local file, not different server nodes.
 """
 from __future__ import annotations
@@ -49,7 +49,9 @@ def schema_fingerprint(value: Any) -> str:
 
 def redact_secrets(value: Any, extra_secrets: Iterable[str] = ()) -> str:
     text = str(value)
-    known = [os.environ.get("CLIK_API_KEY", ""), os.environ.get("UIJEONG_BEARER_TOKEN", ""), *extra_secrets]
+    known = [os.environ.get("CLIK_API_KEY", ""), os.environ.get("UIJEONG_BEARER_TOKEN", ""),
+             os.environ.get("UIJEONG_OAUTH_CLIENT_SECRET", ""),
+             os.environ.get("UIJEONG_VERIFY_TOKEN", ""), *extra_secrets]
     for secret in sorted((s for s in known if s), key=len, reverse=True):
         text = text.replace(secret, "[REDACTED]").replace(quote(secret, safe=""), "[REDACTED]")
     text = re.sub(r"(?i)([?&](?:key|api_?key|servicekey|access_token|token)=)[^&\s\"'<>]+", r"\1[REDACTED]", text)
@@ -167,7 +169,7 @@ class SnapshotStore:
     def __init__(self, path: str | Path | None = None, scope: str = "local", *,
                  allow_private: bool = False, max_bytes: int = 4 * 1024 * 1024,
                  max_entries: int = 500, clock: Callable[[], float] = time.time,
-                 evict_oldest: bool = False, max_total_bytes: int = 0):
+                 evict_oldest: bool = False, max_total_bytes: int = 0, bind_request_scope: bool = False):
         """``evict_oldest`` is opt-in and must be reported by the caller.
 
         Refusing to store is the safe default: evicting an unexpired snapshot
@@ -182,9 +184,14 @@ class SnapshotStore:
         self.allow_private, self.max_bytes, self.max_entries, self.clock = allow_private, max_bytes, max_entries, clock
         self.evict_oldest, self.max_total_bytes = evict_oldest, max_total_bytes
         self.evicted = 0
+        self.bind_request_scope = bind_request_scope
         with _connect(self.path) as conn:
             conn.execute("CREATE TABLE IF NOT EXISTS snapshots (id TEXT PRIMARY KEY, scope TEXT NOT NULL, created REAL NOT NULL, expires REAL NOT NULL, kind TEXT NOT NULL, payload TEXT NOT NULL)")
             conn.execute("CREATE INDEX IF NOT EXISTS snapshot_expiry ON snapshots(expires)")
+
+    def effective_scope(self) -> str:
+        identity = REQUEST_SCOPE.get()
+        return self.scope if not self.bind_request_scope or identity == 'local' else self.scope + ':' + identity
 
     def put(self, payload: Any, ttl_seconds: int = 86400, source_kind: str = "PUBLIC_CLIK") -> str:
         if source_kind not in PUBLIC_KINDS and not self.allow_private:
@@ -199,31 +206,32 @@ class SnapshotStore:
         try:
             conn.execute("BEGIN IMMEDIATE")
             conn.execute("DELETE FROM snapshots WHERE expires<=?", (now,))
-            count = conn.execute("SELECT count(*) FROM snapshots WHERE scope=?", (self.scope,)).fetchone()[0]
+            quota_where, quota_args = ('', ()) if self.bind_request_scope else (' WHERE scope=?', (self.effective_scope(),))
+            count = conn.execute("SELECT count(*) FROM snapshots" + quota_where, quota_args).fetchone()[0]
             if count >= self.max_entries and self.evict_oldest:
                 surplus = count - self.max_entries + 1
                 removed = conn.execute(
-                    "DELETE FROM snapshots WHERE id IN (SELECT id FROM snapshots WHERE scope=?"
-                    " ORDER BY created ASC LIMIT ?)", (self.scope, surplus)).rowcount
+                    "DELETE FROM snapshots WHERE id IN (SELECT id FROM snapshots" + quota_where +
+                    " ORDER BY created ASC LIMIT ?)", (*quota_args, surplus)).rowcount
                 self.evicted += removed
                 count -= removed
             if count >= self.max_entries:
                 # Never invalidate an unexpired cursor silently by eviction.
                 raise SecurityError("증거 보관 한도에 도달했습니다. 기존 묶음 만료 후 재시도하세요.")
             if self.max_total_bytes:
-                total = conn.execute("SELECT coalesce(sum(length(payload)),0) FROM snapshots WHERE scope=?",
-                                     (self.scope,)).fetchone()[0]
-                while total + len(raw) > self.max_total_bytes and self.evict_oldest:
-                    row = conn.execute("SELECT id,length(payload) FROM snapshots WHERE scope=?"
-                                       " ORDER BY created ASC LIMIT 1", (self.scope,)).fetchone()
+                total = conn.execute("SELECT coalesce(sum(length(CAST(payload AS BLOB))),0) FROM snapshots" + quota_where,
+                                     quota_args).fetchone()[0]
+                while total + len(raw.encode()) > self.max_total_bytes and self.evict_oldest:
+                    row = conn.execute("SELECT id,length(CAST(payload AS BLOB)) FROM snapshots" + quota_where +
+                                       " ORDER BY created ASC LIMIT 1", quota_args).fetchone()
                     if not row:
                         break
                     conn.execute("DELETE FROM snapshots WHERE id=?", (row[0],))
                     self.evicted += 1
                     total -= row[1]
-                if total + len(raw) > self.max_total_bytes:
+                if total + len(raw.encode()) > self.max_total_bytes:
                     raise SecurityError("증거 보관 용량 한도를 초과했습니다. 검색 범위를 줄여주세요.")
-            conn.execute("INSERT INTO snapshots VALUES(?,?,?,?,?,?)", (ident, self.scope, now, now + ttl_seconds, source_kind, raw))
+            conn.execute("INSERT INTO snapshots VALUES(?,?,?,?,?,?)", (ident, self.effective_scope(), now, now + ttl_seconds, source_kind, raw))
             conn.execute("COMMIT")
         except BaseException:
             if conn.in_transaction:
@@ -238,12 +246,12 @@ class SnapshotStore:
             return None
         with _connect(self.path) as conn:
             conn.execute("DELETE FROM snapshots WHERE expires<=?", (self.clock(),))
-            row = conn.execute("SELECT payload FROM snapshots WHERE id=? AND scope=? AND expires>?", (ident, self.scope, self.clock())).fetchone()
+            row = conn.execute("SELECT payload FROM snapshots WHERE id=? AND scope=? AND expires>?", (ident, self.effective_scope(), self.clock())).fetchone()
         return json.loads(row[0]) if row else None
 
     def delete(self, ident: str) -> bool:
         with _connect(self.path) as conn:
-            return bool(conn.execute("DELETE FROM snapshots WHERE id=? AND scope=?", (ident, self.scope)).rowcount)
+            return bool(conn.execute("DELETE FROM snapshots WHERE id=? AND scope=?", (ident, self.effective_scope())).rowcount)
 
 
 def validate_url(url: str, allowed_hosts: Iterable[str]) -> str:
@@ -339,7 +347,23 @@ def http_policy() -> dict[str, Any]:
     token = os.environ.get("UIJEONG_BEARER_TOKEN", "")
     hosts = _csv_env("UIJEONG_ALLOWED_HOSTS")
     origins = _csv_env("UIJEONG_ALLOWED_ORIGINS")
-    if remote and (not hosts or len(token) < 32):
+    mode = os.environ.get('UIJEONG_AUTH_MODE', 'auto').strip().lower()
+    if mode == 'auto':mode = 'bearer' if token else 'local'
+    if mode not in ('bearer','oauth','local'):
+        raise SecurityError('UIJEONG_AUTH_MODE는 bearer|oauth|local|auto입니다.')
+    if remote and mode == 'local':
+        raise SecurityError('외부 HTTP에는 인증이 필요합니다. local 모드는 루프백 전용입니다.')
+    if mode == 'bearer' and len(token)<32:
+        raise SecurityError('Bearer 모드에는 32자 이상 UIJEONG_BEARER_TOKEN이 필요합니다.')
+    oauth = None
+    if mode == 'oauth':
+        from oauth_resource import OAuthConfig
+        oauth = OAuthConfig.from_env()
+        if token:
+            raise SecurityError('OAuth 모드에서는 UIJEONG_BEARER_TOKEN을 제거하세요. 두 인증을 혼용하지 않습니다.')
+        if urlsplit(oauth.resource).netloc.lower() not in hosts:
+            raise SecurityError('UIJEONG_RESOURCE_URL 호스트를 UIJEONG_ALLOWED_HOSTS에 정확히 지정하세요.')
+    if remote and (not hosts or (mode == 'bearer' and len(token) < 32)):
         raise SecurityError("외부 HTTP 공개에는 UIJEONG_ALLOWED_HOSTS와 32자 이상 UIJEONG_BEARER_TOKEN이 필요합니다.")
     if any("*" in value or "/" in value or "@" in value for value in hosts):
         raise SecurityError("허용 Host에는 정확한 도메인 또는 도메인:포트만 입력하세요.")
@@ -353,7 +377,21 @@ def http_policy() -> dict[str, Any]:
         parts = urlsplit(origin)
         if parts.scheme not in (("https",) if remote else ("http", "https")) or not parts.netloc or parts.path or parts.query or parts.fragment or parts.username or parts.password:
             raise SecurityError("허용 Origin은 경로 없는 정확한 HTTPS 출처여야 합니다.")
-    return {"host": host, "port": port, "remote": remote, "token": token, "hosts": hosts, "origins": origins}
+    return {"host": host, "port": port, "remote": remote, "token": token, "hosts": hosts, "origins": origins, "auth_mode": mode, "oauth": oauth}
+
+
+def auth_diagnostics() -> dict:
+    """Report configuration stages only. No secret values or live-login claims."""
+    try: policy=http_policy()
+    except SecurityError as exc:
+        return {'status':'CONFIG_INVALID','code':'AUTH_CONFIG_ERROR','message':str(exc),'remote_login_tested':False}
+    mode=policy['auth_mode']
+    return {'status':'CONFIG_VALID','mode':mode,'remote_login_tested':False,
+            'clik_api_is_separate_credential':True,
+            'connection_requirement': ('별도 인증서버의 authorization-code + PKCE 설정 및 실제 로그인 시험 필요' if mode=='oauth' else
+                 '정적 Bearer를 전달할 수 있는 클라이언트/게이트웨이 전용; ChatGPT 직접 OAuth 인증과 다름' if mode=='bearer' else
+                 '127.0.0.1 등 루프백 로컬 실행 전용'),
+            'oauth_token_check': 'RFC7662 introspection' if mode=='oauth' else None}
 
 
 def bind_host() -> str:
@@ -371,20 +409,29 @@ class HTTPGuard:
     """Pure ASGI wrapper; bounded body, exact headers, bearer and rate limit.
 
     Limits are per process. The single bearer maps to one organization scope;
-    trusted proxy headers are deliberately ignored. Multi-user OAuth requires a
-    separate authenticated gateway with its own authorization and rate policy.
+    trusted proxy headers are deliberately ignored. OAuth uses an external authorization server and per-subject request scopes.
+    Limits are process-local; multiple replicas need an upstream shared rate policy.
     """
     def __init__(self, app: Any, policy: dict[str, Any] | None = None, *,
                  max_body: int = 1024 * 1024, requests_per_minute: int = 120):
         self.app, self.policy = app, policy if policy is not None else http_policy()
         self.max_body, self.requests_per_minute = max_body, requests_per_minute
         self.requests: dict[str, collections.deque[float]] = {}
+        self.oauth_verifier = None
+        if self.policy.get('auth_mode') == 'oauth':
+            from oauth_resource import IntrospectionVerifier
+            self.oauth_verifier=IntrospectionVerifier(self.policy['oauth'])
+        self.pre_auth_requests: collections.deque[float] = collections.deque()
 
     async def _reject(self, send: Any, code: int, message: str) -> None:
         payload = json.dumps({"error": message}, ensure_ascii=False).encode()
         headers = [(b"content-type", b"application/json"), (b"cache-control", b"no-store")]
-        if code == 401:
+        if code in (401,403) and self.policy.get('oauth'):
+            challenge=self.policy['oauth'].challenge('insufficient_scope' if code==403 else 'invalid_token')
+            headers.append((b"www-authenticate", challenge.encode()))
+        elif code == 401:
             headers.append((b"www-authenticate", b'Bearer realm="uijeong-mcp"'))
+        if code in (429,503):headers.append((b'retry-after', b'2' if code==503 else b'60'))
         await send({"type": "http.response.start", "status": code, "headers": headers})
         await send({"type": "http.response.body", "body": payload})
 
@@ -406,13 +453,43 @@ class HTTPGuard:
         if origin is not None and origin.lower() not in self.policy["origins"]:
             await self._reject(send, 403, "허용되지 않은 Origin")
             return
-        token = self.policy["token"]
-        auth = headers.get("authorization", [""])[0]
-        if token and not hmac.compare_digest(auth.encode(), ("Bearer " + token).encode()):
-            await self._reject(send, 401, "인증 필요")
+        from release_info import VERSION
+        path=scope.get('path','/mcp')
+        method=scope.get('method','POST')
+        public_metadata = self.policy.get('oauth') and path in (
+            '/.well-known/oauth-protected-resource', self.policy['oauth'].metadata_path)
+        if (path=='/healthz' or public_metadata) and method in ('GET','HEAD'):
+            payload = self.policy['oauth'].metadata() if public_metadata else {'status':'ok','version':VERSION}
+            encoded=json.dumps(payload,ensure_ascii=False).encode()
+            await send({'type':'http.response.start','status':200,'headers':[
+                (b'content-type',b'application/json'),(b'cache-control',b'no-store'),
+                (b'x-content-type-options',b'nosniff')]})
+            await send({'type':'http.response.body','body':b'' if method=='HEAD' else encoded})
             return
-        identity = key_scope(token, "http") if token else "local"
+        token = self.policy.get("token",'')
+        auth = headers.get("authorization", [""])[0]
+        if self.oauth_verifier is not None:
+            # Shared pre-auth budget avoids unbounded remote introspection work.
+            stamp=time.monotonic()
+            while self.pre_auth_requests and self.pre_auth_requests[0]<=stamp-60:self.pre_auth_requests.popleft()
+            if len(self.pre_auth_requests)>=240:
+                await self._reject(send,429,'인증 확인 요청 한도 초과');return
+            self.pre_auth_requests.append(stamp)
+            if not auth.lower().startswith('bearer '):
+                await self._reject(send,401,'OAuth 인증 필요');return
+            from oauth_resource import AuthFailure
+            try:identity=(await self.oauth_verifier.verify(auth[7:]))['identity']
+            except AuthFailure as exc:
+                await self._reject(send,exc.http_status,exc.code);return
+        else:
+            if token and not hmac.compare_digest(auth.encode(), ("Bearer " + token).encode()):
+                await self._reject(send,401,'MCP Bearer 인증 필요; CLIK_API_KEY와 다른 인증입니다.');return
+            identity = key_scope(token,"http") if token else "local"
         now = time.monotonic()
+        for existing,q in list(self.requests.items()):
+            if not q or q[-1]<=now-60:self.requests.pop(existing,None)
+        if identity not in self.requests and len(self.requests)>=1000:
+            await self._reject(send,429,'동시 인증 주체 한도 초과');return
         queue = self.requests.setdefault(identity, collections.deque())
         while queue and queue[0] <= now - 60:
             queue.popleft()

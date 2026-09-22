@@ -31,6 +31,10 @@ DEFAULT_TEXT_JSON_MAX = 8_000
 # Arrays that grow with the size of the source material, with a default cap and
 # the route a caller uses to read the rest. Paths match the trailing key name.
 BULK_ARRAYS: dict[str, tuple[int, str]] = {
+    "citations": (20, "recovery의 council_prepare_response를 max_events=1로 재호출하세요."),
+    "claim_checks": (40, "claims와 draft를 작은 문장 묶음으로 나눠 다시 점검하세요."),
+    "unlinked_spans": (40, "draft를 문장 단위로 나눠 다시 점검하세요."),
+    "next_actions": (20, "coverage의 다음 위치 또는 pending_refs를 확인하세요."),
     "items": (10, "같은 snapshot_id로 item_offset을 늘려 이어봅니다."),
     "discussion_evidence": (12, "council_evidence_bundle(mode='질의답변')에서 item_offset으로 이어봅니다."),
     "other_speech_evidence": (8, "council_evidence_bundle(mode='발언')으로 조회합니다."),
@@ -51,6 +55,7 @@ BULK_ARRAYS: dict[str, tuple[int, str]] = {
 
 # Long verbatim strings: key -> (kept chars, retrieval route).
 LONG_TEXT: dict[str, tuple[int, str]] = {
+    "plain_text": (1500, "recovery의 council_prepare_response를 max_events=1로 재호출하세요."),
     "text": (700, "council_read_source로 원문 전체를 확인합니다."),
     "excerpt": (700, "council_read_source로 원문 전체를 확인합니다."),
     "quote": (700, "council_read_source로 원문 전체를 확인합니다."),
@@ -186,7 +191,11 @@ def _trim_all_strings(node: Any, keep: int, log: list[dict], path: str = "") -> 
 _ESSENTIAL = ("status", "message", "snapshot_id", "keyword", "council", "topic",
               "requested_council", "mode", "total_items", "next_item_offset", "ref",
               "source_url", "limitations", "reason", "recovery", "item_offset", "collection",
-              "next_start_turn", "next_start_char", "offset", "next_offset")
+              "next_start_turn", "next_start_char", "offset", "next_offset",
+              "period", "classification", "same_request_confirmed", "coverage_summary",
+              "observed_repeat_candidates", "snapshot_unavailable", "recovery", "source_status",
+              "readiness", "ready_for_submission", "semantic_support", "mechanical_issues_count",
+              "unlinked_span_count", "evidence_total", "event_offset", "next_event_offset")
 
 
 def _minimal(payload: dict, cap: int, log: list[dict]) -> dict:
@@ -213,6 +222,11 @@ def _repair(original: Any, bounded: Any) -> Any:
         return [_repair(o,b) for o,b in zip(original,bounded)]
     if not isinstance(original,dict) or not isinstance(bounded,dict):return bounded
     out={k:_repair(original.get(k),v) for k,v in bounded.items()}
+    if original.get("workflow")=="claim_audit" and original!=bounded:
+        out["audit_complete"]=False
+        out["all_content_traceable"]=False
+        out["ready_for_submission"]=False
+        out["audit_recovery"]="출력이 축약되었습니다. draft와 claims를 작은 문장 묶음으로 나누어 재점검하세요."
     # Quote hashes and source spans refer to original material, not the displayed prefix.
     for key in LONG_TEXT:
         old,new=original.get(key),out.get(key)

@@ -126,9 +126,9 @@ def review_answer(draft,facts,claims,official_events=None):
    occurrences=[m.start() for m in re.finditer(re.escape(statement),draft)]
    start=occurrences[0] if len(occurrences)==1 else None
   located=type(start)==int and start>=0 and draft[start:start+len(statement)]==statement
-  if located:covered.append((start,start+len(statement)))
   citation=text(c.get('support_excerpt',''),'support_excerpt',3000,False)
   exact=bool(f and citation and citation in f['text'])
+  if located and exact:covered.append((start,start+len(statement)))
   checks.append({'claim':statement,'start_char':start if located else None,'fact_id':fid,'located_in_draft':located,
    'support_excerpt':citation or None,'support_status':'제공자료 내 문구 일치·의미 일치 미판정' if exact else '제공자료 근거 연결 미확인',
    'issues':([ '초안 위치 미확인 또는 중복 문구: start_char 지정 필요'] if not located else [])+(['유효한 fact_id·원문 발췌 필요'] if not exact else [])})

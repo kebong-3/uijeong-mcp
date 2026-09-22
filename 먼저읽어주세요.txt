@@ -1,0 +1,8 @@
+지방의회 MCP 2.5.0-rc.1
+
+1. docs/UPGRADE_v250_KO.md에서 교체와 사용 방법을 확인하세요.
+2. uijeong-mcp 폴더 안의 전체 파일을 프로젝트 루트에 반영하세요.
+3. UIJEONG_PROFILE=work일 때 18개 도구입니다.
+4. 기존 인증 및 CLIK_API_KEY를 유지하고, 새 버전 배포 뒤 도구 명세를 갱신하세요.
+5. docs/VERIFICATION_v250_KO.md에 실제 검증 범위와 미검증 사항을 기록했습니다.
+6. docs/examples-v250은 합성자료 예시이며 실제 의회 발언·사업실적이 아닙니다.
