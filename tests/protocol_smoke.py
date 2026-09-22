@@ -26,6 +26,9 @@ def environment(state: str) -> dict[str, str]:
     env = dict(os.environ)
     for key in ("UIJEONG_ALLOWED_HOSTS", "UIJEONG_ALLOWED_ORIGINS", "UIJEONG_BEARER_TOKEN", "UIJEONG_DATA_DIR"):
         env.pop(key, None)
+    for key in list(env):
+        if key.startswith("UIJEONG_OAUTH_") or key in ("UIJEONG_AUTH_MODE", "UIJEONG_RESOURCE_URL"):
+            env.pop(key, None)
     env.update(CLIK_API_KEY="", UIJEONG_PROFILE="full", UIJEONG_STATE_DB=state,
                UIJEONG_BIND_HOST="127.0.0.1", PYTHONUNBUFFERED="1")
     return env
@@ -43,6 +46,7 @@ async def inspect_session(session: ClientSession) -> dict:
     assert isinstance(status.structuredContent, dict), "Actual MCP structuredContent is missing"
     state = status.structuredContent
     assert state["status"] == "COMPLETE" and state["clik_key_configured"] is False
+    assert state["release_verification"]["status"] == "MATCH"
     assert state["budget"]["attempted_calls"] == 0 and state["live_checks"] == []
     bad = await session.call_tool("council_evidence_bundle", {
         "keyword": "성인지예산", "date_from": "2026-09-17", "date_to": "2023-09-17"})
@@ -66,8 +70,26 @@ async def inspect_session(session: ClientSession) -> dict:
     assert figures.structuredContent["items"][0]["change"]=="20"
     invalid_work = await session.call_tool("council_review_followups", {"snapshot_id":"not-a-real-snapshot", "updates":[], "as_of":"2026-09-19"})
     assert invalid_work.isError
+    resources = await session.list_resources()
+    assert 'uijeong://guide/answer-preparation' in {str(r.uri) for r in resources.resources}
+    guide = await session.read_resource('uijeong://guide/answer-preparation')
+    assert 'council_audit_claims' in guide.contents[0].text
+    prompts = await session.list_prompts()
+    assert '근거기반_의회답변' in {p.name for p in prompts.prompts}
+    assert {"council_prepare_response", "council_audit_claims", "council_compare_metrics", "council_compare_evidence"} <= set(tools)
+    audit = await session.call_tool("council_audit_claims", {"draft":"합성자료 100명", "claims":[], "as_of":"2026-09-20"})
+    assert not audit.isError and audit.structuredContent["unlinked_span_count"] == 1
+    assert audit.structuredContent["ready_for_submission"] is False
+    bad_preparation = await session.call_tool("council_prepare_response", {
+        "topic":"합성사업", "department":"합성부서", "date_from":"2026-09-20", "date_to":"2024-01-01"})
+    assert bad_preparation.isError and bad_preparation.structuredContent["status"] == "INVALID_INPUT"
+    base = dict(unit="천원", metric="합성사업비", entity="합성부서", population="전체", period_basis="연간", accounting_basis="최종예산", document_ref="합성문서")
+    checked = await session.call_tool("council_compare_metrics", {"data":[{"name":"합성사업", "previous":dict(base, value=100, fiscal_year=2025), "current":dict(base, value=120, fiscal_year=2026)}]})
+    assert checked.structuredContent["items"][0]["calculation"]["delta"] == "20000"
+    bad_pair = await session.call_tool("council_compare_evidence", {"snapshot_ids":[], "pairs":[]})
+    assert bad_pair.isError
     return {"protocol": initialized.protocolVersion, "tool_count": len(tools),
-            "workbench_tools": True, "structured_content": True, "invalid_input_is_error": True, "missing_key_is_error": True,
+            "response_tools_v250": True, "resources_and_prompt": True, "runtime_manifest_match": True, "workbench_tools": True, "structured_content": True, "invalid_input_is_error": True, "missing_key_is_error": True,
             "synthetic_provenance": True}
 
 

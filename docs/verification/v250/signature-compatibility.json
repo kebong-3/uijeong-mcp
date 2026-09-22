@@ -1,0 +1,11 @@
+{
+  "existing_tool_count": 34,
+  "new_tool_count": 38,
+  "changed_existing_signatures": [],
+  "added_tools": [
+    "council_audit_claims",
+    "council_compare_evidence",
+    "council_compare_metrics",
+    "council_prepare_response"
+  ]
+}

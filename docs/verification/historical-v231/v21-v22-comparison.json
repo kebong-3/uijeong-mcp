@@ -1,0 +1,16 @@
+[
+  {
+    "version": "review21/uijeong-mcp",
+    "shown_items": 6,
+    "next_item_offset": 70,
+    "expected_next": 46,
+    "oversized_error_chars": 100876
+  },
+  {
+    "version": "release22",
+    "shown_items": 6,
+    "next_item_offset": 46,
+    "expected_next": 46,
+    "oversized_error_chars": 197
+  }
+]

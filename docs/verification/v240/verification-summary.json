@@ -1,0 +1,38 @@
+{
+  "release": "2.4.0-rc.1",
+  "reference_date": "2026-09-21 Asia/Seoul",
+  "scope": "LOCAL_CODE_AND_SYNTHETIC_TESTS",
+  "test_counts": {
+    "passed": 264,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "deselected": 1,
+    "warnings": 4
+  },
+  "existing_offline_passed": 174,
+  "new_v24_passed": 90,
+  "new_test_modules": {
+    "test_upgrade24.py": 57,
+    "test_service24_offline.py": 21,
+    "test_release24.py": 12
+  },
+  "test_categories": [
+    "pure_business_rules",
+    "SQLite_limits_and_request_scopes",
+    "ASGI_guard_with_synthetic_requests",
+    "OAuth_introspection_with_mocked_HTTP",
+    "service_workflow_with_synthetic_upstream",
+    "deployment_validator_with_mocked_HTTP"
+  ],
+  "full_sdk_suite": {
+    "result": "BLOCKED_AT_COLLECTION",
+    "collection_errors": 4,
+    "reason": "mcp SDK not installed; dependency download DNS failure"
+  },
+  "actual_stdio_http_protocol": "NOT_RUN_MISSING_MCP_SDK",
+  "remote_clik_and_council_site": "NOT_RUN",
+  "real_oauth_login": "NOT_RUN",
+  "remote_deployment": "NOT_PERFORMED",
+  "note": "합성 테스트는 실제 MCP SDK 통신·실제 인증·공식 자료 정확도 검수를 대신하지 않는다."
+}

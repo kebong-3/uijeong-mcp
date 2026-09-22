@@ -1,0 +1,65 @@
+{
+  "version": "2.5.0-rc.1",
+  "based_on": "2.4.0-rc.1",
+  "pytest": {
+    "passed": 446,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "existing_cases": 386,
+    "new_cases": 60
+  },
+  "actual_sdk_protocol": {
+    "sdk_version": "1.30.0",
+    "real_sdk": true,
+    "external_api_calls": 0,
+    "stdio": {
+      "protocol": "2025-11-25",
+      "tool_count": 38,
+      "response_tools_v250": true,
+      "resources_and_prompt": true,
+      "runtime_manifest_match": true,
+      "workbench_tools": true,
+      "structured_content": true,
+      "invalid_input_is_error": true,
+      "missing_key_is_error": true,
+      "synthetic_provenance": true
+    },
+    "streamable_http": {
+      "protocol": "2025-11-25",
+      "tool_count": 38,
+      "response_tools_v250": true,
+      "resources_and_prompt": true,
+      "runtime_manifest_match": true,
+      "workbench_tools": true,
+      "structured_content": true,
+      "invalid_input_is_error": true,
+      "missing_key_is_error": true,
+      "synthetic_provenance": true,
+      "unauthorized_401": true,
+      "foreign_host_403": true,
+      "foreign_origin_403": true,
+      "large_request_413": true
+    }
+  },
+  "official_html_capture_component_check": {
+    "records": 2,
+    "parsed_turns": [
+      282,
+      386
+    ],
+    "raw_source_matching": "all turn bodies and labels after whitespace normalization",
+    "not_accuracy_or_recall_benchmark": true
+  },
+  "production_direct_site_path": "BLOCKED_IN_BUILD_ENVIRONMENT; public captures tested separately",
+  "clik_authenticated_live": "NOT_RUN_NO_KEY_PROVIDED",
+  "oauth_login_e2e": "NOT_RUN",
+  "remote_deployment": "NOT_PERFORMED",
+  "existing_signatures_preserved": true,
+  "profiles": {
+    "core": 5,
+    "work": 18,
+    "lite": 26,
+    "full": 38
+  }
+}

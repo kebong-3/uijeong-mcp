@@ -1,0 +1,27 @@
+{
+  "sdk_version": "1.30.0",
+  "real_sdk": true,
+  "external_api_calls": 0,
+  "stdio": {
+    "protocol": "2025-11-25",
+    "tool_count": 34,
+    "workbench_tools": true,
+    "structured_content": true,
+    "invalid_input_is_error": true,
+    "missing_key_is_error": true,
+    "synthetic_provenance": true
+  },
+  "streamable_http": {
+    "protocol": "2025-11-25",
+    "tool_count": 34,
+    "workbench_tools": true,
+    "structured_content": true,
+    "invalid_input_is_error": true,
+    "missing_key_is_error": true,
+    "synthetic_provenance": true,
+    "unauthorized_401": true,
+    "foreign_host_403": true,
+    "foreign_origin_403": true,
+    "large_request_413": true
+  }
+}

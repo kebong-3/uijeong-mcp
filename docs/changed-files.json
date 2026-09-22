@@ -1,0 +1,149 @@
+{
+  "baseline": "uploaded 2.3.1 ZIP",
+  "items": [
+    {
+      "path": ".env.example",
+      "change": "modified"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "change": "modified"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "change": "added"
+    },
+    {
+      "path": "README.md",
+      "change": "modified"
+    },
+    {
+      "path": "coverage_core.py",
+      "change": "added"
+    },
+    {
+      "path": "department_aliases.py",
+      "change": "added"
+    },
+    {
+      "path": "dept_core.py",
+      "change": "modified"
+    },
+    {
+      "path": "docs/DEVELOPER_HANDOFF.md",
+      "change": "added"
+    },
+    {
+      "path": "docs/EXAMPLES_v240_KO.md",
+      "change": "added"
+    },
+    {
+      "path": "docs/SECURITY_v240_KO.md",
+      "change": "added"
+    },
+    {
+      "path": "docs/UPGRADE_v240_KO.md",
+      "change": "added"
+    },
+    {
+      "path": "docs/VERIFICATION_v240_KO.md",
+      "change": "added"
+    },
+    {
+      "path": "docs/source-tool-contracts.json",
+      "change": "added"
+    },
+    {
+      "path": "oauth_resource.py",
+      "change": "added"
+    },
+    {
+      "path": "period_core.py",
+      "change": "added"
+    },
+    {
+      "path": "recurrence_core.py",
+      "change": "added"
+    },
+    {
+      "path": "release_info.py",
+      "change": "added"
+    },
+    {
+      "path": "render.oauth.yaml",
+      "change": "added"
+    },
+    {
+      "path": "render.yaml",
+      "change": "modified"
+    },
+    {
+      "path": "response_budget.py",
+      "change": "modified"
+    },
+    {
+      "path": "result_contract.py",
+      "change": "modified"
+    },
+    {
+      "path": "runtime_security.py",
+      "change": "modified"
+    },
+    {
+      "path": "scripts/build_manifest.py",
+      "change": "added"
+    },
+    {
+      "path": "scripts/check_config.py",
+      "change": "added"
+    },
+    {
+      "path": "scripts/export_runtime_schemas.py",
+      "change": "added"
+    },
+    {
+      "path": "scripts/source_contracts.py",
+      "change": "added"
+    },
+    {
+      "path": "scripts/verify_deployment.py",
+      "change": "added"
+    },
+    {
+      "path": "service_v2.py",
+      "change": "modified"
+    },
+    {
+      "path": "term_core.py",
+      "change": "added"
+    },
+    {
+      "path": "tests/protocol_smoke.py",
+      "change": "modified"
+    },
+    {
+      "path": "tests/test_release24.py",
+      "change": "added"
+    },
+    {
+      "path": "tests/test_service24_offline.py",
+      "change": "added"
+    },
+    {
+      "path": "tests/test_upgrade24.py",
+      "change": "added"
+    },
+    {
+      "path": "uijeong_mcp.py",
+      "change": "modified"
+    },
+    {
+      "path": "workbench_tools.py",
+      "change": "modified"
+    },
+    {
+      "path": "먼저읽어주세요.txt",
+      "change": "added"
+    }
+  ]
+}

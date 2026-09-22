@@ -1,0 +1,6 @@
+{
+  "live": true,
+  "status": "ERROR",
+  "error_type": "SiteBlocked",
+  "message": "요청 실패(SiteBlocked). 인증정보와 서버 응답 원문은 표시하지 않습니다."
+}
