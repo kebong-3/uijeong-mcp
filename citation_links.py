@@ -97,15 +97,17 @@ class OfficialLinkResolver:
             if dates != sorted(dates, reverse=True):
                 return None
             return dates[0], dates[-1]
-        low, high = 1, 1
+        low, high, found = 1, 1, None
         while high <= 1024:
             rows = await page(high)
             bounds = span(rows)
+            if bounds and bounds[0] >= date >= bounds[1]:
+                found = high
+                break
             if not rows or not bounds or bounds[1] <= date:
                 break
             low, high = high + 1, high * 2
-        found = None
-        while low <= high and len(pages) < 14:
+        while found is None and low <= high and len(pages) < 14:
             mid = (low + high) // 2
             rows = await page(mid)
             bounds = span(rows)
@@ -122,8 +124,11 @@ class OfficialLinkResolver:
                 low = mid + 1
         if found:
             # A meeting date may straddle a page boundary.
-            for n in (max(1, found - 1), found + 1):
-                await page(n)
+            bounds = span(pages[found])
+            if bounds[0] == date and found > 1:
+                await page(found - 1)
+            if bounds[1] == date:
+                await page(found + 1)
         unique = {row['key']: row for rows in pages.values() for row in rows
                   if row.get('key') and same_meeting(row, meta)}
         return list(unique.values())
@@ -161,7 +166,8 @@ class OfficialLinkResolver:
             while len(self.cache) > 256:
                 self.cache.popitem(last=False)
             return set_link(record, url, 'FETCHED_MATCHED', 'OFFICIAL_VIEWER')
-        record['source_link']['reason'] = '공식 본문과의 일치 또는 단일 회의 식별을 확인하지 못했습니다.'
+        record['source_link']['reason'] = ('공식 목록에서 일치하는 회의 후보를 찾지 못했습니다.' if not candidates
+            else '공식 본문과의 일치 또는 단일 회의 식별을 확인하지 못했습니다.')
         return record['source_link']
 
     async def enrich(self, records, timeout=25):

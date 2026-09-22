@@ -145,3 +145,53 @@ def test_queue_timeout_and_cancellation_release_capacity():
             assert (await c.post('/mcp',json={})).status_code==200
             assert app.active==0 and app.waiting==0
     asyncio.run(run())
+
+
+def site_list_html(key, date='2026.01.21'):
+    return ('<a href="/kr/assembly/late.do?pageNum=2">2</a><table><tr>'
+            '<td>1</td><td>9대</td><td>제337회</td><td>2차</td>'
+            f'<td><a href="/record/recordView.do?key={key}">사회도시위원회</a></td>'
+            f'<td>{date}</td></tr></table>')
+
+
+def test_real_pagination_and_concurrent_cache_misses(monkeypatch):
+    import uijeong_mcp as U
+    async def run():
+        site=U.CouncilSite(); calls=[]
+        site._page_param='pageIndex'  # Recover a stale deployment setting.
+        async def get(url):
+            calls.append(url); await asyncio.sleep(.005)
+            if '?' not in url:return site_list_html('first')
+            assert url.endswith('?pageNum=2')
+            return site_list_html('second', '2026.01.20')
+        monkeypatch.setattr(site,'get',get)
+        rows=await asyncio.gather(*(site.list_page(2) for _ in range(5)))
+        assert all(r[0]['key']=='second' for r in rows)
+        assert len(calls)==2
+    asyncio.run(run())
+
+
+def test_repeated_first_page_is_reported_as_failure(monkeypatch):
+    import uijeong_mcp as U
+    async def run():
+        site=U.CouncilSite()
+        async def get(url):return site_list_html('same')
+        monkeypatch.setattr(site,'get',get)
+        with pytest.raises(U.SiteBlocked) as exc:await site.list_page(16)
+        assert exc.value.reason_code=='PAGINATION_NOT_ADVANCING'
+        assert 16 not in site._list_cache
+    asyncio.run(run())
+
+
+def test_audit_title_and_detail_cache(monkeypatch):
+    import uijeong_mcp as U
+    async def run():
+        site=U.CouncilSite(); calls=[]
+        async def get(url):
+            calls.append(url); await asyncio.sleep(.005)
+            return '<title>2025년도 사회도시위원회 (2025.12.02.)</title><main>'+BODY+'</main>'
+        monkeypatch.setattr(site,'get',get)
+        docs=await asyncio.gather(*(site.detail(KEY) for _ in range(5)))
+        assert len(calls)==1
+        assert docs[0]['meta']==dict(sesn='2025',mtgnm='사회도시위원회',odr='0',date='20251202')
+    asyncio.run(run())

@@ -68,7 +68,7 @@ async def fake_site(url):
     if url.endswith("robots.txt"):
         return "User-agent: *\nAllow: /\n"
     if "late.do" in url:
-        return LIST if "pageIndex" not in url else "<table></table>"
+        return LIST if "pageNum" not in url else "<table></table>"
     return "<ul><li>메뉴</li></ul><div>" + (SITE_AGENDA if "aaa111" in url else SITE_QA) + "</div><p>Copyright</p>"
 
 

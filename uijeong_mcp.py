@@ -1589,6 +1589,10 @@ def parse_title_meta(text: str, fallback_name: str = "") -> dict:
     if m2:
         return {"sesn": m2.group(1), "mtgnm": m2.group(2).strip(), "odr": m2.group(3),
                 "date": f"{d.group(1)}{int(d.group(2)):02d}{int(d.group(3)):02d}" if d else ""}
+    audit = re.search(r"(20\d{2})년도\s+([^()\n]*?(?:위원회|본회의))\s*\(", fallback_name)
+    if audit:
+        return {"sesn": audit.group(1), "mtgnm": audit.group(2).strip(), "odr": "0",
+                "date": f"{d.group(1)}{int(d.group(2)):02d}{int(d.group(3)):02d}" if d else ""}
     name = re.sub(r"\(.*?\)|\.(html?|txt)$", "", fallback_name).strip()
     return {"sesn": "?", "mtgnm": name or "회의", "odr": "?",
             "date": f"{d.group(1)}{int(d.group(2)):02d}{int(d.group(3)):02d}" if d else ""}
@@ -1777,7 +1781,7 @@ import urllib.parse
 
 SITE_BASE = os.environ.get("SEOGU_COUNCIL_BASE", "https://www.gjsc.or.kr").rstrip("/")
 SITE_LIST_PATH = os.environ.get("SEOGU_LIST_PATH", "/kr/assembly/late.do")
-SITE_PAGE_PARAM = os.environ.get("SEOGU_PAGE_PARAM", "pageIndex")
+SITE_PAGE_PARAM = os.environ.get("SEOGU_PAGE_PARAM", "pageNum")
 SITE_UA = os.environ.get("SEOGU_USER_AGENT", "uijeong-mcp/1.0 (Gwangju Seo-gu office; council minutes research)")
 SITE_DELAY = float(os.environ.get("SEOGU_DELAY_SEC", "1.5"))
 SITE_MAX_PAGES = 10
@@ -1799,6 +1803,10 @@ class CouncilSite:
         self._robots_at = 0.0
         self._last = 0.0
         self._lock = asyncio.Lock()
+        self._list_lock = asyncio.Lock()
+        self._detail_lock = asyncio.Lock()
+        self._robots_lock = asyncio.Lock()
+        self._page_param = SITE_PAGE_PARAM
         self._list_cache: dict[int, tuple[float, list[dict]]] = {}
         self._detail_cache: dict[str, tuple[float, dict]] = {}
         self._client: Optional[httpx.AsyncClient] = None
@@ -1824,6 +1832,10 @@ class CouncilSite:
         return r.text
 
     async def _allowed(self, url: str) -> bool:
+        async with self._robots_lock:
+            return await self._allowed_locked(url)
+
+    async def _allowed_locked(self, url: str) -> bool:
         if self._robots is None or time.time() - self._robots_at > 6 * 3600:
             rp = urllib.robotparser.RobotFileParser()
             try:
@@ -1851,14 +1863,38 @@ class CouncilSite:
         return await self._fetch_text(url)
 
     async def list_page(self, page: int) -> list[dict]:
+        if type(page) is not int or not 1 <= page <= 10000:
+            raise SiteBlocked("잘못된 회의록 목록 페이지입니다.")
+        # Learn pagination from the official first page, including deployments
+        # whose old environment still specifies pageIndex.
+        if page > 1:
+            await self.list_page(1)
+        async with self._list_lock:
+            return await self._list_page_locked(page)
+
+    async def _list_page_locked(self, page: int) -> list[dict]:
         hit = self._list_cache.get(page)
         if hit and time.time() - hit[0] < 1800:
             return hit[1]
-        url = f"{SITE_BASE}{SITE_LIST_PATH}" + (f"?{SITE_PAGE_PARAM}={page}" if page > 1 else "")
+        url = f"{SITE_BASE}{SITE_LIST_PATH}" + (f"?{self._page_param}={page}" if page > 1 else "")
         raw = await self.get(url)
+        if page == 1:
+            page_links = re.findall(r'href=[\"\']([^\"\']+)[\"\']', raw, re.I)
+            for href in page_links:
+                parsed = urllib.parse.urlsplit(htmllib.unescape(href))
+                if parsed.path not in (SITE_LIST_PATH, SITE_LIST_PATH.rsplit('/', 1)[-1], ''):
+                    continue
+                query = urllib.parse.parse_qs(parsed.query)
+                if query.get('pageNum') and any(v.isdigit() and int(v) > 1 for v in query['pageNum']):
+                    self._page_param = 'pageNum'
+                    break
         rows = parse_site_list(raw)
         if not rows and not re.search(r"등록된.*없|검색된.*없|자료가.*없|조회된.*없|<table[^>]*>\s*</table>", raw, re.I):
             raise SiteBlocked("최근회의록 목록 형식을 해석하지 못했습니다. 자료 없음으로 판단하지 않습니다.")
+        first = self._list_cache.get(1)
+        if page > 1 and rows and first and [r['key'] for r in rows] == [r['key'] for r in first[1]]:
+            raise SiteBlocked("홈페이지 페이지 이동이 적용되지 않아 첫 목록이 반복됐습니다. 미조회 구간은 검색 완료로 처리하지 않습니다.",
+                              reason_code="PAGINATION_NOT_ADVANCING")
         _trim_cache(self._list_cache, SITE_LIST_CACHE_MAX)
         self._list_cache[page] = (time.time(), rows)
         return rows
@@ -1866,6 +1902,10 @@ class CouncilSite:
     async def detail(self, key: str) -> dict:
         if not re.fullmatch(r"[0-9A-Za-z]{1,128}", key):
             raise SiteBlocked("잘못된 회의록 key입니다.")
+        async with self._detail_lock:
+            return await self._detail_locked(key)
+
+    async def _detail_locked(self, key: str) -> dict:
         hit = self._detail_cache.get(key)
         if hit and time.time() - hit[0] < 7 * 86400:
             return hit[1]
@@ -1875,8 +1915,10 @@ class CouncilSite:
         def build() -> dict:
             body = _site_body(raw)
             plain = re.sub(r"[ \t]+", " ", _html_to_marked_text(body).replace("\x01", "").replace("\x02", ""))
+            title = re.search(r'(?is)<title[^>]*>(.*?)</title>', raw)
+            title_text = htmllib.unescape(re.sub(r'<[^>]+>', '', title.group(1))).strip() if title else ''
             return {"key": key, "url": url, "turns": parse_turns(body),
-                    "meta": parse_title_meta(plain), "plain_head": plain[:400]}
+                    "meta": parse_title_meta(plain, title_text), "plain_head": plain[:400]}
 
         # 긴 회의록 파싱은 CPU를 오래 쓴다. 작은 인스턴스에서 이벤트 루프를 붙잡으면
         # 그 사이 들어온 연결·상태점검이 모두 대기하므로 별도 스레드에서 처리한다.
