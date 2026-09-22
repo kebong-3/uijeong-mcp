@@ -1,0 +1,30 @@
+name: Repair validation
+on:
+  push:
+    branches: [repair/connection-20260922]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Snapshot exact source for repair testing
+        run: git archive --format=zip HEAD -o /tmp/uijeong-source.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: uijeong-repair-source
+          path: /tmp/uijeong-source.zip
+          retention-days: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.7'
+      - name: Validate repair when present
+        run: |
+          if [ -f scripts/repair_connection.py ]; then
+            pip install -r requirements.txt pytest
+            python scripts/repair_connection.py --check
+            python -m pytest tests/test_connection_repair.py -q
+          fi
