@@ -1,0 +1,122 @@
+[
+  {
+    "duplicate": "build_manifest.py",
+    "preserved_at": "scripts/build_manifest.py",
+    "action": "delete_identical_copy"
+  },
+  {
+    "duplicate": "check_config.py",
+    "preserved_at": "scripts/check_config.py",
+    "action": "delete_identical_copy"
+  },
+  {
+    "duplicate": "demo_response25.py",
+    "preserved_at": "scripts/demo_response25.py",
+    "action": "delete_identical_copy"
+  },
+  {
+    "duplicate": "export_runtime_schemas.py",
+    "preserved_at": "scripts/export_runtime_schemas.py",
+    "action": "delete_identical_copy"
+  },
+  {
+    "duplicate": "offline_check.py",
+    "preserved_at": "tests/offline_check.py",
+    "action": "delete_identical_copy"
+  },
+  {
+    "duplicate": "protocol_smoke.py",
+    "preserved_at": "docs/history/upload-recovery-20260922/protocol_smoke.py",
+    "action": "archive_distinct_copy"
+  },
+  {
+    "duplicate": "regression_r0.py",
+    "preserved_at": "tests/regression_r0.py",
+    "action": "delete_identical_copy"
+  },
+  {
+    "duplicate": "source_contracts.py",
+    "preserved_at": "scripts/source_contracts.py",
+    "action": "delete_identical_copy"
+  },
+  {
+    "duplicate": "test_department23.py",
+    "preserved_at": "tests/test_department23.py",
+    "action": "delete_identical_copy"
+  },
+  {
+    "duplicate": "test_evidence_v2.py",
+    "preserved_at": "tests/test_evidence_v2.py",
+    "action": "delete_identical_copy"
+  },
+  {
+    "duplicate": "test_final_hardening.py",
+    "preserved_at": "docs/history/upload-recovery-20260922/test_final_hardening.py",
+    "action": "archive_distinct_copy"
+  },
+  {
+    "duplicate": "test_realistic_size.py",
+    "preserved_at": "tests/test_realistic_size.py",
+    "action": "delete_identical_copy"
+  },
+  {
+    "duplicate": "test_release24.py",
+    "preserved_at": "tests/test_release24.py",
+    "action": "delete_identical_copy"
+  },
+  {
+    "duplicate": "test_response25.py",
+    "preserved_at": "tests/test_response25.py",
+    "action": "delete_identical_copy"
+  },
+  {
+    "duplicate": "test_response_budget.py",
+    "preserved_at": "tests/test_response_budget.py",
+    "action": "delete_identical_copy"
+  },
+  {
+    "duplicate": "test_runtime_limits.py",
+    "preserved_at": "tests/test_runtime_limits.py",
+    "action": "delete_identical_copy"
+  },
+  {
+    "duplicate": "test_security.py",
+    "preserved_at": "tests/test_security.py",
+    "action": "delete_identical_copy"
+  },
+  {
+    "duplicate": "test_service24_offline.py",
+    "preserved_at": "tests/test_service24_offline.py",
+    "action": "delete_identical_copy"
+  },
+  {
+    "duplicate": "test_service_v2.py",
+    "preserved_at": "tests/test_service_v2.py",
+    "action": "delete_identical_copy"
+  },
+  {
+    "duplicate": "test_sources.py",
+    "preserved_at": "tests/test_sources.py",
+    "action": "delete_identical_copy"
+  },
+  {
+    "duplicate": "test_upgrade24.py",
+    "preserved_at": "tests/test_upgrade24.py",
+    "action": "delete_identical_copy"
+  },
+  {
+    "duplicate": "test_workbench22.py",
+    "preserved_at": "docs/history/upload-recovery-20260922/test_workbench22.py",
+    "action": "archive_distinct_copy"
+  },
+  {
+    "duplicate": "test_workflows.py",
+    "preserved_at": "tests/test_workflows.py",
+    "action": "delete_identical_copy"
+  },
+  {
+    "duplicate": "verify_deployment.py",
+    "preserved_at": "scripts/verify_deployment.py",
+    "action": "delete_identical_copy"
+  }
+]

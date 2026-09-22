@@ -51,11 +51,13 @@ def redact_secrets(value: Any, extra_secrets: Iterable[str] = ()) -> str:
     text = str(value)
     known = [os.environ.get("CLIK_API_KEY", ""), os.environ.get("UIJEONG_BEARER_TOKEN", ""),
              os.environ.get("UIJEONG_OAUTH_CLIENT_SECRET", ""),
-             os.environ.get("UIJEONG_VERIFY_TOKEN", ""), *extra_secrets]
+             os.environ.get("UIJEONG_VERIFY_TOKEN", ""),
+             os.environ.get("UIJEONG_OAUTH_ADMIN_PASSWORD_HASH", ""), *extra_secrets]
     for secret in sorted((s for s in known if s), key=len, reverse=True):
         text = text.replace(secret, "[REDACTED]").replace(quote(secret, safe=""), "[REDACTED]")
-    text = re.sub(r"(?i)([?&](?:key|api_?key|servicekey|access_token|token)=)[^&\s\"'<>]+", r"\1[REDACTED]", text)
+    text = re.sub(r"(?i)([?&](?:key|api_?key|servicekey|access_token|refresh_token|token|code|code_verifier|client_secret|password|csrf)=)[^&\s\"'<>]+", r"\1[REDACTED]", text)
     text = re.sub(r"(?i)(bearer\s+)[A-Za-z0-9._~+/-]+=*", r"\1[REDACTED]", text)
+    text = re.sub(r"\buij[ar]_[A-Za-z0-9_-]{43}\b", "[REDACTED]", text)
     return text
 
 
@@ -66,8 +68,13 @@ def safe_error(exc: BaseException) -> str:
 
 class SecretFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
-        record.msg = redact_secrets(record.getMessage())
-        record.args = ()
+        if record.name == "uvicorn.access" and isinstance(record.args, tuple) and len(record.args) == 5:
+            # AccessFormatter requires (client, method, path, version, status).
+            record.msg = redact_secrets(record.msg)
+            record.args = tuple(redact_secrets(v) if isinstance(v, str) else v for v in record.args)
+        else:
+            record.msg = redact_secrets(record.getMessage())
+            record.args = ()
         # Traceback exception text may carry a URL; transport logs need only type.
         if record.exc_info:
             record.msg += " [" + record.exc_info[0].__name__ + "]"
@@ -349,8 +356,8 @@ def http_policy() -> dict[str, Any]:
     origins = _csv_env("UIJEONG_ALLOWED_ORIGINS")
     mode = os.environ.get('UIJEONG_AUTH_MODE', 'auto').strip().lower()
     if mode == 'auto':mode = 'bearer' if token else 'local'
-    if mode not in ('bearer','oauth','local'):
-        raise SecurityError('UIJEONG_AUTH_MODE는 bearer|oauth|local|auto입니다.')
+    if mode not in ('bearer','oauth','oauth_local','local'):
+        raise SecurityError('UIJEONG_AUTH_MODE는 bearer|oauth|oauth_local|local|auto입니다.')
     if remote and mode == 'local':
         raise SecurityError('외부 HTTP에는 인증이 필요합니다. local 모드는 루프백 전용입니다.')
     if mode == 'bearer' and len(token)<32:
@@ -363,6 +370,15 @@ def http_policy() -> dict[str, Any]:
             raise SecurityError('OAuth 모드에서는 UIJEONG_BEARER_TOKEN을 제거하세요. 두 인증을 혼용하지 않습니다.')
         if urlsplit(oauth.resource).netloc.lower() not in hosts:
             raise SecurityError('UIJEONG_RESOURCE_URL 호스트를 UIJEONG_ALLOWED_HOSTS에 정확히 지정하세요.')
+    if mode == 'oauth_local':
+        from oauth_local import LocalOAuthConfig
+        oauth = LocalOAuthConfig.from_env()
+        if urlsplit(oauth.resource).netloc.lower() not in hosts:
+            raise SecurityError('UIJEONG_RESOURCE_URL 호스트를 UIJEONG_ALLOWED_HOSTS에 정확히 지정하세요.')
+        # Existing secret becomes a domain-separated signing seed, NOT a bearer.
+        token = ''
+        if oauth.issuer.lower() not in origins:
+            origins.append(oauth.issuer.lower())
     if remote and (not hosts or (mode == 'bearer' and len(token) < 32)):
         raise SecurityError("외부 HTTP 공개에는 UIJEONG_ALLOWED_HOSTS와 32자 이상 UIJEONG_BEARER_TOKEN이 필요합니다.")
     if any("*" in value or "/" in value or "@" in value for value in hosts):
@@ -388,10 +404,11 @@ def auth_diagnostics() -> dict:
     mode=policy['auth_mode']
     return {'status':'CONFIG_VALID','mode':mode,'remote_login_tested':False,
             'clik_api_is_separate_credential':True,
-            'connection_requirement': ('별도 인증서버의 authorization-code + PKCE 설정 및 실제 로그인 시험 필요' if mode=='oauth' else
+            'connection_requirement': ('이 서버의 관리자 로그인·명시적 승인 후 OAuth S256 PKCE 연결; 실제 ChatGPT 승인은 별도' if mode=='oauth_local' else
+                 '별도 인증서버의 authorization-code + PKCE 설정 및 실제 로그인 시험 필요' if mode=='oauth' else
                  '정적 Bearer를 전달할 수 있는 클라이언트/게이트웨이 전용; ChatGPT 직접 OAuth 인증과 다름' if mode=='bearer' else
                  '127.0.0.1 등 루프백 로컬 실행 전용'),
-            'oauth_token_check': 'RFC7662 introspection' if mode=='oauth' else None}
+            'oauth_token_check': 'local opaque token store' if mode=='oauth_local' else 'RFC7662 introspection' if mode=='oauth' else None}
 
 
 def bind_host() -> str:
@@ -418,9 +435,14 @@ class HTTPGuard:
         self.max_body, self.requests_per_minute = max_body, requests_per_minute
         self.requests: dict[str, collections.deque[float]] = {}
         self.oauth_verifier = None
+        self.oauth_server = None
         if self.policy.get('auth_mode') == 'oauth':
             from oauth_resource import IntrospectionVerifier
             self.oauth_verifier=IntrospectionVerifier(self.policy['oauth'])
+        if self.policy.get('auth_mode') == 'oauth_local':
+            from oauth_local import LocalOAuthServer
+            self.oauth_server = LocalOAuthServer(self.policy['oauth'])
+            self.oauth_verifier = self.oauth_server
         self.pre_auth_requests: collections.deque[float] = collections.deque()
 
     async def _reject(self, send: Any, code: int, message: str) -> None:
@@ -456,6 +478,11 @@ class HTTPGuard:
         from release_info import VERSION
         path=scope.get('path','/mcp')
         method=scope.get('method','POST')
+        if self.oauth_server is not None:
+            from oauth_local import PUBLIC_PATHS
+            if path in PUBLIC_PATHS:
+                await self.oauth_server.handle(scope, receive, send)
+                return
         public_metadata = self.policy.get('oauth') and path in (
             '/.well-known/oauth-protected-resource', self.policy['oauth'].metadata_path)
         if (path=='/healthz' or public_metadata) and method in ('GET','HEAD'):

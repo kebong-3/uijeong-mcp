@@ -9,7 +9,7 @@ services:
     envVars:
       - key: CLIK_API_KEY
         sync: false
-      # work = 14 tools for practical preparation; core = 5, lite = 22, full = 34.
+      # work = 18 tools; core = 5, lite = 26, full = 38.
       - key: UIJEONG_PROFILE
         value: work
       - key: PYTHON_VERSION
@@ -19,7 +19,11 @@ services:
       - key: UIJEONG_ALLOWED_HOSTS
         sync: false
       - key: UIJEONG_AUTH_MODE
-        value: bearer
+        value: oauth_local
+      - key: UIJEONG_RESOURCE_URL
+        value: https://uijeong-mcp.onrender.com/mcp
+      - key: UIJEONG_OAUTH_ADMIN_PASSWORD_HASH
+        sync: false
       - key: UIJEONG_BEARER_TOKEN
         generateValue: true
       # Keep one tool result inside the model's context window.
@@ -34,5 +38,6 @@ services:
 # For durability, provision persistent storage and set UIJEONG_STATE_DB.
 # Without it the free plan's ephemeral disk loses snapshots and the call budget
 # on every redeploy; evidence paging then needs a fresh search.
-# Compatibility template: static Bearer only. It is not direct ChatGPT OAuth.
-# See render.oauth.yaml for resource-server settings; external AS required.
+# Private single-operator OAuth login; anonymous MCP requests remain denied.
+# Existing UIJEONG_BEARER_TOKEN is used ONLY as a signing seed in oauth_local.
+# For organization-wide SSO use render.oauth.yaml and a reviewed external provider.
