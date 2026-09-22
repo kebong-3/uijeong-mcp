@@ -21,6 +21,7 @@ import department_aliases as A
 import period_core as P
 import coverage_core as C
 import release_info as RELEASE
+from citation_links import OfficialLinkResolver
 from result_contract import wire_result
 
 MODES = ('질의답변', '5분자유발언', '약속', '발언')
@@ -35,6 +36,7 @@ def install(U):
     U.COUNCILS = S.council_code_map()
     U.resolve_council = lambda query: [(r['council_id'],r['name']) for r in S.resolve_councils(query)]
     U.parse_turns = E.parse_turns
+    links = OfficialLinkResolver(U.site)
     U.build_qa_pairs = E.build_qa_pairs
     U.classify_commitment = E.classify_commitment
     U.snippet = E.snippet
@@ -187,6 +189,7 @@ def install(U):
                         errors.append(safe_failure('CLIK','list',exc))
                         coverage.append({'source':'CLIK','query':term,'parsed':0,'selected':0,'exhausted':False,'failed':True})
             records=E.dedup_records(records)
+            await links.enrich(records)
             events=[];followups=[]
             for record in records:
                 seen=set()
@@ -545,7 +548,9 @@ def install(U):
         record=E.make_record(dict(meta,DOCID=key),turns,source='SEOGU_SITE' if origin=='site' else 'CLIK',
                 source_url=url,body_url=url if origin=='site' else 'https://clik.nanet.go.kr/openapi/minutes.do',
                 source_url_verified=origin=='site',body_url_verified=True)
+        await links.enrich([record])
         return {**page,'ref':ref,'meta':record['metadata'],'provenance':record['provenance'],
+                'source_link':record['source_link'],
                 'source_url':record['provenance']['source_url'],'source_kind':'OFFICIAL_FETCHED','fiscal_year':None,
                 'body_hash':hashlib.sha256(json.dumps(turns,ensure_ascii=False,sort_keys=True).encode()).hexdigest()}
 

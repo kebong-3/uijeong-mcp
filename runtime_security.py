@@ -23,7 +23,7 @@ import socket
 import sqlite3
 import time
 from typing import Any, Callable, Iterable
-from urllib.parse import quote, urljoin, urlsplit
+from urllib.parse import quote, urljoin, urlsplit, parse_qsl
 
 KST = dt.timezone(dt.timedelta(hours=9))
 REQUEST_SCOPE: contextvars.ContextVar[str] = contextvars.ContextVar("uijeong_scope", default="local")
@@ -54,8 +54,30 @@ def redact_secrets(value: Any, extra_secrets: Iterable[str] = ()) -> str:
              os.environ.get("UIJEONG_VERIFY_TOKEN", ""), *extra_secrets]
     for secret in sorted((s for s in known if s), key=len, reverse=True):
         text = text.replace(secret, "[REDACTED]").replace(quote(secret, safe=""), "[REDACTED]")
-    text = re.sub(r"(?i)([?&](?:key|api_?key|servicekey|access_token|token)=)[^&\s\"'<>]+", r"\1[REDACTED]", text)
+    # Only an exact, public council record URL may retain its document key.
+    # Do not globally exempt `key`: CLIK's API uses that name for credentials.
+    public_keys = {}
+    def protect_public_url(match):
+        raw = match.group(0)
+        try:
+            parsed = urlsplit(raw)
+            pairs = parse_qsl(parsed.query, keep_blank_values=True)
+            if (parsed.scheme == 'https' and parsed.hostname in ('www.gjsc.or.kr', 'gjsc.or.kr')
+                    and not parsed.username and not parsed.password and parsed.port in (None, 443)
+                    and parsed.path in ('/record/recordView.do', '/record/originalDownload.do')
+                    and len(pairs) == 1 and pairs[0][0] == 'key'
+                    and re.fullmatch(r'[A-Za-z0-9]{1,128}', pairs[0][1])):
+                marker = '__PUBLIC_RECORD_' + secrets.token_hex(16) + '__'
+                public_keys[marker] = raw
+                return marker
+        except ValueError:
+            pass
+        return raw
+    text = re.sub(r'https://[^\s\"\'<>\[\]()]+', protect_public_url, text)
+    text = re.sub(r"(?i)([?&](?:key|api_?key|authkey|servicekey|access_token|token|signature|x-amz-signature)=)[^&\s\"'<>]+", r"\1[REDACTED]", text)
     text = re.sub(r"(?i)(bearer\s+)[A-Za-z0-9._~+/-]+=*", r"\1[REDACTED]", text)
+    for marker, url in public_keys.items():
+        text = text.replace(marker, url)
     return text
 
 
@@ -617,9 +639,12 @@ async def _public_reply(send: Any, status: int, payload: dict[str, Any]) -> None
 
 
 class PublicBoundary:
-    """Global concurrency cap and public-only snapshot namespace; no IP claims."""
-    def __init__(self, app: Any, max_concurrent: int = 3):
+    """Bounded burst queue, global concurrency cap and public snapshot namespace."""
+    def __init__(self, app: Any, max_concurrent: int = 3, *, max_waiting: int = 12,
+                 queue_timeout: float = 20.0):
         self.app, self.max_concurrent, self.active = app, max_concurrent, 0
+        self.max_waiting, self.queue_timeout, self.waiting = max_waiting, queue_timeout, 0
+        self._slots = asyncio.Semaphore(max_concurrent)
 
     async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
         if scope["type"] != "http":
@@ -632,13 +657,22 @@ class PublicBoundary:
             await _public_reply(send, 405, {"authentication": "none", "public_readonly": True,
                 "message": "MCP 프로그램에서 POST로 연결하세요. 서버 상태 확인 주소는 /healthz입니다."})
             return
-        if self.active >= self.max_concurrent:
+        if self.waiting >= self.max_waiting and self._slots.locked():
             await _public_reply(send, 503, {"error": "PUBLIC_BUSY", "message": "동시 조회 중입니다. 잠시 후 다시 시도하세요."})
             return
-        self.active += 1  # No await between checking and reserving the slot.
+        self.waiting += 1
+        try:
+            await asyncio.wait_for(self._slots.acquire(), timeout=self.queue_timeout)
+        except asyncio.TimeoutError:
+            await _public_reply(send, 503, {"error": "PUBLIC_QUEUE_TIMEOUT", "message": "조회 대기시간을 초과했습니다. 잠시 후 다시 시도하세요."})
+            return
+        finally:
+            self.waiting -= 1
+        self.active += 1
         context_token = REQUEST_SCOPE.set("public-readonly-v1")
         try:
             await self.app(scope, receive, send)
         finally:
             REQUEST_SCOPE.reset(context_token)
             self.active -= 1
+            self._slots.release()

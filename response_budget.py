@@ -72,6 +72,7 @@ _NEVER_TRIM = frozenset({
     "turn_index", "char_start", "char_end", "next_start_turn", "next_start_char",
     "next_offset", "next_page", "next_item_offset", "item_offset", "source_url",
     "body_url", "fiscal_year", "fulfillment_status", "message",
+    "citation_url", "citation_markdown", "citation_status", "citation_kind", "url", "markdown",
 })
 
 
@@ -188,7 +189,7 @@ def _trim_all_strings(node: Any, keep: int, log: list[dict], path: str = "") -> 
     return node
 
 
-_ESSENTIAL = ("status", "message", "snapshot_id", "keyword", "council", "topic",
+_ESSENTIAL = ("status", "message", "snapshot_id", "keyword", "council", "topic", "source_link",
               "requested_council", "mode", "total_items", "next_item_offset", "ref",
               "source_url", "limitations", "reason", "recovery", "item_offset", "collection",
               "next_start_turn", "next_start_char", "offset", "next_offset",
@@ -381,6 +382,9 @@ def digest(payload: dict) -> str:
             break
     if payload.get("snapshot_id"):
         lines.append(f"snapshot_id: {payload['snapshot_id']}")
+    link = payload.get('source_link') or {}
+    if link.get('markdown'):
+        lines.append('원문: ' + link['markdown'] + ' [' + link.get('status', '') + ']')
     counts = []
     for key in ("items", "entries", "candidates", "sources", "links", "turns", "years"):
         value = payload.get(key)
@@ -415,6 +419,9 @@ def digest(payload: dict) -> str:
                     break
             lines.append(f"  · {head or row.get('record_id', '')} [{row.get('source_kind', '')}]"
                          + (f" {quoted}…" if quoted else ""))
+            citation = (row.get('question') or row.get('speech') or {}).get('citation', {})
+            if citation.get('citation_markdown'):
+                lines.append('    원문: ' + citation['citation_markdown'])
     budget = payload.get("response_budget")
     if isinstance(budget, dict) and budget.get("truncated"):
         lines.append(f"축약: {budget.get('reduced_count', 0)}곳 — 생략분은 각 retrieval 경로로 확인")

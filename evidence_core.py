@@ -16,7 +16,7 @@ from html.parser import HTMLParser
 from typing import Any, Optional
 from urllib.parse import urlsplit, parse_qsl
 
-SCHEMA_VERSION = "2.0"
+SCHEMA_VERSION = "2.1"
 class EvidenceInputError(ValueError):
     """Invalid input/state; never convert to an empty successful search."""
 
@@ -259,7 +259,7 @@ _SPEECH_WORDS = {"다음은", "그러면", "이어서", "먼저", "네", "예", 
 _LABEL_RE = re.compile(
     rf"(?P<label>{_NAME}[ \t]*(?:의원|위원)|"
     rf"[가-힣·ㆍ()]{{1,28}}(?:위원장직무대리|의장직무대리|전문위원|위원장|의장|의원|위원|청장|시장|군수|지사|교육감|교육장|국장|과장|팀장|실장|소장|단장|담당관|센터장|대표이사|이사장|본부장|원장|관장|처장|계장|사무관|주무관|동장|읍장|면장|사장)[ \t]+{_NAME}|"
-    rf"(?:위원장|의장|위원|의원|시장|군수|구청장|전문위원)[ \t]+{_NAME})"
+    rf"(?:위원장직무대리|의장직무대리|부위원장|부의장|임시위원장|임시의장|위원장|의장|위원|의원|시장|군수|구청장|전문위원)[ \t]+{_NAME})"
     r"(?=[ \t\n:：]|$)")
 _END_RE = re.compile(r"(?:출석|출사무국|참석|불출석|결석|배석|회의록서명|서명의원|청가|출장|속기사)[^\n]{0,50}")
 _HEADING = re.compile(r"(?m)^[ \t]*(?:제\s*)?\d+[.．、)]\s*[^\n]{2,180}(?:의\s*건|조례안|규칙안|승인안|동의안|결의안|건의안|계획안|예산안|업무보고|소관)[ \t]*$")
@@ -482,11 +482,11 @@ def read_page(turns: list[dict], *, start_turn: int = 0, start_char: int = 0,
 _META_KEYS = {
     "council_id": ("council_id", "RASMBLY_ID"),
     "council_name": ("council_name", "council", "RASMBLY_NM"),
-    "term": ("term", "RASMBLY_NUMPR"),
-    "session": ("session", "RASMBLY_SESN"),
-    "sitting": ("sitting", "MINTS_ODR"),
+    "term": ("term", "RASMBLY_NUMPR", "numpr"),
+    "session": ("session", "RASMBLY_SESN", "sesn"),
+    "sitting": ("sitting", "MINTS_ODR", "odr"),
     "meeting_date": ("meeting_date", "date", "MTG_DE"),
-    "meeting_name": ("meeting_name", "title", "MTGNM"),
+    "meeting_name": ("meeting_name", "title", "MTGNM", "mtgnm"),
     "committee": ("committee", "PRMPST_CMIT_NM"),
     "agenda_title": ("agenda_title", "MTR_SJ"),
 }
@@ -609,6 +609,8 @@ def turn_evidence(record: dict, turn: dict) -> dict:
                 "locator": "parsed_turn", "char_start": 0, "char_end": len(turn["text"]),
                 "fiscal_year": record.get("metadata", {}).get("fiscal_year"),
                 "source_url_status": provenance.get("source_url_status"), "body_url_status": provenance.get("body_url_status")}
+    for key in ('citation_url', 'citation_markdown', 'citation_status', 'citation_kind'):
+        citation[key] = provenance.get(key)
     return {"turn_index": turn["idx"], "label": turn["label"], "role": turn["role"], "text": turn["text"],
             "agenda": turn.get("agenda", 0), "act": turn.get("act", "other"), "citation": citation}
 

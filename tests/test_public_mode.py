@@ -98,9 +98,11 @@ def test_three_concurrent_then_recover(public_env):
         async with httpx.AsyncClient(transport=httpx.ASGITransport(app),base_url='https://mcp.example.test') as c:
             tasks=[asyncio.create_task(c.post('/mcp',json={})) for _ in range(3)]
             await asyncio.wait_for(entered.wait(), 1)
-            assert (await c.post('/mcp',json={})).status_code == 503
+            extra=[asyncio.create_task(c.post('/mcp',json={})) for _ in range(2)]
+            await asyncio.sleep(0.01)
+            assert count == 3 and not any(task.done() for task in extra)
             release.set()
-            assert all(x.status_code==200 for x in await asyncio.gather(*tasks))
+            assert all(x.status_code==200 for x in await asyncio.gather(*tasks, *extra))
             assert (await c.post('/mcp',json={})).status_code == 200
     asyncio.run(run())
 
