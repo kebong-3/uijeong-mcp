@@ -347,6 +347,8 @@ def _csv_env(name: str) -> list[str]:
 
 
 def http_policy() -> dict[str, Any]:
+    if is_public_mode():
+        return public_http_policy()
     port = int(os.environ.get("PORT", "8000"))
     if not 1 <= port <= 65535:
         raise SecurityError("PORT는 1~65535여야 합니다.")
@@ -390,6 +392,8 @@ def http_policy() -> dict[str, Any]:
 
 def auth_diagnostics() -> dict:
     """Report configuration stages only. No secret values or live-login claims."""
+    if is_public_mode():
+        return public_auth_diagnostics()
     try: policy=http_policy()
     except SecurityError as exc:
         return {'status':'CONFIG_INVALID','code':'AUTH_CONFIG_ERROR','message':str(exc),'remote_login_tested':False}
@@ -423,6 +427,12 @@ class HTTPGuard:
     def __init__(self, app: Any, policy: dict[str, Any] | None = None, *,
                  max_body: int = 1024 * 1024, requests_per_minute: int = 120):
         self.app, self.policy = app, policy if policy is not None else http_policy()
+        if self.policy.get("auth_mode") == "public":
+            if not getattr(app, "uijeong_public_readonly", False):
+                raise SecurityError("공개 인증은 public_server의 허용목록 전용 앱에서만 사용할 수 있습니다.")
+            self.app = PublicBoundary(app, max_concurrent=3)
+            max_body = min(max_body, 65536)
+            requests_per_minute = min(requests_per_minute, 120)
         self.max_body, self.requests_per_minute = max_body, requests_per_minute
         self.requests: dict[str, collections.deque[float]] = {}
         self.oauth_verifier = None
@@ -546,3 +556,89 @@ class HTTPGuard:
 
 def secure_http_app(app: Any) -> HTTPGuard:
     return HTTPGuard(app)
+
+
+# Explicit anonymous mode: the protected modes above retain their behavior.
+def is_public_mode() -> bool:
+    return os.environ.get("UIJEONG_AUTH_MODE", "auto").strip().lower() in ("public", "none")
+
+
+def public_http_policy() -> dict[str, Any]:
+    if os.environ.get("UIJEONG_PUBLIC_READONLY", "").lower() != "true":
+        raise SecurityError("공개 모드는 UIJEONG_PUBLIC_READONLY=true를 명시해야 합니다.")
+    port = int(os.environ.get("PORT", "8000"))
+    if not 1 <= port <= 65535:
+        raise SecurityError("PORT는 1~65535여야 합니다.")
+    host = os.environ.get("UIJEONG_BIND_HOST", "127.0.0.1").strip()
+    remote = host not in ("127.0.0.1", "localhost", "::1")
+    hosts = _csv_env("UIJEONG_ALLOWED_HOSTS")
+    origins = _csv_env("UIJEONG_ALLOWED_ORIGINS")
+    if remote and not hosts:
+        raise SecurityError("공개 HTTP에는 UIJEONG_ALLOWED_HOSTS의 정확한 도메인이 필요합니다.")
+    if any(not h or any(c in h for c in "*/@?#\\") or any(c.isspace() for c in h) for h in hosts):
+        raise SecurityError("허용 Host에는 정확한 도메인 또는 도메인:포트만 입력하세요.")
+    if not hosts:
+        hosts = [f"127.0.0.1:{port}", f"localhost:{port}", f"[::1]:{port}"]
+    if not origins and not remote:
+        origins = [f"http://127.0.0.1:{port}", f"http://localhost:{port}", f"http://[::1]:{port}"]
+    for origin in origins:
+        parts = urlsplit(origin)
+        if ("*" in origin or parts.scheme not in (("https",) if remote else ("http", "https"))
+                or not parts.netloc or parts.path or parts.query or parts.fragment
+                or parts.username or parts.password):
+            raise SecurityError("허용 Origin은 경로 없는 정확한 출처여야 합니다.")
+    # A retained legacy secret is not an alternative authentication path.
+    return {"host": host, "port": port, "remote": remote, "hosts": hosts,
+            "origins": origins, "auth_mode": "public", "token": "", "oauth": None}
+
+
+def public_auth_diagnostics() -> dict[str, Any]:
+    try:
+        http_policy()
+    except (ValueError, SecurityError) as exc:
+        return {"status": "CONFIG_INVALID", "code": "PUBLIC_CONFIG_ERROR",
+                "message": safe_error(exc), "remote_login_tested": False}
+    return {"status": "CONFIG_VALID", "mode": "public", "authentication": "none",
+            "public_readonly": True, "remote_login_tested": False,
+            "clik_api_is_separate_credential": True,
+            "connection_requirement": "인증 없음. 공개 회의록 조회 도구만 제공하며 내부자료를 입력하지 마세요.",
+            "limits_scope": "single-process shared public budget; not a per-user quota"}
+
+
+async def _public_reply(send: Any, status: int, payload: dict[str, Any]) -> None:
+    headers = [(b"content-type", b"application/json; charset=utf-8"),
+               (b"cache-control", b"no-store"), (b"x-content-type-options", b"nosniff")]
+    if status == 503:
+        headers.append((b"retry-after", b"2"))
+    if status == 405:
+        headers.append((b"allow", b"POST"))
+    await send({"type": "http.response.start", "status": status, "headers": headers})
+    await send({"type": "http.response.body", "body": json.dumps(payload, ensure_ascii=False).encode()})
+
+
+class PublicBoundary:
+    """Global concurrency cap and public-only snapshot namespace; no IP claims."""
+    def __init__(self, app: Any, max_concurrent: int = 3):
+        self.app, self.max_concurrent, self.active = app, max_concurrent, 0
+
+    async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+        if scope.get("path", "").rstrip("/") != "/mcp":
+            await _public_reply(send, 404, {"error": "Not found"})
+            return
+        if scope.get("method") != "POST":
+            await _public_reply(send, 405, {"authentication": "none", "public_readonly": True,
+                "message": "MCP 프로그램에서 POST로 연결하세요. 서버 상태 확인 주소는 /healthz입니다."})
+            return
+        if self.active >= self.max_concurrent:
+            await _public_reply(send, 503, {"error": "PUBLIC_BUSY", "message": "동시 조회 중입니다. 잠시 후 다시 시도하세요."})
+            return
+        self.active += 1  # No await between checking and reserving the slot.
+        context_token = REQUEST_SCOPE.set("public-readonly-v1")
+        try:
+            await self.app(scope, receive, send)
+        finally:
+            REQUEST_SCOPE.reset(context_token)
+            self.active -= 1

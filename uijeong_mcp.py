@@ -2412,7 +2412,11 @@ if __name__ == "__main__":
     if _http_mode:
         import uvicorn
 
-        app = R.secure_http_app(mcp.streamable_http_app())
-        uvicorn.run(app, host=R.bind_host(), port=int(os.environ.get("PORT", "8000")))
+        if R.is_public_mode():
+            from public_server import run as run_public
+            run_public(sys.modules[__name__])
+        else:
+            app = R.secure_http_app(mcp.streamable_http_app())
+            uvicorn.run(app, host=R.bind_host(), port=int(os.environ.get("PORT", "8000")))
     else:
         mcp.run()
