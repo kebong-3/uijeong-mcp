@@ -4,27 +4,55 @@ on:
     branches: [repair/connection-20260922]
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
+concurrency:
+  group: uijeong-connection-repair
+  cancel-in-progress: true
 jobs:
   validate:
+    if: github.ref == 'refs/heads/repair/connection-20260922'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - name: Snapshot exact source for repair testing
-        run: git archive --format=zip HEAD -o /tmp/uijeong-source.zip
-      - uses: actions/upload-artifact@v4
         with:
-          name: uijeong-repair-source
-          path: /tmp/uijeong-source.zip
-          retention-days: 1
+          ref: repair/connection-20260922
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12.7'
-      - name: Validate repair when present
+      - name: Install exact runtime dependencies
+        run: python -m pip install -r requirements.txt pytest==8.4.2
+      - name: Apply reviewed layout and runtime repair
+        run: python scripts/repair_connection.py --apply --check
+      - name: Test complete regression suite
         run: |
-          if [ -f scripts/repair_connection.py ]; then
-            pip install -r requirements.txt pytest
-            python scripts/repair_connection.py --check
-            python -m pytest tests/test_connection_repair.py -q
+          set -o pipefail
+          python -m pytest -q --junitxml=/tmp/repair-pytest.xml | tee /tmp/repair-pytest.txt
+      - name: Test real stdio and Streamable HTTP protocols
+        run: |
+          python tests/regression_r0.py > /tmp/repair-regression.txt
+          python tests/offline_check.py > /tmp/repair-offline.txt
+          python tests/protocol_smoke.py > /tmp/repair-protocol.json
+      - name: Commit validated repair on repair branch only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m 'fix: validated connection repair rc.2 [skip ci]'
+            git push origin HEAD:repair/connection-20260922
           fi
+      - name: Package exact tested source
+        if: always()
+        run: |
+          git archive --format=zip HEAD -o /tmp/uijeong-tested-source.zip
+          git diff > /tmp/repair-uncommitted.diff
+          python -m pip freeze > /tmp/repair-environment.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: uijeong-repair-validation
+          path: |
+            /tmp/repair-*
+            /tmp/uijeong-tested-source.zip
+          retention-days: 3
