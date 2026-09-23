@@ -14,13 +14,23 @@ from typing import Any, Optional
 import runtime_security as R
 
 PUBLIC_TOOLS = (
-    "council_find_council", "council_evidence_bundle", "council_evidence_search",
+    "council_find_council",
+    "council_evidence_bundle", "council_evidence_search", "council_period_review",
+    "council_department_brief", "council_recurring_issues",
     "council_read_source", "council_open_record", "council_get_evidence",
     "council_data_sources", "council_search_minutes", "council_prepare_pack", "council_status",
 )
-INSTRUCTIONS = """지방의회MCP 공개 조회 모드 — 인증 없이 공개 회의록만 검색합니다.
-권장 흐름: council_find_council → council_evidence_bundle → council_get_evidence / council_read_source.
-답변 준비자료는 council_prepare_pack을 사용하고, 내부 초안·개인정보·비공개 자료는 입력하지 마세요.
+INSTRUCTIONS = """지방의회MCP 직원 배포용 공개 조회 모드 — 인증 없이 공개 지방의회 자료만 조회합니다.
+개발·기획: 광주 서구청 펀온워크 케빈정.
+질문 의도에 따라 가장 좁고 정확한 도구를 먼저 선택하세요.
+- 일반 주제·사업 검색: council_evidence_bundle
+- '최근 N년'·연도별 비교: council_period_review
+- 특정 부서의 의회 질의·답변: council_department_brief
+- 여러 회의연도의 반복 쟁점 후보: council_recurring_issues
+- 원문 확인·이어읽기: council_get_evidence / council_read_source / council_open_record
+- 답변 준비자료: council_prepare_pack
+의회명이 애매할 때만 council_find_council을 먼저 사용하세요.
+내부 초안·개인정보·비공개 자료는 입력하지 마세요.
 검색어는 공개 주제어로 입력하세요. 검색 결과 보관함은 공개 자료용이며 사용자별 비공개 공간이 아닙니다.
 원문 주소·회의일·발언 근거를 제시하고 PARTIAL / EMPTY / ERROR를 구분하세요.
 근거는 source_link.markdown 또는 citation.citation_markdown을 사용해 클릭 가능한 링크로 제시하세요.
@@ -33,7 +43,10 @@ URL·문서 key·발언 앵커를 추측하지 마세요. 파싱 발언번호는
 연결 점검은 council_status(live=False), 실제 출처 조회 점검은 live=True입니다.
 """
 TOOL_TIMEOUT_SECONDS = 60
-PUBLIC_ARGUMENT_LIMITS = {"max_docs": 6, "max_chars": 16000, "max_evidence": 12, "limit": 30}
+PUBLIC_ARGUMENT_LIMITS = {
+    "max_docs": 6, "max_docs_per_year": 6, "years": 5,
+    "max_chars": 16000, "max_evidence": 12, "limit": 30, "top": 20,
+}
 
 
 def _scrub(value: Any) -> Any:
