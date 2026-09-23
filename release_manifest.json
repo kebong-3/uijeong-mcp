@@ -1,6 +1,6 @@
 {
-  "version": "2.6.0-public.1",
-  "based_on": "2.5.3-public.1",
+  "version": "2.6.1-public.1",
+  "based_on": "2.6.0-public.1",
   "release_stage": "RELEASE_CANDIDATE",
   "runtime_sha256": {
     "citation_links.py": "cde952164ba6d40a0bc865c57d959bf9bdbfc8ccf0459edef4ef149b5f1b11cf",
@@ -16,23 +16,24 @@
     "period_core.py": "7317a5a794d07c08062a2e3096e56ed196120d0ffcc9c962743dd99a32fc4019",
     "public_server.py": "f42f0f5ff9428e3bcd6dae90f9a0ffe870a656557f23f12ba26d99e90d7bbeae",
     "recurrence_core.py": "71102c50323fb5f323bc3664f52b0578e47578778a2796b52c12fc3e7238d0aa",
-    "release_info.py": "f958f175fb1bb99e092f6ada1943860ee22a3d6c7289dfa15919d853346bdb23",
+    "release_info.py": "5576cfdfcf3fbd5231cafe4ef9d4231f103ff8ff678237e592943ed2fc6e3486",
     "requirements.txt": "174a9dd7c5a00c908f5a326602a13007c9816d163dc82ca4955a4122213236b3",
     "response_budget.py": "6fef83a1a8691199902704ec1b48a66589a1765d58ba1f6639319b2a13e115e7",
     "response_core.py": "caeae961d55db4406efb819396ebb745129b4292a8a923a131abb8b8c03d0ae1",
     "response_guidance.py": "71abc08243346788727a4b538055adac1aacdc204452c6ec6c438f54fd43f746",
     "response_tools.py": "42e1eaeac720ebfa16a7ba0977309bb64b84fe3a65c294061b5c21d342c3330f",
     "result_contract.py": "686e8bd001eb98fa818c4fee98ab82915016a6a2b95afb08bdd15d7739e65a77",
-    "runtime_security.py": "d95467c458d098586d47951817f8f95aa884483608dee4b16a0496389bd19604",
+    "runtime_security.py": "75b648187b636fca50fb26d28f490c84f866922b99a1d790096f57d7cd539298",
     "service_v2.py": "565778b402be1a3c3d5549d92d4e5e764d0b02219cf3f6ac1da8708a5672193e",
     "sources.py": "4a884dac90906dbbf501fd4fb9eb25b2fb2d85894058fe766c4e2dc3d4513dbf",
     "term_core.py": "264b166a085be6cadd0ef62cf69f836e58130f6295c5982f38076f564b96ae0c",
     "uijeong_mcp.py": "a3614e5c695ff414f831ef362c275a0231a5bdd936f4a3543b3c34854fd5fd90",
     "workbench_tools.py": "4c542a2eba57571993ca4b8c0a9339c783f5920e3dd1000c3f9a144f552f4355",
     "workflow_core.py": "180b52f2b2dffb57d7d53625c1f19fe1f779c79a6a24d52c8977a03688c39be8",
-    "openai_compat.py": "976ab5589ce7a907f9990477cb83dbf58813e89fc51e69b9d123b1da0b278db4"
+    "openai_compat.py": "976ab5589ce7a907f9990477cb83dbf58813e89fc51e69b9d123b1da0b278db4",
+    "public_site.py": "a8559185696e224a8d663d632fce0f53d840911005573ffdbe7fd4ee8c740ad3"
   },
-  "runtime_fingerprint": "8ba34b18938fdf00f5ef4afdc3eca55ccc985130dc857ba694804d2f60248b7e",
+  "runtime_fingerprint": "2cea403bab908f4f53bbac67163d88f2a53881a36655ad13c8538f0f11fd7c04",
   "profile_tool_counts": {
     "core": 5,
     "work": 18,
@@ -211,7 +212,7 @@
     "regression-r0 (6).txt": "8e831c2b7a735897aa84a7a4ff5f21d20a4a10142367748e92c820a9cd0e1a74",
     "regression-r0.txt": "8e831c2b7a735897aa84a7a4ff5f21d20a4a10142367748e92c820a9cd0e1a74",
     "regression.log": "8e831c2b7a735897aa84a7a4ff5f21d20a4a10142367748e92c820a9cd0e1a74",
-    "release_info.py": "f958f175fb1bb99e092f6ada1943860ee22a3d6c7289dfa15919d853346bdb23",
+    "release_info.py": "5576cfdfcf3fbd5231cafe4ef9d4231f103ff8ff678237e592943ed2fc6e3486",
     "release_manifest (2).json": "190041f8187d167a8c55ff48774757337e95880b15290a64c8c711d4579dfa59",
     "render.oauth.yaml": "00da517e3c82c566d16a82ded4acd7aa0cb0015748495ebfe6364568ae6cfab8",
     "render.yaml": "0ddbb923b51a98fabef08e1e8c8b479e1e2cfe17c966b3432b37ba4e4f6de4f3",
@@ -225,7 +226,7 @@
     "result_contract.py": "686e8bd001eb98fa818c4fee98ab82915016a6a2b95afb08bdd15d7739e65a77",
     "run-summary.json": "e3f0345cd616639911f7c9e74ec21ea5294ca5c3ae7a1f539220caabef93565b",
     "runtime-work-schemas.json": "9df56deefadb3f4675d6504fa5280056daa391b6bb6131cf5dd6114bab6a6d76",
-    "runtime_security.py": "d95467c458d098586d47951817f8f95aa884483608dee4b16a0496389bd19604",
+    "runtime_security.py": "75b648187b636fca50fb26d28f490c84f866922b99a1d790096f57d7cd539298",
     "scripts/build_manifest.py": "13a1d5594ef1b9237994e71bf3e219b11e3ac8387b669bed74964ed52960819f",
     "scripts/check_config.py": "acc668a4f75243cb1649255bde30d218e045eaf01a2bbcbb610cef8fe920b539",
     "scripts/demo_response25.py": "125a4c9dd59ddc83b8bc1daaf94076c70275052b215b662d017cb477191d55f6",
@@ -271,10 +272,12 @@
     "먼저읽어주세요.txt": "c6899fb23a4fc0feb77bf849bb10bb76ee0a9fca7ecf1f6e9939fa59ef9b4cd1",
     "실행예시_합성자료.md": "0aae0b7b7fc6af9ec0deb97d4a2eb4baef634fcbad31abc216064b6374e2ee3a",
     "openai_compat.py": "976ab5589ce7a907f9990477cb83dbf58813e89fc51e69b9d123b1da0b278db4",
-    "tests/test_openai_compat.py": "59d07de2f0bf29fcab72ee285b2140e80d13176e2df9e1b20d30469e97c2423b"
+    "tests/test_openai_compat.py": "59d07de2f0bf29fcab72ee285b2140e80d13176e2df9e1b20d30469e97c2423b",
+    "public_site.py": "a8559185696e224a8d663d632fce0f53d840911005573ffdbe7fd4ee8c740ad3",
+    "tests/test_public_site.py": "28d07e3e68170f5b70ef44230d6a375d8852262716c71017d27f46c3f8b9283e"
   },
   "integrity_note": "내용 일치 검사이며 제작자 서명·원격 배포 증명은 아닙니다.",
   "verification_reference": "docs/verification/v250/verification-summary.json",
-  "runtime_protocol_claim": "STANDARD_SEARCH_FETCH_ADDED; VERIFY_IN_CI_AND_REMOTE_BEFORE_RELEASE",
+  "runtime_protocol_claim": "PUBLIC_RELEASE_PREP; POLICY_PAGES_AND_DOMAIN_CHALLENGE_ADDED; VERIFY_IN_CI_AND_REMOTE",
   "deployment_performed_in_this_build": false
 }
