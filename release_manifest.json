@@ -1,5 +1,5 @@
 {
-  "version": "2.5.2-public.2",
+  "version": "2.5.3-public.1",
   "based_on": "user-provided 2.4.0-rc.1",
   "release_stage": "RELEASE_CANDIDATE",
   "runtime_sha256": {
@@ -14,9 +14,9 @@
     "evidence_core.py": "8b6538f1b5732b2e46ea6ef2d6b4b425f69d26e2286f5f8fa9e4dba8d93232b2",
     "oauth_resource.py": "d343b01a1e48bf186aabf06cde1bcb69c462393f0510db2ec9508f9fd4026dc0",
     "period_core.py": "7317a5a794d07c08062a2e3096e56ed196120d0ffcc9c962743dd99a32fc4019",
-    "public_server.py": "b35fd0e6358eef526f59e660a7e5c7eae7206a4c553fb0d6da7cc4a672cee66b",
+    "public_server.py": "c3aac9bb833ce03363975066288fe837bb131c65d792518fef5c1fba205d3d20",
     "recurrence_core.py": "71102c50323fb5f323bc3664f52b0578e47578778a2796b52c12fc3e7238d0aa",
-    "release_info.py": "7f0d4e1dc327515f09180056a6e9f36ae95c6e916302faee9414d3a53a8d2e26",
+    "release_info.py": "e3762e9b06f87be20815a6b560067b753fb8ce9c286ce55693e005420664c9dd",
     "requirements.txt": "174a9dd7c5a00c908f5a326602a13007c9816d163dc82ca4955a4122213236b3",
     "response_budget.py": "6fef83a1a8691199902704ec1b48a66589a1765d58ba1f6639319b2a13e115e7",
     "response_core.py": "caeae961d55db4406efb819396ebb745129b4292a8a923a131abb8b8c03d0ae1",
@@ -31,12 +31,13 @@
     "workbench_tools.py": "4c542a2eba57571993ca4b8c0a9339c783f5920e3dd1000c3f9a144f552f4355",
     "workflow_core.py": "180b52f2b2dffb57d7d53625c1f19fe1f779c79a6a24d52c8977a03688c39be8"
   },
-  "runtime_fingerprint": "b0506d3ed71260bc1e41798b556147c6e4c4d39a952ba19e275921fb168bf400",
+  "runtime_fingerprint": "1c4b8d0e8110b50d0897ff385085a8afc90eef5a99584d4490d9828c474f11f4",
   "profile_tool_counts": {
     "core": 5,
     "work": 18,
     "lite": 26,
-    "full": 38
+    "full": 38,
+    "public": 13
   },
   "files_sha256": {
     "CHANGELOG.md": "c0a7ae3aa234889bd6f83a9d4298d581f5975cd86ac95a8155991d83f7dd68d1",
@@ -195,7 +196,7 @@
     "protocol-attempt.log": "ceef816c1896159e1e08bf0166999c86a96b9e4dde3323320e50138afaf03eac",
     "protocol.json": "893804386c4279ffddf3d7edfbaa718933448c5a2a86c5c4a6144a0a9da014b0",
     "protocol.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "public_server.py": "b35fd0e6358eef526f59e660a7e5c7eae7206a4c553fb0d6da7cc4a672cee66b",
+    "public_server.py": "c3aac9bb833ce03363975066288fe837bb131c65d792518fef5c1fba205d3d20",
     "pytest (5).txt": "184ca2c39161d3a8322ed7c35fd8bc2f75f92f4b00fce28d1653f332b9ccfeae",
     "pytest-baseline-v21.xml": "bbdcea31ad8f25fbb978cddffa7abc42edb8408784dc5887f265e184fbc971e5",
     "pytest-v22.xml": "0177ffca50622d5ae2b472a8d6ec81136ebb12f7d28813d84c2133dd7788fc6e",
@@ -209,10 +210,10 @@
     "regression-r0 (6).txt": "8e831c2b7a735897aa84a7a4ff5f21d20a4a10142367748e92c820a9cd0e1a74",
     "regression-r0.txt": "8e831c2b7a735897aa84a7a4ff5f21d20a4a10142367748e92c820a9cd0e1a74",
     "regression.log": "8e831c2b7a735897aa84a7a4ff5f21d20a4a10142367748e92c820a9cd0e1a74",
-    "release_info.py": "7f0d4e1dc327515f09180056a6e9f36ae95c6e916302faee9414d3a53a8d2e26",
+    "release_info.py": "e3762e9b06f87be20815a6b560067b753fb8ce9c286ce55693e005420664c9dd",
     "release_manifest (2).json": "190041f8187d167a8c55ff48774757337e95880b15290a64c8c711d4579dfa59",
     "render.oauth.yaml": "00da517e3c82c566d16a82ded4acd7aa0cb0015748495ebfe6364568ae6cfab8",
-    "render.yaml": "3bed1b783b05f8eb2547e3599dea3d523c0551771bef36b97394ab3c26144563",
+    "render.yaml": "0ddbb923b51a98fabef08e1e8c8b479e1e2cfe17c966b3432b37ba4e4f6de4f3",
     "requirements.txt": "174a9dd7c5a00c908f5a326602a13007c9816d163dc82ca4955a4122213236b3",
     "response-budget.md": "439d297a9c749c436a19b9e5608789bfee1e95c5f5038782ed615f89ec137eb6",
     "response_budget.py": "6fef83a1a8691199902704ec1b48a66589a1765d58ba1f6639319b2a13e115e7",
@@ -247,7 +248,7 @@
     "tests/test_department23.py": "f95eed44ee3fe5e4ef9a4a2da2fb04ddbd5a7fd10dcceb1d4c6ca8c269a7fd02",
     "tests/test_evidence_v2.py": "f9a8f33ae9a40177f89fb3ced9abb18dc5a69ab61f5a4520249a1bf082c0d3f4",
     "tests/test_final_hardening.py": "3dca029a74e0febb73306784724da47d1341535f92359544080b058fed44aea1",
-    "tests/test_public_mode.py": "0a9b89d4d2c5cbead73bcdbd51f4808883485af2d8d0c88df7de7debfbceb5b1",
+    "tests/test_public_mode.py": "7c73ed4ef7543c26f4bd7ea26141ee7cde7d869a163749f2fcc2f7cedf0b5e57",
     "tests/test_realistic_size.py": "68389af6956030d4b4f0d563d1180b5d6346963b3e228d7346692af7c546d712",
     "tests/test_release24.py": "6f0abf19940f6056b58d94caca511c76548af12a2d0163d5642270073aa6db63",
     "tests/test_response25.py": "f468802c32825106b5d5ef1a52bcae1f98e779ae40efafb8836fd0a7bf299032",
