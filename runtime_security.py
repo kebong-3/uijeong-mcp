@@ -496,6 +496,25 @@ class HTTPGuard:
         from release_info import VERSION
         path=scope.get('path','/mcp')
         method=scope.get('method','POST')
+
+        # Public listing / policy / support / OpenAI domain-verification pages
+        # bypass the MCP-only PublicBoundary but keep exact Host/Origin checks.
+        if self.policy.get("auth_mode") == "public":
+            from public_site import route as public_site_route
+            public_site_response = public_site_route(path, method)
+            if public_site_response is not None:
+                status, content_type, body = public_site_response
+                response_headers = [
+                    (b"content-type", content_type),
+                    (b"cache-control", b"no-store"),
+                    (b"x-content-type-options", b"nosniff"),
+                    (b"content-security-policy", b"default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'"),
+                    (b"referrer-policy", b"no-referrer"),
+                ]
+                await send({"type":"http.response.start","status":status,"headers":response_headers})
+                await send({"type":"http.response.body","body":b"" if method=="HEAD" else body})
+                return
+
         public_metadata = self.policy.get('oauth') and path in (
             '/.well-known/oauth-protected-resource', self.policy['oauth'].metadata_path)
         if (path=='/healthz' or public_metadata) and method in ('GET','HEAD'):
