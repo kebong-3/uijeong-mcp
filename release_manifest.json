@@ -1,6 +1,6 @@
 {
-  "version": "2.5.3-public.1",
-  "based_on": "user-provided 2.4.0-rc.1",
+  "version": "2.6.0-public.1",
+  "based_on": "2.5.3-public.1",
   "release_stage": "RELEASE_CANDIDATE",
   "runtime_sha256": {
     "citation_links.py": "cde952164ba6d40a0bc865c57d959bf9bdbfc8ccf0459edef4ef149b5f1b11cf",
@@ -14,9 +14,9 @@
     "evidence_core.py": "8b6538f1b5732b2e46ea6ef2d6b4b425f69d26e2286f5f8fa9e4dba8d93232b2",
     "oauth_resource.py": "d343b01a1e48bf186aabf06cde1bcb69c462393f0510db2ec9508f9fd4026dc0",
     "period_core.py": "7317a5a794d07c08062a2e3096e56ed196120d0ffcc9c962743dd99a32fc4019",
-    "public_server.py": "c3aac9bb833ce03363975066288fe837bb131c65d792518fef5c1fba205d3d20",
+    "public_server.py": "f42f0f5ff9428e3bcd6dae90f9a0ffe870a656557f23f12ba26d99e90d7bbeae",
     "recurrence_core.py": "71102c50323fb5f323bc3664f52b0578e47578778a2796b52c12fc3e7238d0aa",
-    "release_info.py": "e3762e9b06f87be20815a6b560067b753fb8ce9c286ce55693e005420664c9dd",
+    "release_info.py": "f958f175fb1bb99e092f6ada1943860ee22a3d6c7289dfa15919d853346bdb23",
     "requirements.txt": "174a9dd7c5a00c908f5a326602a13007c9816d163dc82ca4955a4122213236b3",
     "response_budget.py": "6fef83a1a8691199902704ec1b48a66589a1765d58ba1f6639319b2a13e115e7",
     "response_core.py": "caeae961d55db4406efb819396ebb745129b4292a8a923a131abb8b8c03d0ae1",
@@ -29,15 +29,16 @@
     "term_core.py": "264b166a085be6cadd0ef62cf69f836e58130f6295c5982f38076f564b96ae0c",
     "uijeong_mcp.py": "a3614e5c695ff414f831ef362c275a0231a5bdd936f4a3543b3c34854fd5fd90",
     "workbench_tools.py": "4c542a2eba57571993ca4b8c0a9339c783f5920e3dd1000c3f9a144f552f4355",
-    "workflow_core.py": "180b52f2b2dffb57d7d53625c1f19fe1f779c79a6a24d52c8977a03688c39be8"
+    "workflow_core.py": "180b52f2b2dffb57d7d53625c1f19fe1f779c79a6a24d52c8977a03688c39be8",
+    "openai_compat.py": "976ab5589ce7a907f9990477cb83dbf58813e89fc51e69b9d123b1da0b278db4"
   },
-  "runtime_fingerprint": "1c4b8d0e8110b50d0897ff385085a8afc90eef5a99584d4490d9828c474f11f4",
+  "runtime_fingerprint": "8ba34b18938fdf00f5ef4afdc3eca55ccc985130dc857ba694804d2f60248b7e",
   "profile_tool_counts": {
     "core": 5,
     "work": 18,
     "lite": 26,
     "full": 38,
-    "public": 13
+    "public": 15
   },
   "files_sha256": {
     "CHANGELOG.md": "c0a7ae3aa234889bd6f83a9d4298d581f5975cd86ac95a8155991d83f7dd68d1",
@@ -196,7 +197,7 @@
     "protocol-attempt.log": "ceef816c1896159e1e08bf0166999c86a96b9e4dde3323320e50138afaf03eac",
     "protocol.json": "893804386c4279ffddf3d7edfbaa718933448c5a2a86c5c4a6144a0a9da014b0",
     "protocol.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "public_server.py": "c3aac9bb833ce03363975066288fe837bb131c65d792518fef5c1fba205d3d20",
+    "public_server.py": "f42f0f5ff9428e3bcd6dae90f9a0ffe870a656557f23f12ba26d99e90d7bbeae",
     "pytest (5).txt": "184ca2c39161d3a8322ed7c35fd8bc2f75f92f4b00fce28d1653f332b9ccfeae",
     "pytest-baseline-v21.xml": "bbdcea31ad8f25fbb978cddffa7abc42edb8408784dc5887f265e184fbc971e5",
     "pytest-v22.xml": "0177ffca50622d5ae2b472a8d6ec81136ebb12f7d28813d84c2133dd7788fc6e",
@@ -210,7 +211,7 @@
     "regression-r0 (6).txt": "8e831c2b7a735897aa84a7a4ff5f21d20a4a10142367748e92c820a9cd0e1a74",
     "regression-r0.txt": "8e831c2b7a735897aa84a7a4ff5f21d20a4a10142367748e92c820a9cd0e1a74",
     "regression.log": "8e831c2b7a735897aa84a7a4ff5f21d20a4a10142367748e92c820a9cd0e1a74",
-    "release_info.py": "e3762e9b06f87be20815a6b560067b753fb8ce9c286ce55693e005420664c9dd",
+    "release_info.py": "f958f175fb1bb99e092f6ada1943860ee22a3d6c7289dfa15919d853346bdb23",
     "release_manifest (2).json": "190041f8187d167a8c55ff48774757337e95880b15290a64c8c711d4579dfa59",
     "render.oauth.yaml": "00da517e3c82c566d16a82ded4acd7aa0cb0015748495ebfe6364568ae6cfab8",
     "render.yaml": "0ddbb923b51a98fabef08e1e8c8b479e1e2cfe17c966b3432b37ba4e4f6de4f3",
@@ -248,7 +249,7 @@
     "tests/test_department23.py": "f95eed44ee3fe5e4ef9a4a2da2fb04ddbd5a7fd10dcceb1d4c6ca8c269a7fd02",
     "tests/test_evidence_v2.py": "f9a8f33ae9a40177f89fb3ced9abb18dc5a69ab61f5a4520249a1bf082c0d3f4",
     "tests/test_final_hardening.py": "3dca029a74e0febb73306784724da47d1341535f92359544080b058fed44aea1",
-    "tests/test_public_mode.py": "7c73ed4ef7543c26f4bd7ea26141ee7cde7d869a163749f2fcc2f7cedf0b5e57",
+    "tests/test_public_mode.py": "9f275c32608c77aadb63818e85740ff3347d1cbddd3c1914fda8802d025bca2e",
     "tests/test_realistic_size.py": "68389af6956030d4b4f0d563d1180b5d6346963b3e228d7346692af7c546d712",
     "tests/test_release24.py": "6f0abf19940f6056b58d94caca511c76548af12a2d0163d5642270073aa6db63",
     "tests/test_response25.py": "f468802c32825106b5d5ef1a52bcae1f98e779ae40efafb8836fd0a7bf299032",
@@ -268,10 +269,12 @@
     "workbench_tools.py": "4c542a2eba57571993ca4b8c0a9339c783f5920e3dd1000c3f9a144f552f4355",
     "workflow_core.py": "180b52f2b2dffb57d7d53625c1f19fe1f779c79a6a24d52c8977a03688c39be8",
     "먼저읽어주세요.txt": "c6899fb23a4fc0feb77bf849bb10bb76ee0a9fca7ecf1f6e9939fa59ef9b4cd1",
-    "실행예시_합성자료.md": "0aae0b7b7fc6af9ec0deb97d4a2eb4baef634fcbad31abc216064b6374e2ee3a"
+    "실행예시_합성자료.md": "0aae0b7b7fc6af9ec0deb97d4a2eb4baef634fcbad31abc216064b6374e2ee3a",
+    "openai_compat.py": "976ab5589ce7a907f9990477cb83dbf58813e89fc51e69b9d123b1da0b278db4",
+    "tests/test_openai_compat.py": "59d07de2f0bf29fcab72ee285b2140e80d13176e2df9e1b20d30469e97c2423b"
   },
   "integrity_note": "내용 일치 검사이며 제작자 서명·원격 배포 증명은 아닙니다.",
   "verification_reference": "docs/verification/v250/verification-summary.json",
-  "runtime_protocol_claim": "SEE_VERIFICATION_SUMMARY",
+  "runtime_protocol_claim": "STANDARD_SEARCH_FETCH_ADDED; VERIFY_IN_CI_AND_REMOTE_BEFORE_RELEASE",
   "deployment_performed_in_this_build": false
 }

@@ -12,8 +12,10 @@ import json
 from typing import Any, Optional
 
 import runtime_security as R
+import openai_compat as O
 
 PUBLIC_TOOLS = (
+    "search", "fetch",
     "council_find_council",
     "council_evidence_bundle", "council_evidence_search", "council_period_review",
     "council_department_brief", "council_recurring_issues",
@@ -22,6 +24,8 @@ PUBLIC_TOOLS = (
 )
 INSTRUCTIONS = """지방의회MCP 직원 배포용 공개 조회 모드 — 인증 없이 공개 지방의회 자료만 조회합니다.
 개발·기획: 광주 서구청 펀온워크 케빈정.
+표준 지식검색/심층리서치 클라이언트는 search → fetch 흐름을 사용합니다.
+일반 ChatGPT 업무대화에서는 아래의 전문 도구를 사용해 더 풍부한 행정 맥락을 확인할 수 있습니다.
 질문 의도에 따라 가장 좁고 정확한 도구를 먼저 선택하세요.
 - 일반 주제·사업 검색: council_evidence_bundle
 - '최근 N년'·연도별 비교: council_period_review
@@ -108,7 +112,18 @@ def build_server(backend: Any = None) -> Any:
                      json_response=True, transport_security=R.transport_security_settings())
     annotations = ToolAnnotations(readOnlyHint=True, destructiveHint=False,
                                   idempotentHint=True, openWorldHint=True)
+
+    # OpenAI standard search/fetch use typed return models so FastMCP advertises
+    # outputSchema and returns structuredContent exactly as research clients expect.
+    standard = O.build_tools(backend)
+    for name in O.STANDARD_TOOL_NAMES:
+        fn = standard[name]
+        server.tool(name=name, annotations=annotations)(fn)
+
+    # Preserve the richer employee workflow tools without changing their contracts.
     for name in PUBLIC_TOOLS:
+        if name in O.STANDARD_TOOL_NAMES:
+            continue
         fn = getattr(backend, name, None)
         if not callable(fn):
             raise R.SecurityError(f"공개 조회 도구가 없습니다: {name}")
@@ -124,6 +139,15 @@ async def verify_surface(server: Any) -> None:
         raise R.SecurityError("공개 도구 허용목록 검증 실패")
     if any(not t.annotations or not t.annotations.readOnlyHint for t in tools):
         raise R.SecurityError("읽기 전용 도구 명세 검증 실패")
+    standard = {t.name: t for t in tools if t.name in O.STANDARD_TOOL_NAMES}
+    for name, required in (("search", {"results"}), ("fetch", {"id", "title", "text", "url"})):
+        tool = standard.get(name)
+        schema = getattr(tool, "outputSchema", None) if tool else None
+        if schema is None and tool is not None:
+            schema = getattr(tool, "output_schema", None)
+        props = (schema or {}).get("properties", {})
+        if not schema or not required.issubset(props):
+            raise R.SecurityError(f"{name} 표준 출력 스키마 검증 실패")
     # An unregistered local/draft tool must never be copied into this server.
     if await server.list_resources() or await server.list_resource_templates():
         raise R.SecurityError("공개 서버에는 별도 파일 리소스를 노출하지 않습니다.")
@@ -165,8 +189,15 @@ async def self_test() -> dict[str, Any]:
             checks["no_auth_initialize"] = init.status_code == 200 and "result" in init.json()
             listing = await client.post("/mcp", json={"jsonrpc": "2.0", "id": 2,
                                                        "method": "tools/list", "params": {}})
-            names = {item["name"] for item in listing.json().get("result", {}).get("tools", [])}
+            tool_rows = listing.json().get("result", {}).get("tools", [])
+            names = {item["name"] for item in tool_rows}
             checks["exact_allowlist"] = listing.status_code == 200 and names == set(PUBLIC_TOOLS)
+            standard_rows = {item["name"]: item for item in tool_rows if item["name"] in O.STANDARD_TOOL_NAMES}
+            checks["standard_search_fetch_schemas"] = (
+                set(standard_rows) == set(O.STANDARD_TOOL_NAMES)
+                and set((standard_rows["search"].get("outputSchema") or {}).get("properties", {})) >= {"results"}
+                and set((standard_rows["fetch"].get("outputSchema") or {}).get("properties", {})) >= {"id", "title", "text", "url"}
+            )
             result = await client.post("/mcp", json={"jsonrpc": "2.0", "id": 3, "method": "tools/call",
                 "params": {"name": "council_find_council", "arguments": {"query": "광주 서구"}}})
             payload = result.json().get("result", {})
