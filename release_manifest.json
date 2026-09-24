@@ -259,7 +259,7 @@
     "tests/test_release24.py": "6f0abf19940f6056b58d94caca511c76548af12a2d0163d5642270073aa6db63",
     "tests/test_response25.py": "f468802c32825106b5d5ef1a52bcae1f98e779ae40efafb8836fd0a7bf299032",
     "tests/test_response_budget.py": "b7652ac27bf6c2e8b3fa178b38a343089a2c104a92297cd9e993ecfeb69c4462",
-    "tests/test_runtime_limits.py": "ba0ceab660351a916b44c6e91ff2dcb8641aac58549d8dbf194e955c61b03785",
+    "tests/test_runtime_limits.py": "6fb82382270da3974cdaf084b39320e4de49107e2d4c01e92d2be4b05e2e139f",
     "tests/test_security.py": "c1f88065ade02d03f7a9b6bd99ee85b77db3f139224d53567082381ab1b03159",
     "tests/test_service24_offline.py": "b213a3b7b1170c481a38f28201c7563f0879f5cb5f8225709742af897d89de7f",
     "tests/test_service_v2.py": "446bc33b2f109f9a888fba7810bbca581a1f1ac74c68c3be59d10789b8c24807",
