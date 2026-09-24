@@ -42,7 +42,7 @@
     "core": 5,
     "work": 18,
     "lite": 26,
-    "full": 38,
+    "full": 41,
     "public": 18
   },
   "files_sha256": {
@@ -253,7 +253,7 @@
     "tests/test_citation_links.py": "2d6a370687a05048f7f72241437e7ea5b42b41f237487f9d8f101482f01ba181",
     "tests/test_department23.py": "f95eed44ee3fe5e4ef9a4a2da2fb04ddbd5a7fd10dcceb1d4c6ca8c269a7fd02",
     "tests/test_evidence_v2.py": "f9a8f33ae9a40177f89fb3ced9abb18dc5a69ab61f5a4520249a1bf082c0d3f4",
-    "tests/test_final_hardening.py": "3dca029a74e0febb73306784724da47d1341535f92359544080b058fed44aea1",
+    "tests/test_final_hardening.py": "7ad7bd08a1747bac869f5472605e3545496404bb1b4862840b75fd9f1d43fb50",
     "tests/test_public_mode.py": "9ffda2f5a47a563bb30437a8806a9e55f4fd2c202f6a6be82562cd88880d3681",
     "tests/test_realistic_size.py": "68389af6956030d4b4f0d563d1180b5d6346963b3e228d7346692af7c546d712",
     "tests/test_release24.py": "6f0abf19940f6056b58d94caca511c76548af12a2d0163d5642270073aa6db63",
