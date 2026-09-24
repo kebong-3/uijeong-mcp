@@ -17,6 +17,10 @@ services:
         sync: false
       - key: FINANCE365_API_URL
         value: https://www.lofin365.go.kr/lf/hub/QWGJK
+      - key: DATA_GO_KR_SEARCH_KEY
+        sync: false
+      - key: DATA_GO_KR_SEARCH_URL
+        value: https://apis.data.go.kr/AAAAAAA/GetSearchDataList/v2/search
       - key: CLIK_BASE_URL
         value: https://clik.nanet.go.kr/openapi
       - key: UIJEONG_PROFILE
@@ -44,7 +48,7 @@ services:
       - key: UIJEONG_SNAPSHOT_MAX_TOTAL_BYTES
         value: "67108864"
 # Explicit anonymous public queries. The CLIK API key remains server-side.
-# Public launcher registers 18 curated read-only tools for employee workflows.
+# Public launcher registers 19 curated read-only tools for employee workflows.
 # Existing bearer/oauth/local paths remain available in the protected launcher.
 # Free instances sleep; ephemeral storage and quota counters reset on redeploy.
 # A retained UIJEONG_BEARER_TOKEN is ignored only in explicit public mode.
@@ -53,3 +57,6 @@ services:
 # LOFIN_API_KEY: 지방재정365 개발자공간에서 발급받는 OpenAPI 인증키(권장)
 # FINANCE365_SERVICE_KEY: 이전 배포 호환용 키 이름(선택)
 # FINANCE365_API_URL: 세부사업별 세출현황 QWGJK endpoint (기본값 설정됨)
+
+# DATA_GO_KR_SEARCH_KEY: 공공데이터포털 검색서비스 인증키(메타데이터 Discovery 전용)
+# DATA_GO_KR_SEARCH_URL: 공공데이터포털 검색서비스 /search endpoint
