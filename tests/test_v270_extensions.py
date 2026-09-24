@@ -44,15 +44,59 @@ def test_ordinance_jurisdiction_alias_accepts_historical_name():
 
 
 def test_finance_slots_are_explicit(monkeypatch):
+    monkeypatch.delenv("LOFIN_API_KEY", raising=False)
     monkeypatch.delenv("FINANCE365_SERVICE_KEY", raising=False)
     monkeypatch.delenv("FINANCE365_API_URL", raising=False)
     cfg = F.configuration()
     assert cfg["configured"] is False
-    assert cfg["env"]["service_key"] == "FINANCE365_SERVICE_KEY"
-    assert cfg["env"]["api_url"] == "FINANCE365_API_URL"
+    assert cfg["env"]["primary_key"] == "LOFIN_API_KEY"
+    assert cfg["endpoint"].endswith("/lf/hub/QWGJK")
     result = asyncio.run(F.context("체납관리단", "전남광주통합특별시 서구의회"))
     assert result["status"] == "NOT_CONFIGURED"
     assert result["items"] == []
+
+
+def test_finance_qwgjk_response_parsing_and_local_filter():
+    payload = {
+        "QWGJK": [
+            {"head": [
+                {"list_total_count": 1},
+                {"RESULT": {"CODE": "INFO-000", "MESSAGE": "정상 처리되었습니다."}},
+            ]},
+            {"row": [{
+                "fyr": "2026",
+                "exe_ymd": "20260925",
+                "laf_cd": "TEST",
+                "laf_hg_nm": "광주서구",
+                "dbiz_cd": "B1",
+                "dbiz_nm": "체납관리단 운영",
+                "acnt_dv_nm": "일반회계",
+                "bdg_cash_amt": "110000000",
+                "bdg_ntep": "0",
+                "capep": "110000000",
+                "sggep": "0",
+                "etc_amt": "0",
+                "ep_amt": "55000000",
+                "cpl_amt": "110000000",
+                "fld_nm": "일반공공행정",
+                "part_nm": "재정·금융",
+            }]},
+        ]
+    }
+    parsed = F._parse_payload(payload)
+    assert parsed["result_code"] == "INFO-000"
+    assert parsed["total_count"] == 1
+    assert F._belongs(parsed["rows"][0], "전남광주통합특별시 서구의회")
+    item = F._public_row(parsed["rows"][0])
+    assert item["budget_current_amount"] == 110000000
+    assert item["expenditure"] == 55000000
+    assert item["execution_rate_percent"] == 50.0
+
+
+def test_finance_info_200_is_empty_not_error():
+    parsed = F._parse_payload({"RESULT": [{"CODE": "INFO-200", "MESSAGE": "해당하는 데이터가 없습니다."}]})
+    assert parsed["result_code"] == "INFO-200"
+    assert parsed["rows"] == []
 
 
 def test_admin_term_expansion_is_bounded():
