@@ -21,9 +21,10 @@ PUBLIC_TOOLS = (
     "council_department_brief", "council_recurring_issues",
     "council_read_source", "council_open_record", "council_get_evidence",
     "council_data_sources", "council_search_minutes", "council_prepare_pack", "council_status",
+    "council_legislation_context", "council_finance_context", "council_context_pack",
 )
 INSTRUCTIONS = """지방의회MCP 직원 배포용 공개 조회 모드 — 인증 없이 공개 지방의회 자료만 조회합니다.
-개발·기획: 광주 서구청 펀온워크 케빈정.
+개발·기획: 전남광주통합특별시 서구청 펀온워크 케빈정.
 표준 지식검색/심층리서치 클라이언트는 search → fetch 흐름을 사용합니다.
 일반 ChatGPT 업무대화에서는 아래의 전문 도구를 사용해 더 풍부한 행정 맥락을 확인할 수 있습니다.
 질문 의도에 따라 가장 좁고 정확한 도구를 먼저 선택하세요.
@@ -33,7 +34,11 @@ INSTRUCTIONS = """지방의회MCP 직원 배포용 공개 조회 모드 — 인�
 - 여러 회의연도의 반복 쟁점 후보: council_recurring_issues
 - 원문 확인·이어읽기: council_get_evidence / council_read_source / council_open_record
 - 답변 준비자료: council_prepare_pack
+- 법령·조례 근거 후보: council_legislation_context
+- 재정 연계 상태·세출 컨텍스트: council_finance_context
+- 현안 통합 근거팩(회의록+의안+의원기록후보+정책+법령/조례+재정): council_context_pack
 의회명이 애매할 때만 council_find_council을 먼저 사용하세요.
+의원정보는 Discovery 전용입니다. 실제 발언은 반드시 회의록 원문 근거로 확인하세요.
 내부 초안·개인정보·비공개 자료는 입력하지 마세요.
 검색어는 공개 주제어로 입력하세요. 검색 결과 보관함은 공개 자료용이며 사용자별 비공개 공간이 아닙니다.
 원문 주소·회의일·발언 근거를 제시하고 PARTIAL / EMPTY / ERROR를 구분하세요.

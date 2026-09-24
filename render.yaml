@@ -9,6 +9,14 @@ services:
     envVars:
       - key: CLIK_API_KEY
         sync: false
+      - key: LAW_OC
+        sync: false
+      - key: FINANCE365_SERVICE_KEY
+        sync: false
+      - key: FINANCE365_API_URL
+        sync: false
+      - key: CLIK_BASE_URL
+        value: https://clik.nanet.go.kr/openapi
       - key: UIJEONG_PROFILE
         value: core
       - key: PYTHON_VERSION
@@ -34,7 +42,11 @@ services:
       - key: UIJEONG_SNAPSHOT_MAX_TOTAL_BYTES
         value: "67108864"
 # Explicit anonymous public queries. The CLIK API key remains server-side.
-# Public launcher registers 13 curated read-only tools for employee workflows.
+# Public launcher registers 18 curated read-only tools for employee workflows.
 # Existing bearer/oauth/local paths remain available in the protected launcher.
 # Free instances sleep; ephemeral storage and quota counters reset on redeploy.
 # A retained UIJEONG_BEARER_TOKEN is ignored only in explicit public mode.
+
+# LAW_OC: 국가법령정보 공동활용 API 인증값(OC)
+# FINANCE365_SERVICE_KEY: 공공데이터포털 지방재정365 서비스키
+# FINANCE365_API_URL: 활용신청 승인 화면의 실제 요청 URL
