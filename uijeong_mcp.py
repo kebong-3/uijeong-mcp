@@ -15,7 +15,10 @@
 [데이터 원천]
   - 지방의회 회의록  : https://clik.nanet.go.kr/openapi/minutes.do
   - 지방의회 의안정보: https://clik.nanet.go.kr/openapi/bill.do
+  - 지방의회 의원정보: https://clik.nanet.go.kr/openapi/assemblyinfo.do (Discovery 전용)
   - 지방정책정보     : https://clik.nanet.go.kr/openapi/policyinfoList.do / policyinfoDetail.do
+  - 법령·자치법규    : 국가법령정보 공동활용 OPEN API (LAW_OC 설정 시)
+  - 지방재정365      : 세부사업별 세출현황 연계 슬롯 (서비스키·요청URL 설정 시)
   ※ 호출 제한: 1회 100건, 인증키당 1일 1,000회 → 캐시와 호출 예산 관리 내장
 
 [실행]
@@ -50,7 +53,7 @@ from mcp.types import ToolAnnotations
 # 1. 설정
 # ════════════════════════════════════════════════════════════
 from release_info import VERSION as SERVER_VERSION
-BASE = "https://clik.nanet.go.kr/openapi"
+BASE = os.environ.get("CLIK_BASE_URL", "https://clik.nanet.go.kr/openapi").strip().rstrip("/")
 API_KEY = os.environ.get("CLIK_API_KEY", "").strip()
 VERIFY_SSL = True  # TLS certificate validation is always enabled
 DAILY_LIMIT = int(os.environ.get("CLIK_DAILY_LIMIT", "1000"))
@@ -2446,6 +2449,8 @@ from response_tools import install as install_response
 install_response(sys.modules[__name__], V2_SERVICES["snapshots"])
 from response_guidance import install as install_guidance
 install_guidance(sys.modules[__name__])
+from council_extensions import install as install_council_extensions
+install_council_extensions(sys.modules[__name__])
 
 if __name__ == "__main__":
     if "--check" in sys.argv:
