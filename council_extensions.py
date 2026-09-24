@@ -17,6 +17,7 @@ from typing import Any, Optional
 
 import finance_context as F
 import legal_context as L
+import public_data_discovery as D
 import runtime_security as R
 from result_contract import wire_result
 
@@ -202,8 +203,8 @@ def install(U: Any) -> None:
         fiscal_year: Optional[int] = None,
         limit: int = 20,
     ) -> dict[str, Any]:
-        """지방재정365 세부사업별 세출현황 연계 준비상태와 재정질의 컨텍스트를 확인합니다.
-        현재는 승인받은 서비스키·요청 URL을 Render에 넣기 전까지 안전하게 NOT_CONFIGURED를 반환합니다."""
+        """지방재정365 세부사업별 세출현황에서 예산현액·재원구성·지출액·집행률을 조회합니다.
+        검색 미발견과 API 오류를 구분하며 최종 예산답변은 공식 예산서·추경서·결산서 확인이 필요합니다."""
         cid,cname,error=U.pick_council(council)
         if error:
             return {"status":"INVALID_INPUT","message":error}
@@ -218,6 +219,8 @@ def install(U: Any) -> None:
         date_to: Optional[str] = None,
         include_legal: bool = True,
         include_finance: bool = True,
+        include_public_data: bool = False,
+        fiscal_year: Optional[int] = None,
         max_docs: int = 4,
     ) -> dict[str, Any]:
         """한 현안의 의회기록·의안·의원공식기록후보·정책자료·법령/조례·재정상태를 한 번에 묶습니다.
@@ -255,7 +258,9 @@ def install(U: Any) -> None:
         if include_legal:
             tasks.append(L.context(topic.strip(),_jurisdiction_from_council(cname),include_articles=True))
         if include_finance:
-            tasks.append(F.context(topic.strip(),cname,None,20))
+            tasks.append(F.context(topic.strip(),cname,fiscal_year,20))
+        if include_public_data:
+            tasks.append(D.search(topic.strip(),6))
         results=await asyncio.gather(*tasks)
 
         idx=0
@@ -263,12 +268,13 @@ def install(U: Any) -> None:
         bills=results[idx];idx+=1
         policy=results[idx];idx+=1
         legal=results[idx] if include_legal else {"status":"SKIPPED"}; idx += 1 if include_legal else 0
-        finance=results[idx] if include_finance else {"status":"SKIPPED"}
+        finance=results[idx] if include_finance else {"status":"SKIPPED"}; idx += 1 if include_finance else 0
+        public_data=results[idx] if include_public_data else {"status":"SKIPPED"}
 
         statuses=[
             evidence.get("status") if isinstance(evidence,dict) else "ERROR",
             members.get("status"),bills.get("status"),policy.get("status"),
-            legal.get("status"),finance.get("status"),
+            legal.get("status"),finance.get("status"),public_data.get("status"),
         ]
         completed=[x for x in statuses if x in ("COMPLETE","EMPTY","NOT_CONFIGURED","SKIPPED","PENDING_ENDPOINT_CONTRACT")]
         status="COMPLETE" if len(completed)==len(statuses) and (evidence.get("status") if isinstance(evidence,dict) else "ERROR")!="ERROR" else "PARTIAL"
@@ -289,15 +295,131 @@ def install(U: Any) -> None:
             "policy_background":policy,
             "legal_and_ordinance_context":legal,
             "finance_context":finance,
+            "public_data_discovery":public_data,
+            "integration_configuration":{
+                "law":L.configuration(),
+                "finance365":F.configuration(),
+                "public_data_search":D.configuration(),
+            },
             "interpretation":[
                 "회의록은 최종 발언 근거, 의원정보는 관련 공식기록 후보 발견용입니다.",
                 "법령·조례 결과는 의회 대응용 근거 후보이며 최종 법적 판단은 별도 전문 검토가 필요합니다.",
-                "재정 API가 미설정이어도 나머지 레이어는 정상 반환됩니다.",
+                "재정·공공데이터 검색 API가 미설정이어도 나머지 레이어는 정상 반환됩니다.",
+                "공공데이터 검색 결과는 데이터값이 아니라 추가 공식 데이터 후보입니다. 자동으로 후보 API를 실행하지 않습니다.",
                 "ERROR를 자료 없음으로 해석하지 않으며 PARTIAL은 확인 범위를 함께 표시해야 합니다.",
             ],
         }
 
-    for fn in (council_legislation_context,council_finance_context,council_context_pack):
+    PURPOSES = {"일반","업무보고","행정사무감사","본예산","추경","조례·의안","5분발언","구정질문"}
+
+    async def council_session_ready_pack(
+        topic: str,
+        council: str = "광주 서구",
+        purpose: str = "일반",
+        date_from: Optional[str] = None,
+        date_to: Optional[str] = None,
+        fiscal_year: Optional[int] = None,
+        need_public_data: bool = False,
+        max_docs: int = 4,
+    ) -> dict[str, Any]:
+        """회기 전 실무 준비용 시그니처 도구입니다.
+
+        회의록·의안·법령/조례·재정 근거를 목적에 맞게 묶고, 동일 스냅샷으로 답변준비자료를 생성합니다.
+        purpose: 일반 | 업무보고 | 행정사무감사 | 본예산 | 추경 | 조례·의안 | 5분발언 | 구정질문
+        need_public_data=True일 때만 공공데이터포털에서 추가 데이터 후보를 탐색합니다.
+        """
+        if purpose not in PURPOSES:
+            return {"status":"INVALID_INPUT","message":"지원 purpose: "+", ".join(sorted(PURPOSES))}
+        if not isinstance(topic,str) or not topic.strip() or len(topic)>200:
+            return {"status":"INVALID_INPUT","message":"topic은 1~200자 문자열이어야 합니다."}
+
+        finance_cues=("예산","추경","결산","집행","사업비","재원","국비","시비","구비")
+        finance_needed = purpose in {"본예산","추경","행정사무감사"} or any(x in topic for x in finance_cues)
+        legal_needed = purpose in {"조례·의안","본예산","추경","행정사무감사","구정질문"} or any(
+            x in topic for x in ("조례","법령","법적근거","상위법","위임","동의안","민간위탁","출연")
+        )
+
+        context = await council_context_pack(
+            topic=topic,council=council,date_from=date_from,date_to=date_to,
+            include_legal=legal_needed,include_finance=finance_needed,
+            include_public_data=need_public_data,fiscal_year=fiscal_year,max_docs=max_docs,
+        )
+        if context.get("status")=="INVALID_INPUT":
+            return context
+
+        evidence=context.get("council_evidence") if isinstance(context,dict) else None
+        snapshot=(evidence or {}).get("snapshot_id") if isinstance(evidence,dict) else None
+        prepared={"status":"SKIPPED","message":"회의록 근거 스냅샷을 확보하지 못해 자동 답변팩 생성을 건너뜁니다."}
+        if snapshot:
+            prepared=await U.council_prepare_pack(
+                keyword=topic,council=council,date_from=date_from,date_to=date_to,
+                max_docs=max_docs,snapshot_id=snapshot,max_evidence=10,
+            )
+
+        source_status={
+            "council_evidence":(evidence or {}).get("status") if isinstance(evidence,dict) else "ERROR",
+            "bills":context.get("related_bills",{}).get("status"),
+            "legal":context.get("legal_and_ordinance_context",{}).get("status"),
+            "finance":context.get("finance_context",{}).get("status"),
+            "public_data_discovery":context.get("public_data_discovery",{}).get("status"),
+            "response_pack":prepared.get("status") if isinstance(prepared,dict) else "ERROR",
+        }
+        gaps=[]
+        for key,value in source_status.items():
+            if value in ("ERROR","PARTIAL","NOT_CONFIGURED"):
+                gaps.append({"area":key,"status":value})
+        next_tools=[]
+        if purpose in {"행정사무감사","업무보고"}:
+            next_tools.append({"tool":"council_recurring_issues","why":"여러 회의연도의 반복 쟁점 후보를 별도로 확인"})
+        if purpose in {"본예산","추경"}:
+            next_tools.append({"tool":"council_finance_context","why":"특정 세부사업명·회계연도를 좁혀 재정 수치를 재확인"})
+        if purpose=="조례·의안":
+            next_tools.append({"tool":"council_legislation_context","why":"상위법·자치법규 조문 후보를 재확인"})
+
+        return {
+            "status":"PARTIAL" if gaps else context.get("status","PARTIAL"),
+            "workflow":"SESSION_READY_PACK",
+            "purpose":purpose,
+            "topic":topic.strip(),
+            "council":context.get("council"),
+            "context":context,
+            "response_preparation":prepared,
+            "readiness":{
+                "source_status":source_status,
+                "gaps":gaps,
+                "human_checklist":[
+                    "현재 사업현황·최근 실적이 최신 내부자료와 일치하는지 확인",
+                    "의회에 과거 답변한 후속조치의 실제 이행상태 확인",
+                    "예산·추경·결산 수치는 공식 예산서와 담당부서 자료로 최종 대조",
+                    "법령·조례 후보는 시행일·부칙·위임범위까지 원문으로 최종 확인",
+                    "답변 초안의 수치·고유명사·기한은 담당자가 최종 검증",
+                ],
+                "recommended_followup_tools":next_tools,
+            },
+            "signature_note":"의회기록→법령·조례→예산·집행→답변준비 순으로 근거를 연결하는 공무원용 회기 대비 패키지",
+        }
+
+    base_status=U.council_status
+    async def council_status(test_council:str="광주 서구",live:bool=False)->dict[str, Any]:
+        result=await base_status(test_council=test_council,live=live)
+        if not isinstance(result,dict):
+            return result
+        result["integrations"]={
+            "law":L.configuration(),
+            "finance365":F.configuration(),
+            "public_data_search":D.configuration(),
+        }
+        if live and F.configuration().get("configured"):
+            result.setdefault("live_checks",[]).append({"source":"FINANCE365","check":await F.ping()})
+            if result["live_checks"][-1]["check"].get("status")=="ERROR":
+                result["status"]="PARTIAL"
+        if live and D.configuration().get("configured"):
+            result.setdefault("live_checks",[]).append({"source":"DATA_GO_KR_SEARCH","check":await D.search("지방행정",1)})
+        return result
+
+    setattr(U,"council_status",council_status)
+
+    for fn in (council_legislation_context,council_finance_context,council_context_pack,council_session_ready_pack):
         setattr(U,fn.__name__,fn)
         if U.profile_allows(fn.__name__):
             try:
