@@ -88,5 +88,7 @@ def test_minute_parsing_does_not_block_the_event_loop(monkeypatch):
         return during
 
     during = asyncio.run(run())
-    # 파싱을 이벤트 루프에서 하면 그동안 다른 작업이 한 번도 진행되지 못한다.
-    assert during >= 10, f'파싱 중에도 다른 작업이 진행돼야 한다(진행 {during}회)'
+    # 파싱을 이벤트 루프에서 직접 실행하면 heartbeat가 0회다.
+    # CI 러너 속도·스케줄러에 따라 tick 절대 횟수는 흔들리므로,
+    # 실제로 다른 작업이 진행됐다는 사실만 검증한다.
+    assert during >= 1, f'파싱 중에도 다른 작업이 진행돼야 한다(진행 {during}회)'
