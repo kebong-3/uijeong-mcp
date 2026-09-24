@@ -349,12 +349,13 @@ def install(U: Any) -> None:
 
         evidence=context.get("council_evidence") if isinstance(context,dict) else None
         snapshot=(evidence or {}).get("snapshot_id") if isinstance(evidence,dict) else None
-        prepared={"status":"SKIPPED","message":"회의록 근거 스냅샷을 확보하지 못해 자동 답변팩 생성을 건너뜁니다."}
-        if snapshot:
-            prepared=await U.council_prepare_pack(
-                keyword=topic,council=council,date_from=date_from,date_to=date_to,
-                max_docs=max_docs,snapshot_id=snapshot,max_evidence=10,
-            )
+        # council_prepare_pack의 snapshot 재사용은 동일 검색조건일 때만 안전하다.
+        # 보조 검색어가 추가된 경우에는 exact 검색으로 준비팩을 다시 만들고, 확장 근거는 context에 보존한다.
+        reuse_snapshot = snapshot if not context.get("search_strategy",{}).get("expanded") else None
+        prepared=await U.council_prepare_pack(
+            keyword=topic,council=council,date_from=date_from,date_to=date_to,
+            max_docs=max_docs,snapshot_id=reuse_snapshot,max_evidence=10,
+        )
 
         source_status={
             "council_evidence":(evidence or {}).get("status") if isinstance(evidence,dict) else "ERROR",
