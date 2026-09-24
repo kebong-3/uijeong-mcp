@@ -22,6 +22,7 @@ PUBLIC_TOOLS = (
     "council_read_source", "council_open_record", "council_get_evidence",
     "council_data_sources", "council_search_minutes", "council_prepare_pack", "council_status",
     "council_legislation_context", "council_finance_context", "council_context_pack",
+    "council_session_ready_pack",
 )
 INSTRUCTIONS = """지방의회MCP 직원 배포용 공개 조회 모드 — 인증 없이 공개 지방의회 자료만 조회합니다.
 개발·기획: 전남광주통합특별시 서구청 펀온워크 케빈정.
@@ -37,6 +38,8 @@ INSTRUCTIONS = """지방의회MCP 직원 배포용 공개 조회 모드 — 인�
 - 법령·조례 근거 후보: council_legislation_context
 - 재정 연계 상태·세출 컨텍스트: council_finance_context
 - 현안 통합 근거팩(회의록+의안+의원기록후보+정책+법령/조례+재정): council_context_pack
+- 회기 전 원스톱 준비(업무보고·행감·본예산·추경·조례/의안·5분발언·구정질문): council_session_ready_pack
+공공데이터포털 검색은 실제 수치가 아니라 추가 공식 데이터셋 후보를 찾는 Discovery 기능이며, 명시적으로 필요한 경우에만 사용합니다.
 의회명이 애매할 때만 council_find_council을 먼저 사용하세요.
 의원정보는 Discovery 전용입니다. 실제 발언은 반드시 회의록 원문 근거로 확인하세요.
 내부 초안·개인정보·비공개 자료는 입력하지 마세요.
@@ -165,9 +168,17 @@ def run(backend: Any = None) -> None:
     app = server.streamable_http_app()
     app.uijeong_public_readonly = True
     policy = R.http_policy()
+    import finance_context as F
+    import legal_context as L
+    import public_data_discovery as D
     print(json.dumps({"public_readonly": True, "authentication": "none",
                       "tool_count": len(PUBLIC_TOOLS), "max_concurrent": 3,
-                      "requests_per_minute_shared": 120}, ensure_ascii=False), flush=True)
+                      "requests_per_minute_shared": 120,
+                      "integrations_configured": {
+                          "law": bool(L.configuration().get("configured")),
+                          "finance365": bool(F.configuration().get("configured")),
+                          "public_data_search": bool(D.configuration().get("configured")),
+                      }}, ensure_ascii=False), flush=True)
     uvicorn.run(R.secure_http_app(app), host=policy["host"], port=policy["port"])
 
 

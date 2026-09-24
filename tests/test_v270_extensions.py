@@ -4,6 +4,7 @@ import asyncio
 import council_extensions as C
 import finance_context as F
 import legal_context as L
+import public_data_discovery as D
 
 
 def test_law_missing_credential_is_not_empty(monkeypatch):
@@ -146,9 +147,44 @@ class FakeInstallBackend:
         return False
 
 
-def test_extension_install_attaches_three_public_functions():
+def test_extension_install_attaches_signature_functions():
     U = FakeInstallBackend()
+    async def base_status(test_council="광주 서구", live=False):
+        return {"status":"COMPLETE","live_checks":[]}
+    U.council_status = base_status
     C.install(U)
     assert callable(U.council_legislation_context)
     assert callable(U.council_finance_context)
     assert callable(U.council_context_pack)
+    assert callable(U.council_session_ready_pack)
+    assert callable(U.council_status)
+
+
+def test_public_data_discovery_missing_key_is_not_empty(monkeypatch):
+    monkeypatch.delenv("DATA_GO_KR_SEARCH_KEY", raising=False)
+    result = asyncio.run(D.search("고독사", 5))
+    assert result["status"] == "NOT_CONFIGURED"
+    assert result["configuration"]["role"] == "METADATA_DISCOVERY_ONLY"
+
+
+def test_public_data_candidate_parser_is_metadata_only():
+    payload = {
+        "response": {
+            "body": {
+                "items": [
+                    {
+                        "dataNm": "독거노인 현황",
+                        "dataDc": "지역별 독거노인 관련 공개데이터",
+                        "orgNm": "가상기관",
+                        "dataId": "TEST1",
+                        "detailUrl": "https://www.data.go.kr/data/TEST1",
+                    }
+                ]
+            }
+        }
+    }
+    items = D._extract_candidates(payload, 5)
+    assert len(items) == 1
+    assert items[0]["title"] == "독거노인 현황"
+    assert items[0]["role"] == "DISCOVERY_CANDIDATE"
+    assert "value" not in items[0]
