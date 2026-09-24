@@ -207,6 +207,38 @@ async def _request(params: dict[str, Any]) -> dict[str, Any]:
     raise FinanceContextError(str(last or "LOFIN_UNKNOWN_ERROR"))
 
 
+async def ping() -> dict[str, Any]:
+    """Validate the configured Finance365 key with one minimal QWGJK request.
+
+    This does not prove a specific project exists; it only checks whether the
+    upstream accepts the credential/request contract.
+    """
+    cfg = configuration()
+    if not cfg["configured"]:
+        return {"status": "NOT_CONFIGURED", "configured": False}
+    today = dt.date.today()
+    try:
+        parsed = await _request({
+            "fyr": str(today.year),
+            "exe_ymd": today.strftime("%Y%m%d"),
+        })
+        return {
+            "status": "COMPLETE",
+            "configured": True,
+            "service_code": SERVICE_CODE,
+            "response_code": parsed["result_code"],
+            "message": parsed["message"],
+            "sample_rows_received": len(parsed["rows"]),
+        }
+    except FinanceContextError as exc:
+        return {
+            "status": "ERROR",
+            "configured": True,
+            "service_code": SERVICE_CODE,
+            "message": str(exc),
+        }
+
+
 def _norm(value: Any) -> str:
     return re.sub(r"[^0-9A-Za-z가-힣]", "", str(value or "")).casefold()
 
