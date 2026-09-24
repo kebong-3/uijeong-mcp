@@ -50,7 +50,7 @@ def schema_fingerprint(value: Any) -> str:
 def redact_secrets(value: Any, extra_secrets: Iterable[str] = ()) -> str:
     text = str(value)
     known = [os.environ.get("CLIK_API_KEY", ""), os.environ.get("LAW_OC", ""),
-             os.environ.get("FINANCE365_SERVICE_KEY", ""),
+             os.environ.get("LOFIN_API_KEY", ""), os.environ.get("FINANCE365_SERVICE_KEY", ""),
              os.environ.get("UIJEONG_BEARER_TOKEN", ""),
              os.environ.get("UIJEONG_OAUTH_CLIENT_SECRET", ""),
              os.environ.get("UIJEONG_VERIFY_TOKEN", ""), *extra_secrets]
