@@ -208,8 +208,9 @@ def install(U: Any) -> None:
         cid,cname,error=U.pick_council(council)
         if error:
             return {"status":"INVALID_INPUT","message":error}
-        result=await F.context(topic,cname,fiscal_year,limit)
+        result=await F.context(topic,cname,fiscal_year,limit,search_terms=_expansions(topic,2))
         result["council"]={"id":cid,"name":cname}
+        result["execution_trace"]={"mcp_tool":"council_finance_context","source":"FINANCE365","used":True}
         return result
 
     async def council_context_pack(
@@ -258,7 +259,7 @@ def install(U: Any) -> None:
         if include_legal:
             tasks.append(L.context(topic.strip(),_jurisdiction_from_council(cname),include_articles=True))
         if include_finance:
-            tasks.append(F.context(topic.strip(),cname,fiscal_year,20))
+            tasks.append(F.context(topic.strip(),cname,fiscal_year,20,search_terms=_expansions(topic,2)))
         if include_public_data:
             tasks.append(D.search(topic.strip(),6))
         results=await asyncio.gather(*tasks)
@@ -296,6 +297,19 @@ def install(U: Any) -> None:
             "legal_and_ordinance_context":legal,
             "finance_context":finance,
             "public_data_discovery":public_data,
+            "execution_trace":{
+                "mcp_tool":"council_context_pack",
+                "stages":[
+                    {"stage":"council_evidence","source":"CLIK/official council site","status":evidence.get("status") if isinstance(evidence,dict) else "ERROR"},
+                    {"stage":"related_bills","source":"CLIK bill","status":bills.get("status")},
+                    {"stage":"member_discovery","source":"CLIK assemblyinfo","status":members.get("status"),"role":"DISCOVERY_ONLY"},
+                    {"stage":"policy_background","source":"CLIK policyinfo","status":policy.get("status"),"role":"BACKGROUND_ONLY"},
+                    {"stage":"legal","source":"National Law Information","status":legal.get("status")},
+                    {"stage":"finance","source":"Finance365","status":finance.get("status")},
+                    {"stage":"public_data_discovery","source":"data.go.kr search","status":public_data.get("status"),"role":"DISCOVERY_ONLY"}
+                ],
+                "supplemental_web_search_required": any(x in ("ERROR","PARTIAL") for x in statuses)
+            },
             "integration_configuration":{
                 "law":L.configuration(),
                 "finance365":F.configuration(),
@@ -377,6 +391,15 @@ def install(U: Any) -> None:
         if purpose=="조례·의안":
             next_tools.append({"tool":"council_legislation_context","why":"상위법·자치법규 조문 후보를 재확인"})
 
+        coverage_card={
+            "requested_scope":{"topic":topic.strip(),"council":context.get("council"),"date_from":date_from,"date_to":date_to,
+                               "purpose":purpose,"fiscal_year":fiscal_year},
+            "search_strategy":context.get("search_strategy",{}),
+            "source_status":source_status,
+            "evidence_status":(evidence or {}).get("status") if isinstance(evidence,dict) else "ERROR",
+            "checked_not_proven_absent":True,
+            "interpretation":"미발견은 확인한 기간·검색어·출처 범위에 한정하며 전체 부재를 의미하지 않습니다."
+        }
         return {
             "status":"PARTIAL" if gaps else context.get("status","PARTIAL"),
             "workflow":"SESSION_READY_PACK",
@@ -385,6 +408,13 @@ def install(U: Any) -> None:
             "council":context.get("council"),
             "context":context,
             "response_preparation":prepared,
+            "coverage_card":coverage_card,
+            "execution_trace":{
+                "mcp_tool":"council_session_ready_pack",
+                "mcp_first":True,
+                "sources_used":[k for k,v in source_status.items() if v not in (None,"SKIPPED","NOT_CONFIGURED")],
+                "supplemental_web_search_policy":"MCP 근거 우선. 부족한 범위만 공식 웹검색으로 보완하고 보완검색임을 표시."
+            },
             "readiness":{
                 "source_status":source_status,
                 "gaps":gaps,
