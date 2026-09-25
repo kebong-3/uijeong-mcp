@@ -208,8 +208,9 @@ def install(U: Any) -> None:
         cid,cname,error=U.pick_council(council)
         if error:
             return {"status":"INVALID_INPUT","message":error}
-        result=await F.context(topic,cname,fiscal_year,limit)
+        result=await F.context(topic,cname,fiscal_year,limit,search_terms=_expansions(topic,2))
         result["council"]={"id":cid,"name":cname}
+        result["execution_trace"]={"mcp_tool":"council_finance_context","source":"FINANCE365","used":True}
         return result
 
     async def council_context_pack(
@@ -258,7 +259,7 @@ def install(U: Any) -> None:
         if include_legal:
             tasks.append(L.context(topic.strip(),_jurisdiction_from_council(cname),include_articles=True))
         if include_finance:
-            tasks.append(F.context(topic.strip(),cname,fiscal_year,20))
+            tasks.append(F.context(topic.strip(),cname,fiscal_year,20,search_terms=_expansions(topic,2)))
         if include_public_data:
             tasks.append(D.search(topic.strip(),6))
         results=await asyncio.gather(*tasks)
@@ -296,6 +297,19 @@ def install(U: Any) -> None:
             "legal_and_ordinance_context":legal,
             "finance_context":finance,
             "public_data_discovery":public_data,
+            "execution_trace":{
+                "mcp_tool":"council_context_pack",
+                "stages":[
+                    {"stage":"council_evidence","source":"CLIK/official council site","status":evidence.get("status") if isinstance(evidence,dict) else "ERROR"},
+                    {"stage":"related_bills","source":"CLIK bill","status":bills.get("status")},
+                    {"stage":"member_discovery","source":"CLIK assemblyinfo","status":members.get("status"),"role":"DISCOVERY_ONLY"},
+                    {"stage":"policy_background","source":"CLIK policyinfo","status":policy.get("status"),"role":"BACKGROUND_ONLY"},
+                    {"stage":"legal","source":"National Law Information","status":legal.get("status")},
+                    {"stage":"finance","source":"Finance365","status":finance.get("status")},
+                    {"stage":"public_data_discovery","source":"data.go.kr search","status":public_data.get("status"),"role":"DISCOVERY_ONLY"}
+                ],
+                "supplemental_web_search_required": any(x in ("ERROR","PARTIAL") for x in statuses)
+            },
             "integration_configuration":{
                 "law":L.configuration(),
                 "finance365":F.configuration(),
@@ -377,6 +391,57 @@ def install(U: Any) -> None:
         if purpose=="조례·의안":
             next_tools.append({"tool":"council_legislation_context","why":"상위법·자치법규 조문 후보를 재확인"})
 
+        coverage_card={
+            "requested_scope":{"topic":topic.strip(),"council":context.get("council"),"date_from":date_from,"date_to":date_to,
+                               "purpose":purpose,"fiscal_year":fiscal_year},
+            "search_strategy":context.get("search_strategy",{}),
+            "source_status":source_status,
+            "evidence_status":(evidence or {}).get("status") if isinstance(evidence,dict) else "ERROR",
+            "checked_not_proven_absent":True,
+            "interpretation":"미발견은 확인한 기간·검색어·출처 범위에 한정하며 전체 부재를 의미하지 않습니다."
+        }
+
+        def check_item(name, status, basis, action=None):
+            row={"item":name,"status":status,"basis":basis}
+            if action: row["action"]=action
+            return row
+
+        legal_items=(context.get("legal_and_ordinance_context",{}).get("laws") or []) + (context.get("legal_and_ordinance_context",{}).get("ordinances") or [])
+        finance_items=context.get("finance_context",{}).get("items") or []
+        council_items=(evidence or {}).get("items") or [] if isinstance(evidence,dict) else []
+        bill_items=context.get("related_bills",{}).get("items") or []
+        followup_entries=(prepared.get("followup_ledger",{}).get("entries") or []) if isinstance(prepared,dict) else []
+        audit_readiness=[
+            check_item("과거 의회 질의·답변", "CONFIRMED" if council_items else "NEEDS_CONFIRMATION",
+                       f"공식 근거 {len(council_items)}건 확인" if council_items else "이번 검색에서 직접 연결된 질의·답변 미확인",
+                       None if council_items else "검색어·기간·회의유형 확장 여부 검토"),
+            check_item("관련 의안", "CONFIRMED" if bill_items else "NOT_OBSERVED_IN_SEARCH",
+                       f"관련 의안 후보 {len(bill_items)}건" if bill_items else "이번 검색범위에서 관련 의안 미확인"),
+            check_item("법령·조례 근거", "CONFIRMED" if legal_items else ("NOT_CONFIGURED" if source_status.get("legal")=="NOT_CONFIGURED" else "NEEDS_CONFIRMATION"),
+                       f"법령·자치법규 후보 {len(legal_items)}건" if legal_items else "법적 근거 후보 추가 확인 필요",
+                       "시행일·부칙·위임범위 원문 확인"),
+            check_item("예산·집행 근거", "CONFIRMED" if finance_items else ("NOT_CONFIGURED" if source_status.get("finance")=="NOT_CONFIGURED" else "NEEDS_CONFIRMATION"),
+                       f"지방재정365 관련 세부사업 후보 {len(finance_items)}건" if finance_items else "세부사업명 불일치 가능성 포함 추가 확인 필요",
+                       "공식 예산서·추경서·결산서와 최종 대조"),
+            check_item("과거 후속조치 후보", "CANDIDATE_FOUND" if followup_entries else "NOT_OBSERVED_IN_SEARCH",
+                       f"후속조치 후보 {len(followup_entries)}건" if followup_entries else "이번 확인 범위에서 후속조치 후보 미확인",
+                       "실제 이행상태는 담당부서 증빙 확인"),
+            check_item("현재 사업현황·최근 실적", "DEPARTMENT_CONFIRMATION_REQUIRED",
+                       "공개 의회·법령·재정 데이터만으로 현재 내부 실적을 확정할 수 없음",
+                       "최신 내부 업무자료 확인"),
+            check_item("이용률·참여율·대상자 현황", "DEPARTMENT_CONFIRMATION_REQUIRED",
+                       "사업별 운영실적은 별도 행정자료가 필요할 수 있음",
+                       "월별·연도별 실적표 준비"),
+            check_item("만족도·민원·개선요구", "DEPARTMENT_CONFIRMATION_REQUIRED",
+                       "공개 회의록 검색만으로 현재 만족도·민원현황을 확정할 수 없음",
+                       "설문·민원·개선조치 자료 확인"),
+            check_item("본청·현장·부서 간 접근 형평성", "DEPARTMENT_CONFIRMATION_REQUIRED",
+                       "사업 대상·접근성의 현재 운영상태 확인 필요",
+                       "대상별 이용조건·대체지원 확인"),
+            check_item("향후계획·답변수치", "DEPARTMENT_CONFIRMATION_REQUIRED",
+                       "향후계획과 최신 수치는 정책결정·담당부서 확인사항",
+                       "결재자료와 수치 최종 검증")
+        ]
         return {
             "status":"PARTIAL" if gaps else context.get("status","PARTIAL"),
             "workflow":"SESSION_READY_PACK",
@@ -385,6 +450,13 @@ def install(U: Any) -> None:
             "council":context.get("council"),
             "context":context,
             "response_preparation":prepared,
+            "coverage_card":coverage_card,
+            "execution_trace":{
+                "mcp_tool":"council_session_ready_pack",
+                "mcp_first":True,
+                "sources_used":[k for k,v in source_status.items() if v not in (None,"SKIPPED","NOT_CONFIGURED")],
+                "supplemental_web_search_policy":"MCP 근거 우선. 부족한 범위만 공식 웹검색으로 보완하고 보완검색임을 표시."
+            },
             "readiness":{
                 "source_status":source_status,
                 "gaps":gaps,
@@ -396,6 +468,7 @@ def install(U: Any) -> None:
                     "답변 초안의 수치·고유명사·기한은 담당자가 최종 검증",
                 ],
                 "recommended_followup_tools":next_tools,
+                "audit_readiness_checklist":audit_readiness if purpose=="행정사무감사" else audit_readiness[:5],
             },
             "signature_note":"의회기록→법령·조례→예산·집행→답변준비 순으로 근거를 연결하는 공무원용 회기 대비 패키지",
         }

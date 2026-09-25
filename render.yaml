@@ -48,7 +48,7 @@ services:
       - key: UIJEONG_SNAPSHOT_MAX_TOTAL_BYTES
         value: "67108864"
 # Explicit anonymous public queries. The CLIK API key remains server-side.
-# Public launcher registers 19 curated read-only tools for employee workflows.
+# Public launcher registers 21 curated read-only tools for employee workflows.
 # Existing bearer/oauth/local paths remain available in the protected launcher.
 # Free instances sleep; ephemeral storage and quota counters reset on redeploy.
 # A retained UIJEONG_BEARER_TOKEN is ignored only in explicit public mode.

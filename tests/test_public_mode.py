@@ -164,8 +164,8 @@ def test_tool_timeout(monkeypatch):
 
 
 def test_no_document_input_or_local_archive_tools():
-    assert len(P.PUBLIC_TOOLS)==19
-    assert {'search','fetch','council_period_review','council_department_brief','council_recurring_issues','council_legislation_context','council_finance_context','council_context_pack','council_session_ready_pack'} <= set(P.PUBLIC_TOOLS)
+    assert len(P.PUBLIC_TOOLS)==21
+    assert {'search','fetch','council_period_review','council_department_brief','council_recurring_issues','council_legislation_context','council_finance_context','council_context_pack','council_session_ready_pack','council_peer_cases','council_department_session_brief'} <= set(P.PUBLIC_TOOLS)
     assert not set(P.PUBLIC_TOOLS)&{'council_search_local','council_analyze_text','council_review_answer','council_build_issue_card'}
 
 

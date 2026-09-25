@@ -4,7 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 
-VERSION = "2.8.0-public.1"
+VERSION = "2.9.0-public.1"
 CAPABILITIES = ["one_call_response_preparation", "exact_source_claim_audit",
                 "dimension_checked_metric_comparison", "side_by_side_evidence_comparison",
                 "date_bounded_department_aliases", "recurring_topic_cues_not_verdicts",
@@ -20,7 +20,9 @@ CAPABILITIES = ["one_call_response_preparation", "exact_source_claim_audit",
                 "clik_member_discovery", "law_ordinance_context",
                 "finance365_configuration_ready", "finance365_qwgjk_live",
                 "public_data_metadata_discovery", "session_ready_signature_pack",
-                "council_context_pack"]
+                "peer_council_cases", "department_session_brief",
+                "evidence_coverage_card", "finance_progressive_widening",
+                "mcp_first_trace", "council_context_pack"]
 
 
 def runtime_files(root: Path) -> list[Path]:
