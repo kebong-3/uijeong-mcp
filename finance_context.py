@@ -312,7 +312,7 @@ def _public_row(row: dict[str, Any]) -> dict[str, Any]:
 
 
 async def context(topic: str, council: str = "", fiscal_year: int | None = None,
-                  limit: int = 20) -> dict[str, Any]:
+                  limit: int = 20, search_terms: list[str] | None = None) -> dict[str, Any]:
     if not isinstance(topic, str) or not topic.strip() or len(topic) > 200:
         return {"status": "INVALID_INPUT", "message": "topic은 1~200자 문자열이어야 합니다."}
     if type(limit) is not int or not 1 <= limit <= 50:
@@ -332,13 +332,42 @@ async def context(topic: str, council: str = "", fiscal_year: int | None = None,
         }
 
     year = fiscal_year or dt.date.today().year
+    terms = [topic.strip()]
+    for term in (search_terms or []):
+        if isinstance(term, str) and term.strip() and term.strip() not in terms and len(term.strip()) <= 100:
+            terms.append(term.strip())
+        if len(terms) >= 3:
+            break
     try:
         exe_ymd = _snapshot_date(int(year))
-        parsed = await _request({
-            "fyr": str(year),
-            "dbiz_nm": topic.strip(),
-            "exe_ymd": exe_ymd,
-        })
+        attempts = []
+        combined_rows = []
+        seen_rows = set()
+        total_upstream = 0
+        last_code = "INFO-200"
+        last_message = ""
+        for idx, term in enumerate(terms):
+            parsed = await _request({
+                "fyr": str(year),
+                "dbiz_nm": term,
+                "exe_ymd": exe_ymd,
+            })
+            last_code, last_message = parsed["result_code"], parsed["message"]
+            total_upstream += int(parsed.get("total_count") or 0)
+            matched_term = [row for row in parsed["rows"] if _belongs(row, council)] if council else parsed["rows"]
+            attempts.append({"term": term, "upstream_total": parsed["total_count"],
+                             "matched_local_government": len(matched_term),
+                             "response_code": parsed["result_code"]})
+            for row in matched_term:
+                key = (str(row.get("laf_cd") or ""), str(row.get("dbiz_cd") or ""),
+                       str(row.get("exe_ymd") or ""), str(row.get("acnt_dv_cd") or ""))
+                if key not in seen_rows:
+                    seen_rows.add(key)
+                    combined_rows.append(row)
+            if combined_rows:
+                break  # progressive widening: exact or first successful synonym only
+        parsed = {"rows": combined_rows, "total_count": total_upstream,
+                  "result_code": last_code, "message": last_message}
     except (ValueError, FinanceContextError) as exc:
         return {
             "status": "ERROR" if not isinstance(exc, ValueError) else "INVALID_INPUT",
@@ -350,7 +379,7 @@ async def context(topic: str, council: str = "", fiscal_year: int | None = None,
         }
 
     rows = parsed["rows"]
-    matched = [row for row in rows if _belongs(row, council)] if council else rows
+    matched = rows
     items = [_public_row(row) for row in matched[:limit]]
     return {
         "status": "COMPLETE" if items else "EMPTY",
@@ -362,6 +391,13 @@ async def context(topic: str, council: str = "", fiscal_year: int | None = None,
             "council": council or None,
             "fiscal_year": year,
             "snapshot_date": exe_ymd,
+            "search_terms": terms,
+        },
+        "search_strategy": {
+            "exact_first": True,
+            "progressive_widening": len(attempts) > 1,
+            "attempts": attempts,
+            "rule": "정확 사업명 검색 후 미발견일 때만 보조어를 순차 검색하고, 첫 매칭에서 중단",
         },
         "upstream_total": parsed["total_count"],
         "matched_local_government_count": len(matched),
