@@ -41,7 +41,7 @@ jobs:
         run: |
           git config user.name 'uijeong-release-validation'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add uijeong_mcp.py public_server.py council_extensions.py council_v29.py release_info.py release_manifest.json
+          git add uijeong_mcp.py public_server.py council_extensions.py council_v29.py release_info.py release_manifest.json v3_reliability.py
           if git diff --cached --quiet; then
             echo 'No generated integration changes.'
           else
