@@ -54,10 +54,12 @@ def apply():
         change('release_info.py','VERSION = "2.9.0-public.1"','VERSION = "3.0.0-public.1"')
         change('release_info.py','"mcp_first_trace", "council_context_pack"]',
                '"mcp_first_trace", "council_context_pack",\n                "bounded_identical_request_coalescing", "live_mcp_receipt",\n                "strict_jurisdiction_candidates", "schema_errors_not_empty",\n                "partial_layer_preservation", "missing_expenditure_not_zero"]')
-        # A capped nationwide pass cannot claim there were no cases anywhere.
         change('council_v29.py','status = _coverage_status(errors=errors, returned=len(cases), requested=case_count)',
                'status = _coverage_status(errors=errors, returned=len(cases), requested=case_count)\n    limited = details_checked >= max_details or any(x["upstream_total"] > x["rows_received"] for x in list_calls)\n    if limited and len(cases) < case_count and status == "EMPTY":\n        status = "PARTIAL"')
         change('council_v29.py','"max_details": max_details,','"max_details": max_details,\n            "limited": limited,')
+    change('v3_reliability.py',
+           '    session.__signature__ = inspect.signature(old_session)\n    session.__annotations__ = inspect.get_annotations(old_session,eval_str=True)',
+           '    ann = inspect.get_annotations(old_session, eval_str=True)\n    sig = inspect.signature(old_session)\n    session.__signature__ = sig.replace(parameters=[p.replace(annotation=ann.get(p.name,p.annotation)) for p in sig.parameters.values()],return_annotation=ann.get("return",sig.return_annotation))\n    session.__annotations__ = ann')
     for path in ['uijeong_mcp.py','public_server.py','council_extensions.py','council_v29.py','release_info.py','v3_reliability.py']:
         py_compile.compile(str(ROOT/path),doraise=True)
     manifest_path=ROOT/'release_manifest.json'
