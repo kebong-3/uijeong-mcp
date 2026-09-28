@@ -208,7 +208,7 @@ def install(U: Any) -> None:
         cid,cname,error=U.pick_council(council)
         if error:
             return {"status":"INVALID_INPUT","message":error}
-        result=await F.context(topic,cname,fiscal_year,limit,search_terms=_expansions(topic,2))
+        result=await F.context(topic,cname,fiscal_year,limit)
         result["council"]={"id":cid,"name":cname}
         result["execution_trace"]={"mcp_tool":"council_finance_context","source":"FINANCE365","used":True}
         return result
@@ -353,7 +353,7 @@ def install(U: Any) -> None:
             x in topic for x in ("조례","법령","법적근거","상위법","위임","동의안","민간위탁","출연")
         )
 
-        context = await council_context_pack(
+        context = await U.council_context_pack(
             topic=topic,council=council,date_from=date_from,date_to=date_to,
             include_legal=legal_needed,include_finance=finance_needed,
             include_public_data=need_public_data,fiscal_year=fiscal_year,max_docs=max_docs,
@@ -366,10 +366,13 @@ def install(U: Any) -> None:
         # council_prepare_pack의 snapshot 재사용은 동일 검색조건일 때만 안전하다.
         # 보조 검색어가 추가된 경우에는 exact 검색으로 준비팩을 다시 만들고, 확장 근거는 context에 보존한다.
         reuse_snapshot = snapshot if not context.get("search_strategy",{}).get("expanded") else None
-        prepared=await U.council_prepare_pack(
-            keyword=topic,council=council,date_from=date_from,date_to=date_to,
-            max_docs=max_docs,snapshot_id=reuse_snapshot,max_evidence=10,
-        )
+        prepared={"status":"SKIPPED","message":"같은 조건의 근거 스냅샷 미확보. 중복 재검색 대신 확보한 출처와 미확인 사항을 반환합니다."}
+        if reuse_snapshot:
+            from v3_reliability import stage
+            prepared=await stage(U.council_prepare_pack(
+                keyword=topic,council=council,date_from=date_from,date_to=date_to,
+                max_docs=max_docs,snapshot_id=reuse_snapshot,max_evidence=10,
+            ), 8)
 
         source_status={
             "council_evidence":(evidence or {}).get("status") if isinstance(evidence,dict) else "ERROR",

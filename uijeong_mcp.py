@@ -2453,6 +2453,8 @@ from council_extensions import install as install_council_extensions
 install_council_extensions(sys.modules[__name__])
 from council_v29 import install as install_council_v29
 install_council_v29(sys.modules[__name__])
+from v3_reliability import install as install_v3_reliability
+install_v3_reliability(sys.modules[__name__])
 
 if __name__ == "__main__":
     if "--check" in sys.argv:

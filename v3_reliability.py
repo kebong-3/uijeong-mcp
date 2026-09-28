@@ -542,8 +542,10 @@ def install(U):
                     row["status"] = "CANDIDATE_FOUND"
             result["review_note"] = "자료 발견과 법적 적용·동일 사업·최신 수치 검증은 다릅니다."
         return result
-    session.__signature__ = inspect.signature(old_session)
-    session.__annotations__ = inspect.get_annotations(old_session,eval_str=True)
+    ann = inspect.get_annotations(old_session, eval_str=True)
+    sig = inspect.signature(old_session)
+    session.__signature__ = sig.replace(parameters=[p.replace(annotation=ann.get(p.name,p.annotation)) for p in sig.parameters.values()],return_annotation=ann.get("return",sig.return_annotation))
+    session.__annotations__ = ann
     for name,fn in {"council_context_pack":council_context_pack,"council_status":council_status,"council_session_ready_pack":session}.items():
         setattr(U,name,fn)
         if U.profile_allows(name):

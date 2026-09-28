@@ -219,6 +219,9 @@ async def _peer_cases(
                            "message": R.safe_error(exc)})
 
     status = _coverage_status(errors=errors, returned=len(cases), requested=case_count)
+    limited = details_checked >= max_details or any(x["upstream_total"] > x["rows_received"] for x in list_calls)
+    if limited and len(cases) < case_count and status == "EMPTY":
+        status = "PARTIAL"
     return {
         "status": status,
         "workflow": "PEER_COUNCIL_CASES",
@@ -235,6 +238,7 @@ async def _peer_cases(
             "distinct_councils_returned": len(cases),
             "requested_case_count": case_count,
             "max_details": max_details,
+            "limited": limited,
             "is_exhaustive_national_archive": False,
             "clik_coverage_note": "CLIK Open API 연계 범위와 상세확인 상한 내 사례 검색이며 전국 모든 의회의 전수 결과가 아닙니다.",
         },
