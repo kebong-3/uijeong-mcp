@@ -430,7 +430,7 @@ async def finance_ping() -> dict[str, Any]:
     import finance_context as F
     if not F.configuration()["configured"]:
         return {"status": "NOT_CONFIGURED", "configured": False}
-    checked = await stage(F._request({"fyr":str(today().year), "pSize":1}),16)
+    checked = await stage(F._request({"fyr":str(today().year), "exe_ymd":today().strftime("%Y%m%d"), "pSize":1}),16)
     if checked.get("status") == "ERROR":
         return checked
     count = len(checked.get("rows", []))

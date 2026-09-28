@@ -1,0 +1,46 @@
+name: v3 live-schema verification
+on:
+  push:
+    branches: [upgrade-v3-api-verification-20260928]
+    paths:
+      - 'scripts/fix_v3_upstreams.py'
+      - 'tests/test_v3_api_response.py'
+      - '.github/workflows/v3-api-response-check.yml'
+permissions:
+  contents: write
+concurrency:
+  group: v3-live-schema-check
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: upgrade-v3-api-verification-20260928
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Apply observed-schema fixes
+        run: python scripts/fix_v3_upstreams.py
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt pytest==8.4.2
+      - name: Regression and protocol verification
+        run: |
+          python scripts/check_config.py --manifest
+          python tests/regression_r0.py
+          python tests/offline_check.py
+          python -m pytest -q --maxfail=3
+          python tests/protocol_smoke.py
+      - name: Commit tested adapter corrections on release branch
+        run: |
+          git config user.name 'uijeong-release-validation'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public_data_discovery.py v3_reliability.py release_manifest.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'v3.0: fix observed metadata field mapping and dated finance health probe'
+            git push origin HEAD:upgrade-v3-api-verification-20260928
+          fi
