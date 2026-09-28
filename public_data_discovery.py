@@ -111,10 +111,10 @@ def _pick(node: dict[str, Any], *keys: str) -> str:
 
 
 def _candidate(node: dict[str, Any]) -> dict[str, Any] | None:
-    title = _pick(node, "title", "dataNm", "openApiNm", "apiNm", "datasetNm", "name")
+    title = _pick(node, "title", "dataName", "dataNm", "openApiNm", "apiNm", "datasetNm", "name")
     if not title or len(title) > 500:
         return None
-    detail_url = _pick(node, "detailUrl", "dataUrl", "url", "link", "dataDetailUrl")
+    detail_url = _pick(node, "detailPageUrl", "detailUrl", "dataUrl", "url", "link", "dataDetailUrl")
     description = _pick(node, "description", "dataDc", "openApiDc", "desc", "summary")
     provider = _pick(node, "orgNm", "insttNm", "provider", "organization", "orgName")
     data_type = _pick(node, "dataType", "apiType", "type", "serviceType")
