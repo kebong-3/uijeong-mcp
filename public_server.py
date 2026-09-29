@@ -27,7 +27,7 @@ PUBLIC_TOOLS = (
     "council_peer_cases", "council_department_session_brief",
 )
 INSTRUCTIONS = """지방의회MCP 직원 배포용 공개 조회 모드 — 인증 없이 공개 지방의회 자료만 조회합니다.
-개발·기획: 전남광주통합특별시 서구청 펀온워크 케빈정.
+개발·기획: 전남광주통합특별시 서구청 펀온워크 AI혁신분과 에이블(AIBLE).
 표준 지식검색/심층리서치 클라이언트는 search → fetch 흐름을 사용합니다.
 일반 ChatGPT 업무대화에서는 아래의 전문 도구를 사용해 더 풍부한 행정 맥락을 확인할 수 있습니다.
 질문 의도에 따라 가장 좁고 정확한 도구를 먼저 선택하세요.

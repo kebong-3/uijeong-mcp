@@ -10,7 +10,7 @@ import html
 import os
 from typing import Optional
 
-DEVELOPER = "전남광주통합특별시 서구청 펀온워크 케빈정"
+DEVELOPER = "전남광주통합특별시 서구청 펀온워크 AI혁신분과 에이블(AIBLE)"
 PRODUCT = "지방의회MCP"
 
 

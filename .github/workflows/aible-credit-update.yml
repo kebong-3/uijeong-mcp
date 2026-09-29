@@ -1,0 +1,81 @@
+name: AIBLE credit update
+on:
+  push:
+    branches: [branding-aible-20260929]
+    paths: ['.github/workflows/aible-credit-update.yml']
+permissions:
+  contents: write
+concurrency:
+  group: aible-credit-update
+  cancel-in-progress: false
+jobs:
+  branding:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: branding-aible-20260929
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Replace only developer credits and refresh integrity
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, json, subprocess
+          root=Path('.')
+          old=('전남광주통합특별시 서구청 펀온워크 케빈정', '광주 서구청 펀온워크 케빈정', '서구청 펀온워크 케빈정')
+          new='전남광주통합특별시 서구청 펀온워크 AI혁신분과 에이블(AIBLE)'
+          candidates=[*root.glob('*.py'),root/'README.md',*root.glob('docs/*.md'),root/'tests/test_public_site.py']
+          changed=[]
+          for p in candidates:
+              if not p.is_file():
+                  continue
+              before=p.read_text(encoding='utf-8')
+              after=before
+              for text in old:
+                  after=after.replace(text,new)
+              if after!=before:
+                  p.write_text(after,encoding='utf-8')
+                  changed.append(p.as_posix())
+          assert 'public_site.py' in changed and 'public_server.py' in changed, changed
+          for p in root.glob('*.py'):
+              assert not any(text in p.read_text(encoding='utf-8') for text in old), p
+          mpath=root/'release_manifest.json'
+          manifest=json.loads(mpath.read_text(encoding='utf-8'))
+          runtime=[*root.glob('*.py'),*root.glob('data/*.json'),root/'requirements.txt']
+          hashes={p.as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(runtime) if p.is_file()}
+          manifest['runtime_sha256']=hashes
+          manifest['runtime_fingerprint']=hashlib.sha256(json.dumps(hashes,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+          for path in changed:
+              manifest.setdefault('files_sha256',{})[path]=hashlib.sha256(Path(path).read_bytes()).hexdigest()
+          mpath.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          assert manifest['version']=='3.0.0-public.1'
+          changed.append('release_manifest.json')
+          Path('/tmp/aible_changed.json').write_text(json.dumps(changed))
+          print(json.dumps({'changed':changed,'developer_credit':new,'functional_change':False},ensure_ascii=False))
+          PY
+      - name: Install runtime and test dependencies
+        run: python -m pip install -r requirements.txt pytest==8.4.2
+      - name: Verify integrity, regressions and MCP protocol
+        run: |
+          python scripts/check_config.py --manifest
+          python tests/regression_r0.py
+          python tests/offline_check.py
+          python -m pytest -q --maxfail=3
+          python tests/protocol_smoke.py
+      - name: Commit tested credit changes only to branding branch
+        run: |
+          python - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          paths=json.loads(Path('/tmp/aible_changed.json').read_text())
+          subprocess.run(['git','config','user.name','uijeong-release-validation'],check=True)
+          subprocess.run(['git','config','user.email','41898282+github-actions[bot]@users.noreply.github.com'],check=True)
+          subprocess.run(['git','add','--',*paths],check=True)
+          subprocess.run(['git','commit','-m','브랜딩: 개발·기획을 펀온워크 AI혁신분과 에이블(AIBLE)로 통일'],check=True)
+          subprocess.run(['git','push','origin','HEAD:branding-aible-20260929'],check=True)
+          PY
