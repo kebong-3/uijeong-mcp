@@ -110,43 +110,8 @@ def install(U):
                     'pagination_consistency':'상류 목록은 갱신될 수 있는 offset 방식; 수집 전체 고정 스냅샷 아님'}
         return records,errors,coverage
 
-    async def collect_site(df,dto,committee,max_docs,start_page=1):
-        records,errors,rows=[],[],[]
-        scanned=0; exhausted=False; next_page=start_page
-        # Whole pages selected, then details bounded; remainder refs preserved in coverage.
-        for page in range(start_page,start_page+3):
-            try:
-                got=await U.site.list_page(page)
-            except Exception as exc:
-                errors.append(safe_failure('SEOGU_SITE','list',exc,str(page))); next_page=page; break
-            scanned+=len(got); next_page=page+1
-            if not got:
-                exhausted=True; next_page=None; break
-            for row in got:
-                date=row.get('date','')
-                if (df or dto) and not date:
-                    errors.append({'source':'SEOGU_SITE','stage':'date','ref':row.get('key'),'message':'회의일 누락: 기간 포함 여부 미확인'}); continue
-                if df and date<df or dto and date>dto: continue
-                if committee and not E.match_text(row.get('mtgnm',''),committee): continue
-                rows.append(row)
-            if df and got[-1].get('date','') and got[-1]['date']<df:
-                exhausted=True; next_page=None; break
-            if len(rows)>=max_docs: break
-        selected=rows[:max_docs]
-        for row in selected:
-            try:
-                doc=await U.site.detail(row['key'])
-                if not doc['turns']: raise ValueError('발언 형식 미해석')
-                meta={'DOCID':row['key'],'RASMBLY_ID':'062006','RASMBLY_NM':U.COUNCILS.get('062006','서구의회'),
-                      'RASMBLY_NUMPR':row.get('numpr'),'RASMBLY_SESN':row.get('sesn'),
-                      'MINTS_ODR':row.get('odr'),'MTGNM':row.get('mtgnm'),'MTG_DE':row.get('date')}
-                records.append(E.make_record(meta,doc['turns'],source='SEOGU_SITE',source_url=doc['url'],body_url=doc['url'],source_url_verified=True,body_url_verified=True))
-            except Exception as exc:
-                errors.append(safe_failure('SEOGU_SITE','detail',exc,row['key']))
-        return records,errors,{'source':'SEOGU_SITE','council_id':'062006','scanned':scanned,
-                'selected':len(selected),'parsed':len(records),'exhausted':exhausted and len(rows)<=max_docs,
-                'failed':bool(errors) and not scanned,'next_page':next_page,'pending_refs':['site:'+x['key'] for x in rows[max_docs:]],
-                'pagination_consistency':'목록 offset 갱신 가능; 미열람 ref는 council_read_source로 직접 조회'}
+    # Seo-gu council website crawling was removed in v3.0.1.
+    # Council meeting evidence uses CLIK only; official URLs supplied by CLIK are preserved as references.
 
     @register
     async def council_evidence_bundle(keyword:str,council:str='광주 서구',mode:str='질의답변',
