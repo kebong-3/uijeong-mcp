@@ -660,7 +660,7 @@ async def _public_reply(send: Any, status: int, payload: dict[str, Any]) -> None
     if status == 503:
         headers.append((b"retry-after", b"2"))
     if status == 405:
-        headers.append((b"allow", b"POST"))
+        headers.append((b"allow", b"POST, GET, DELETE"))
     await send({"type": "http.response.start", "status": status, "headers": headers})
     await send({"type": "http.response.body", "body": json.dumps(payload, ensure_ascii=False).encode()})
 
@@ -680,9 +680,9 @@ class PublicBoundary:
         if scope.get("path", "").rstrip("/") != "/mcp":
             await _public_reply(send, 404, {"error": "Not found"})
             return
-        if scope.get("method") != "POST":
+        if scope.get("method") not in ("POST","GET","DELETE"):
             await _public_reply(send, 405, {"authentication": "none", "public_readonly": True,
-                "message": "MCP 프로그램에서 POST로 연결하세요. 서버 상태 확인 주소는 /healthz입니다."})
+                "message": "MCP Streamable HTTP는 POST/GET/DELETE를 지원합니다. 서버 상태 확인 주소는 /healthz입니다."})
             return
         if self.waiting >= self.max_waiting and self._slots.locked():
             await _public_reply(send, 503, {"error": "PUBLIC_BUSY", "message": "동시 조회 중입니다. 잠시 후 다시 시도하세요."})
