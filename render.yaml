@@ -41,16 +41,14 @@ services:
         value: "30000"
       - key: UIJEONG_CACHE_MAX_ENTRIES
         value: "200"
-      - key: UIJEONG_SITE_CACHE_MAX_ENTRIES
-        value: "60"
       - key: UIJEONG_SNAPSHOT_MAX_ENTRIES
         value: "200"
       - key: UIJEONG_SNAPSHOT_MAX_TOTAL_BYTES
         value: "67108864"
 # Explicit anonymous public queries. The CLIK API key remains server-side.
-# Public launcher registers 21 curated read-only tools for employee workflows.
+# Public launcher registers 21 curated read-only tools. Council retrieval is CLIK-only; Seo-gu website crawling is disabled.
 # Existing bearer/oauth/local paths remain available in the protected launcher.
-# Free instances sleep; ephemeral storage and quota counters reset on redeploy.
+# Free instances sleep; cold starts can affect first connection. Consider a paid web-service instance for staff-wide production use.
 # A retained UIJEONG_BEARER_TOKEN is ignored only in explicit public mode.
 
 # LAW_OC: 국가법령정보 공동활용 API 인증값(OC)
