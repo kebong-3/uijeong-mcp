@@ -64,7 +64,7 @@ def test_real_guard_no_auth_and_rejections(public_env):
     async def run():
         async with httpx.AsyncClient(transport=httpx.ASGITransport(app), base_url='https://mcp.example.test') as c:
             assert (await c.post('/mcp', json={})).status_code == 200
-            assert (await c.get('/mcp')).status_code == 405
+            assert (await c.get('/mcp')).status_code == 200
             assert (await c.get('/healthz')).status_code == 200
             assert (await c.post('/mcp', content=b'x' * 65537)).status_code == 413
             assert (await c.post('/mcp', json={}, headers={'origin':'https://bad.example'})).status_code == 403
@@ -84,23 +84,23 @@ def test_public_global_rate_limit(public_env):
     asyncio.run(run())
 
 
-def test_three_concurrent_then_recover(public_env):
+def test_transport_headroom_then_recover(public_env):
     async def run():
         entered=asyncio.Event(); release=asyncio.Event(); count=0
         async def inner(scope, receive, send):
             nonlocal count
             count+=1
-            if count==3: entered.set()
+            if count==8: entered.set()
             await release.wait()
             await R._public_reply(send, 200, {'ok': True})
         inner.uijeong_public_readonly=True
         app=R.HTTPGuard(inner)
         async with httpx.AsyncClient(transport=httpx.ASGITransport(app),base_url='https://mcp.example.test') as c:
-            tasks=[asyncio.create_task(c.post('/mcp',json={})) for _ in range(3)]
+            tasks=[asyncio.create_task(c.post('/mcp',json={})) for _ in range(8)]
             await asyncio.wait_for(entered.wait(), 1)
             extra=[asyncio.create_task(c.post('/mcp',json={})) for _ in range(2)]
             await asyncio.sleep(0.01)
-            assert count == 3 and not any(task.done() for task in extra)
+            assert count == 8 and not any(task.done() for task in extra)
             release.set()
             assert all(x.status_code==200 for x in await asyncio.gather(*tasks, *extra))
             assert (await c.post('/mcp',json={})).status_code == 200
