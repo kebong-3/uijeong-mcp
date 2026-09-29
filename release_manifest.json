@@ -266,7 +266,7 @@
     "tests/test_security.py": "c1f88065ade02d03f7a9b6bd99ee85b77db3f139224d53567082381ab1b03159",
     "tests/test_service24_offline.py": "b213a3b7b1170c481a38f28201c7563f0879f5cb5f8225709742af897d89de7f",
     "tests/test_service_v2.py": "446bc33b2f109f9a888fba7810bbca581a1f1ac74c68c3be59d10789b8c24807",
-    "tests/test_sources.py": "b83fdb89949cf59ca064a5ea2442b21e9fd7467467c67363fe0e7c61d65a8f53",
+    "tests/test_sources.py": "99c0c5fb7934f137d99944b3e65c125431c874ff11dff51ca455e35d8fc5b0c8",
     "tests/test_upgrade24.py": "3001cc22cc3933c8db9db944ccfea7ef2f66fd0c9283be5ba2eb93a9f55fe690",
     "tests/test_workbench22.py": "5bb75c51139c6b882a4247ddd1d2b82a2d7d2fa12a4216254eb2893f6bf03ebd",
     "tests/test_workflows.py": "687cb7dc1119cbdd86534cb38514ead3882657a6459f8e8d5fda2550fcc2dc52",
