@@ -21,7 +21,7 @@ import department_aliases as A
 import period_core as P
 import coverage_core as C
 import release_info as RELEASE
-from citation_links import OfficialLinkResolver
+from citation_links import set_link
 from result_contract import wire_result
 
 MODES = ('질의답변', '5분자유발언', '약속', '발언')
@@ -36,7 +36,13 @@ def install(U):
     U.COUNCILS = S.council_code_map()
     U.resolve_council = lambda query: [(r['council_id'],r['name']) for r in S.resolve_councils(query)]
     U.parse_turns = E.parse_turns
-    links = OfficialLinkResolver(U.site)
+    async def attach_source_links(records):
+        """Use only source URLs already supplied by CLIK; never fetch the Seo-gu council website."""
+        for record in records:
+            p=record.get('provenance',{})
+            set_link(record,p.get('source_url'),p.get('source_url_status','UNRESOLVED'),
+                     'OFFICIAL_SOURCE' if p.get('source_url') else None,
+                     None if p.get('source_url') else 'CLIK에서 직접 열 수 있는 원문 링크를 제공하지 않았습니다.')
     U.build_qa_pairs = E.build_qa_pairs
     U.classify_commitment = E.classify_commitment
     U.snippet = E.snippet
@@ -147,14 +153,15 @@ def install(U):
             answerer:Optional[str]=None,committee:Optional[str]=None,date_from:Optional[str]=None,
             date_to:Optional[str]=None,max_docs:int=6,source:str='auto',search_terms:Optional[list[str]]=None,
             snapshot_id:Optional[str]=None,item_offset:int=0,limit:int=10,source_offset:int=0,site_start_page:int=1)->dict[str, Any]:
-        """근거 중심 통합검색. source=auto|clik|site. 네 검색모드에 동일한 발언 규칙 적용.
-        max_docs=출처·검색어별 최대 상세 건수(1~15); search_terms=사용자가 승인한 추가 검색어 최대2개.
-        snapshot_id+item_offset으로 동일 결과를 재조회 없이 이어보기. 원래 검색조건도 그대로 전달.
-        coverage.next_offset/source_offset, next_page/site_start_page로 미조회 목록을 계속 검색.
+        """근거 중심 CLIK 검색. source=auto|clik이며 auto도 CLIK만 사용한다.
+        서구의회 홈페이지 직접 자동수집은 안정성을 위해 제거했다.
+        max_docs=검색어별 최대 상세 건수(1~15); search_terms=사용자가 승인한 추가 검색어 최대2개.
+        snapshot_id+item_offset으로 동일 결과를 재조회 없이 이어보기.
+        source_offset으로 CLIK 목록 이어검색. site_start_page는 기존 호출 호환용으로 남아 있지만 사용하지 않는다.
         검색 결과의 PARTIAL·오류·미확인 범위를 최종 답변에 반드시 포함한다.
         """
         if not isinstance(keyword,str) or not keyword.strip() or len(keyword)>200: return invalid('검색어는 1~200자로 입력하세요.')
-        if mode not in MODES or source not in ('auto','clik','site'): return invalid('지원하지 않는 mode 또는 source입니다.')
+        if mode not in MODES or source not in ('auto','clik'): return invalid('source는 auto|clik만 지원합니다. 서구의회 홈페이지 직접 검색은 안정성을 위해 제거되었습니다.')
         if any(type(v) is not int for v in (max_docs,limit,item_offset,source_offset,site_start_page)):
             return invalid('건수·위치 인자는 정수입니다.')
         if not (1<=max_docs<=15 and 1<=limit<=30 and 0<=item_offset and 0<=source_offset and 1<=site_start_page<=10000):
@@ -167,7 +174,6 @@ def install(U):
         if error:return invalid(error)
         df,dto,error=U.check_dates(date_from,date_to)
         if error:return invalid(error)
-        if source=='site' and cid!='062006': return invalid('직접 목록 자동수집 어댑터는 현재 서구의회만 지원합니다. 다른 의회는 clik을 사용하세요.')
         parameters=params_for(keyword,cid,mode,answerer,committee,df,dto,max_docs,source,terms)
         parameters.update(source_offset=source_offset,site_start_page=site_start_page)
         store_warnings=[]
@@ -177,9 +183,6 @@ def install(U):
             if not payload or payload.get('parameters')!=parameters:return invalid('스냅샷 검색조건과 요청조건이 다릅니다.')
         else:
             records=[];errors=[];coverage=[]
-            if source in ('auto','site') and cid=='062006':
-                rec,errs,cov=await collect_site(df,dto,committee,max_docs,site_start_page)
-                records.extend(rec);errors.extend(errs);coverage.append(cov)
             if source in ('auto','clik'):
                 for term in terms:
                     try:
@@ -189,7 +192,7 @@ def install(U):
                         errors.append(safe_failure('CLIK','list',exc))
                         coverage.append({'source':'CLIK','query':term,'parsed':0,'selected':0,'exhausted':False,'failed':True})
             records=E.dedup_records(records)
-            await links.enrich(records)
+            await attach_source_links(records)
             events=[];followups=[]
             for record in records:
                 seen=set()
@@ -301,13 +304,11 @@ def install(U):
             return invalid('limit은 1~30의 정수입니다.')
         if isinstance(max_docs,bool) or not isinstance(max_docs,int) or not 1<=max_docs<=15:
             return invalid('max_docs는 1~15의 정수입니다.')
-        if source not in ('auto','clik','site'):return invalid('source는 auto|clik|site입니다.')
+        if source not in ('auto','clik'):return invalid('source는 auto|clik만 지원합니다. 서구의회 홈페이지 직접 검색은 제거되었습니다.')
         cid,cname,error=U.pick_council(council)
         if error:return invalid(error)
         df,dto,error=U.check_dates(date_from,date_to)
         if error:return invalid(error)
-        if source=='site' and cid!='062006':
-            return invalid('직접 목록 자동수집 어댑터는 현재 서구의회만 지원합니다. 다른 의회는 clik을 사용하세요.')
         if type(source_offset) is not int or source_offset<0 or type(site_start_page) is not int or not 1<=site_start_page<=10000:
             return invalid('source_offset은 0 이상 정수, site_start_page는 1~10000의 정수입니다.')
         try:aliases=A.normalize_aliases(department,department_aliases,extra_terms)
@@ -316,9 +317,6 @@ def install(U):
         # 부서명은 질의 본문이 아니라 발언자 직함에 나타난다. 부서명으로 회의록을 찾되
         # event 단계에서는 주제어 필터를 걸지 않고, 발언자 직함으로 소관을 가른다.
         records=[];errors=[];coverage=[]
-        if source in ('auto','site') and cid=='062006':
-            rec,errs,cov=await collect_site(df,dto,committee,max_docs,site_start_page)
-            records.extend(rec);errors.extend(errs);coverage.append(cov)
         if source in ('auto','clik'):
             for term in terms:
                 try:
@@ -413,7 +411,7 @@ def install(U):
         if type(top) is not int or not 1<=top<=60:return invalid('top은 1~60의 정수입니다.')
         if type(max_docs_per_year) is not int or not 1<=max_docs_per_year<=10:
             return invalid('max_docs_per_year는 1~10의 정수입니다.')
-        if source not in ('auto','clik','site'):return invalid('source는 auto|clik|site입니다.')
+        if source not in ('auto','clik'):return invalid('source는 auto|clik만 지원합니다. 서구의회 홈페이지 직접 검색은 제거되었습니다.')
         if not department and (department_aliases or extra_terms):return invalid('부서 별칭은 department 조회에만 사용합니다.')
         try:
             period=P.resolve_period(years=years,include_current_year=include_current_year,as_of=as_of,
@@ -498,38 +496,23 @@ def install(U):
                 'limitations':LIMITS}
 
     def parse_ref(ref):
-        if len(ref)>500:raise ValueError('ref가 너무 깁니다.')
-        if '://' in ref:
-            u=urlparse(ref)
-            expected=urlparse(U.SITE_BASE)
-            if u.scheme!='https' or u.hostname!=expected.hostname or u.username or u.password or u.port not in (None,443) or u.path!='/record/recordView.do':
-                raise ValueError('허용된 서구의회 회의록 URL이 아닙니다. 다른 의회는 CLIK docid를 사용하세요.')
-            keys=parse_qs(u.query)
-            if set(keys)!={'key'} or len(keys['key'])!=1:raise ValueError('key 하나만 지정하세요.')
-            key=keys['key'][0]
-            if not U.re.fullmatch(r'[0-9A-Za-z]{1,128}',key):raise ValueError('잘못된 key입니다.')
-            return 'site',key
-        if U.re.fullmatch(r'[0-9a-f]{40,128}',ref): return 'site',ref
-        if ref.startswith('site:'):
-            key=ref[5:]
-            if not U.re.fullmatch(r'[0-9A-Za-z]{1,128}',key):raise ValueError('잘못된 key입니다.')
-            return 'site',key
-        if not U.re.fullmatch(r'[0-9A-Za-z_-]{1,160}',ref):raise ValueError('잘못된 docid입니다.')
+        if not isinstance(ref,str) or len(ref)>500:raise ValueError('ref가 너무 깁니다.')
+        if '://' in ref or ref.startswith('site:') or U.re.fullmatch(r'[0-9a-f]{40,128}',ref or ''):
+            raise ValueError('서구의회 홈페이지 직접 조회는 제거되었습니다. CLIK docid를 사용하세요.')
+        if not U.re.fullmatch(r'[0-9A-Za-z_-]{1,160}',ref):raise ValueError('잘못된 CLIK docid입니다.')
         return 'clik',ref
 
     @register
     async def council_read_source(ref:str,keyword:Optional[str]=None,start_turn:int=0,start_char:int=0,
             max_turns:int=30,max_chars:int=12000,whole_agenda:bool=False)->dict[str, Any]:
-        """CLIK docid, site:key 또는 서구의회 공식 URL에서 원문 발언을 끝까지 이어읽기.
+        """CLIK docid로 원문 발언을 끝까지 이어읽기.
+        서구의회 홈페이지 URL/site:key 직접 조회는 안정성을 위해 제거했다.
         next_start_turn/next_start_char를 그대로 전달한다. body_hash가 바뀌면 원문이 갱신된 것이다."""
         try: origin,key=parse_ref(ref.strip())
         except ValueError as exc:return invalid(str(exc))
         if not (0<=start_turn and 0<=start_char and 1<=max_turns<=80 and 100<=max_chars<=24000):return invalid('이어읽기 범위가 잘못되었습니다.')
         try:
-            if origin=='site':
-                doc=await U.site.detail(key);turns=doc['turns'];meta=doc['meta'];url=doc['url']
-            else:
-                meta=await U.minutes_detail(key);turns=await asyncio.to_thread(E.parse_turns,meta.get('MINTS_HTML',''));url=meta.get('ORGINL_FILE_URL')
+            meta=await U.minutes_detail(key);turns=await asyncio.to_thread(E.parse_turns,meta.get('MINTS_HTML',''));url=meta.get('ORGINL_FILE_URL')
         except Exception as exc:return {'status':'ERROR','message':R.safe_error(exc),'items':[]}
         if not turns:return {'status':'PARTIAL','reason':'BODY_UNAVAILABLE_OR_FORMAT_UNSUPPORTED','ref':ref,'source_url':E.make_record(dict(meta,DOCID=key),[],source=origin,source_url=url)['provenance']['source_url'],'items':[]}
         keep=None
@@ -545,10 +528,10 @@ def install(U):
         except ValueError as exc:return invalid(str(exc))
         for turn in page.get('turns',[]):
             turn['speech_context']=E.speech_context(turns,turn['idx'])
-        record=E.make_record(dict(meta,DOCID=key),turns,source='SEOGU_SITE' if origin=='site' else 'CLIK',
-                source_url=url,body_url=url if origin=='site' else 'https://clik.nanet.go.kr/openapi/minutes.do',
-                source_url_verified=origin=='site',body_url_verified=True)
-        await links.enrich([record])
+        record=E.make_record(dict(meta,DOCID=key),turns,source='CLIK',
+                source_url=url,body_url='https://clik.nanet.go.kr/openapi/minutes.do',
+                source_url_verified=False,body_url_verified=True)
+        await attach_source_links([record])
         return {**page,'ref':ref,'meta':record['metadata'],'provenance':record['provenance'],
                 'source_link':record['source_link'],
                 'source_url':record['provenance']['source_url'],'source_kind':'OFFICIAL_FETCHED','fiscal_year':None,
@@ -599,7 +582,7 @@ def install(U):
                     'note':'한도 도달 시 가장 오래된 묶음을 비우고 응답 warnings에 알립니다.'},
                 'snapshot_policy':'공개 근거만 SQLite에 저장; 붙여넣기·로컬 비공개자료는 저장하지 않음',
                 'state_persistence':'UIJEONG_STATE_DB가 영속 볼륨이면 재시작 후 유지; 다른 서버/분리 볼륨 간 공유 불가',
-                'direct_adapters':['CLIK','SEOGU_SITE'],'live_checks':[]}
+                'direct_adapters':['CLIK'],'disabled_adapters':['SEOGU_SITE'],'live_checks':[]}
         if live:
             cid,name,error=U.pick_council(test_council)
             if error:return invalid(error)
@@ -607,9 +590,6 @@ def install(U):
                 obj=await U.clik.get('minutes.do',displayType='list',startCount=0,listCount=1,searchType='ALL',rasmblyId=cid,sort='MTG_DE/DESC')
                 output['live_checks'].append({'source':'CLIK','council':name,'total':obj.get('TOTAL_COUNT'),'rows':U._rows(obj)})
             except Exception as exc:output['live_checks'].append(safe_failure('CLIK','health',exc));output['status']='PARTIAL'
-            if cid=='062006':
-                try:output['live_checks'].append({'source':'SEOGU_SITE','rows':await U.site.list_page(1)})
-                except Exception as exc:output['live_checks'].append(safe_failure('SEOGU_SITE','health',exc));output['status']='PARTIAL'
         return output
 
-    return {'collect_clik':collect_clik,'collect_site':collect_site,'parse_ref':parse_ref,'snapshots':snapshots}
+    return {'collect_clik':collect_clik,'parse_ref':parse_ref,'snapshots':snapshots}
