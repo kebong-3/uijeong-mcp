@@ -249,7 +249,7 @@
     "test-migration (7).md": "1ff9ef8527b99c8449cf2fa210253a8844fa947dd9b742aadd8ca4510d153071",
     "test-migration.md": "e0f87586beaf916578533b4bfa1ad797c83a99c3f3f7ae6239d328fb68260d73",
     "tests/fixtures/official_excerpts.json": "61611019b8d6da4c1cb07c1bc6649476cbc5573dfc6ad3354a03bb9454d5a9f6",
-    "tests/offline_check.py": "7ff29ff37d6dcbb25df7c081f7a37da0649bc2aff2cbd8246ed99f5c85905a8f",
+    "tests/offline_check.py": "bfb5864fe1c82861f9dcae9aab67d7533bd04db1adcae0557e175953752e8769",
     "tests/protocol_smoke.py": "b14520b40b49d3b2c66c802452ed3bf5615db48c57460e7921bb562e7050f905",
     "tests/regression_r0.py": "acaec194b6a551a4f978935a948441a18480c2704347a7d24b5ad855ab5762d7",
     "tests/test_access_logging.py": "71c2c18942dc094dfaa7a3e3ce324c9f8475435df6d463d46969ad80367ac2ac",
