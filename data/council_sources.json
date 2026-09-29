@@ -2031,14 +2031,15 @@
       "minutes_entry_status": "page_observed",
       "api_adapter": "clik",
       "clik_coverage": "must_check_per_query",
-      "direct_adapter": "seogu",
-      "direct_adapter_status": "implemented_in_main",
+      "direct_adapter": null,
+      "direct_adapter_status": "disabled_for_stability",
       "aliases": [
         "광주광역시 서구의회",
         "광주 서구의회"
       ],
       "notes": [
-        "공식 디렉터리의 구 명칭과 CLIK 최신 코드표 명칭을 분리 보존"
+        "공식 디렉터리의 구 명칭과 CLIK 최신 코드표 명칭을 분리 보존",
+        "서구의회 홈페이지 직접 자동수집은 2026-09-29 안정화 릴리스부터 사용하지 않음; 회의록 조회는 CLIK 사용"
       ]
     },
     {

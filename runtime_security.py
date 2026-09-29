@@ -455,9 +455,11 @@ class HTTPGuard:
         if self.policy.get("auth_mode") == "public":
             if not getattr(app, "uijeong_public_readonly", False):
                 raise SecurityError("공개 인증은 public_server의 허용목록 전용 앱에서만 사용할 수 있습니다.")
-            self.app = PublicBoundary(app, max_concurrent=3)
+            # Keep heavy tool work bounded elsewhere while giving MCP initialize/tools-list
+            # enough transport headroom for staff connecting at the same time.
+            self.app = PublicBoundary(app, max_concurrent=8, max_waiting=40, queue_timeout=12.0)
             max_body = min(max_body, 65536)
-            requests_per_minute = min(requests_per_minute, 120)
+            requests_per_minute = min(requests_per_minute, 360)
         self.max_body, self.requests_per_minute = max_body, requests_per_minute
         self.requests: dict[str, collections.deque[float]] = {}
         self.oauth_verifier = None
@@ -599,7 +601,10 @@ class HTTPGuard:
 
 
 def secure_http_app(app: Any) -> HTTPGuard:
-    return HTTPGuard(app)
+    # One ChatGPT connection can make several lightweight MCP requests
+    # (initialize, tools/list, resources/list). A shared 120 rpm cap was too
+    # tight for a 30~40 person rollout even though heavy tool concurrency is bounded.
+    return HTTPGuard(app, requests_per_minute=360 if is_public_mode() else 120)
 
 
 # Explicit anonymous mode: the protected modes above retain their behavior.
@@ -655,7 +660,7 @@ async def _public_reply(send: Any, status: int, payload: dict[str, Any]) -> None
     if status == 503:
         headers.append((b"retry-after", b"2"))
     if status == 405:
-        headers.append((b"allow", b"POST"))
+        headers.append((b"allow", b"POST, GET, DELETE"))
     await send({"type": "http.response.start", "status": status, "headers": headers})
     await send({"type": "http.response.body", "body": json.dumps(payload, ensure_ascii=False).encode()})
 
@@ -675,9 +680,9 @@ class PublicBoundary:
         if scope.get("path", "").rstrip("/") != "/mcp":
             await _public_reply(send, 404, {"error": "Not found"})
             return
-        if scope.get("method") != "POST":
+        if scope.get("method") not in ("POST","GET","DELETE"):
             await _public_reply(send, 405, {"authentication": "none", "public_readonly": True,
-                "message": "MCP 프로그램에서 POST로 연결하세요. 서버 상태 확인 주소는 /healthz입니다."})
+                "message": "MCP Streamable HTTP는 POST/GET/DELETE를 지원합니다. 서버 상태 확인 주소는 /healthz입니다."})
             return
         if self.waiting >= self.max_waiting and self._slots.locked():
             await _public_reply(send, 503, {"error": "PUBLIC_BUSY", "message": "동시 조회 중입니다. 잠시 후 다시 시도하세요."})

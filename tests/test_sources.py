@@ -11,7 +11,7 @@ def test_registry_has_authority_and_separates_coverage():
     assert data["directory_host_count"] == 243
     assert len(data["sources"]) == data["source_count"] == 248
     assert len({r["source_id"] for r in data["sources"]}) == 248
-    assert sum(bool(r["direct_adapter"]) for r in data["sources"]) == 1
+    assert sum(bool(r["direct_adapter"]) for r in data["sources"]) == 0
     assert all(r["clik_coverage"] == "must_check_per_query" for r in data["sources"])
     assert all(r["directory_url"] for r in data["sources"] if r["official_host"])
 
@@ -62,8 +62,11 @@ def test_source_pagination_and_direct_filter():
         offset = result["next_offset"]
     assert len(all_rows) == len(set(all_rows)) == 248
     direct = sources.search_sources(direct_only=True)
-    assert direct["total_matches"] == 1
-    assert direct["sources"][0]["council_id"] == "062006"
+    assert direct["status"] == "EMPTY"
+    assert direct["total_matches"] == 0
+    seogu = next(r for r in sources.load_sources()["sources"] if r["council_id"] == "062006")
+    assert seogu["direct_adapter"] is None
+    assert seogu["direct_adapter_status"] == "disabled_for_stability"
     assert sources.search_sources("전남광주통합특별시의회")["total_matches"] == 1
 
 
