@@ -62,3 +62,14 @@ def test_procurement_diagnostics_do_not_accept_alternate_success():
             parse_procurement(payload)
     assert parse_procurement({'response': {'header': {'resultCode': '00'},
                               'body': {'totalCount':0, 'items':[]}}}) == ([],0)
+
+
+def test_procurement_unknown_class_envelope_and_secret_property(monkeypatch):
+    from budget_mcp.api import procurement_diagnostic
+    monkeypatch.setenv('DATA_GO_KR_SERVICE_KEY', 'AlphabeticSecret')
+    result = procurement_diagnostic({'Provider.ResponseError':{'header':{'resultCode':'20', 'resultMsg':'never echo'}},
+                                     'AlphabeticSecret':{'code':'30'}})
+    assert result['provider_codes'] == [{'path':'$.Provider.ResponseError.header.resultCode','code':'20'}]
+    assert result['envelopes'][0]['other_key_names'] == ['Provider.ResponseError']
+    assert 'AlphabeticSecret' not in json.dumps(result)
+    assert 'never echo' not in json.dumps(result)

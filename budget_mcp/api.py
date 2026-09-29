@@ -85,8 +85,8 @@ class ProcurementResponseError(BudgetError):
 def procurement_diagnostic(payload):
     """Only predefined envelope names and short numeric codes, never raw text.
 
-    Unknown property names could themselves contain credentials, so they are
-    counted rather than echoed. Alternate envelopes remain failures until their
+    Unknown property names are short identifier-only names, credential-redacted;
+    values and free-form messages are never echoed. Alternate envelopes remain failures until their
     success contract has been verified against official specifications.
     """
     containers = {'response', 'header', 'body', 'error', 'result',
@@ -96,18 +96,24 @@ def procurement_diagnostic(payload):
     known = containers | code_fields | {'resultMsg', 'rsltMsg', 'returnAuthMsg',
              'errMsg', 'message', 'name', 'reason', 'detail', 'totalCount', 'items', 'item', 'pageNo', 'numOfRows'}
     shapes, codes = [], []
+    def safe_name(key):
+        if not isinstance(key,str) or not re.fullmatch(r'[A-Za-z_][A-Za-z_.]{0,99}',key):
+            return None
+        cleaned=redact(key)
+        return cleaned if cleaned==key else None
     def walk(node, path='$', depth=0):
-        if not isinstance(node, dict) or depth > 4:
+        if not isinstance(node, dict) or depth > 4 or len(shapes)>=16:
             return
         shapes.append({'path': path, 'known_keys': sorted(k for k in node if k in known),
-                       'other_key_count': sum(k not in known for k in node)})
+                       'other_key_count': sum(k not in known for k in node),
+                       'other_key_names': sorted(k for k in node if k not in known and safe_name(k))[:8]})
         for k in sorted(code_fields):
             if k in node:
                 value = str(node[k])
                 codes.append({'path': path + '.' + k,
                               'code': value if re.fullmatch(r'[0-9]{1,4}', value) else 'UNRECOGNIZED'})
-        for k in sorted(containers):
-            if k in node:
+        for k in sorted(node)[:32]:
+            if k in containers or (k not in known and safe_name(k)):
                 walk(node[k], path + '.' + k, depth + 1)
     walk(payload)
     return {'envelopes': shapes, 'provider_codes': codes,

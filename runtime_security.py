@@ -670,7 +670,7 @@ def public_auth_diagnostics() -> dict[str, Any]:
     return {"status": "CONFIG_VALID", "mode": "public", "authentication": "none",
             "public_readonly": True, "remote_login_tested": False,
             "clik_api_is_separate_credential": True,
-            "connection_requirement": "인증 없음. 공개 회의록 조회 도구만 제공하며 내부자료를 입력하지 마세요.",
+            "connection_requirement": "인증 없음. 공개 의회·예산·조례 조회와 검토 도구를 제공하며 내부자료를 입력하지 마세요.",
             "limits_scope": "single-process shared public budget; not a per-user quota"}
 
 

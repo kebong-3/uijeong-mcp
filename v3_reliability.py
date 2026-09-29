@@ -17,7 +17,7 @@ from typing import Any, Optional
 from urllib.parse import parse_qsl, urlsplit
 
 KST = dt.timezone(dt.timedelta(hours=9))
-VERSION = "3.0.2-public.1"
+from release_info import VERSION
 METRICS = {"requests": 0, "cache_hits": 0, "coalesced": 0, "executions": 0, "errors": 0}
 _CACHE = OrderedDict()
 _FLIGHTS = {}
