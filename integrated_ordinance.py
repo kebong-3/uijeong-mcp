@@ -33,7 +33,7 @@ async def _run(action):
             async with LawClient(_settings()) as client:
                 result = await action(client)
                 if len(json.dumps(result,ensure_ascii=False,default=str)) > 60000:
-                    return {'status':'partial','code':'response_budget_exceeded',
+                    return {'status':'OUTPUT_LIMIT','code':'response_budget_exceeded',
                             'summary':result.get('summary'),
                             'documents':result.get('documents',[])[:6],
                             'coverage':{'output_omitted':True,'analysis_delivered':False},
@@ -77,21 +77,59 @@ def register(mcp):
                     'selection_required':True,'law_view':'effective' if kind=='law' else None}
         return await _run(action)
 
-    @tool('ordinance_get_document','검색에서 선택한 DocumentRef(kind,document_id 또는 mst)로 공식 원문. 법령 MST에는 effective_date 필수. 조문 페이지·해시·시행상태·출처 제공.')
-    async def ordinance_get_document(reference:DocumentRef, keyword:str='', offset:int=0, limit:int=8) -> dict:
+    @tool('ordinance_get_document','공식 원문·해시·시행상태 조회. section=articles/supplementary/annexes 별도 페이지. coverage.next_offset/next_start_char로 이어읽기. 법령 MST에는 effective_date 필수.')
+    async def ordinance_get_document(reference:DocumentRef, keyword:str='', offset:int=0, limit:int=8,
+                                     section:Literal['articles','supplementary','annexes']='articles',
+                                     start_char:int=0, max_chars:int=2000) -> dict:
         async def action(c):
-            if offset<0 or not 1<=limit<=30: raise ValueError('range')
+            if offset<0 or start_char<0 or not 1<=limit<=30 or not 200<=max_chars<=5000: raise ValueError('range')
             d=await c.get_document(reference)
-            articles=[a for a in d.articles if not keyword or keyword in a.text or keyword in a.title]
-            selected=articles[offset:offset+limit]
-            entries=[evidence(d,a) for a in selected]
-            return {'status':'retrieved','summary':d.summary(),'temporal_status':temporal_status(d,_date()),
-                    'articles':[a.model_dump() for a in selected], 'evidence':{e['id']:e for e in entries},
-                    'supplementary':d.supplementary,'annexes':d.annexes,
-                    'coverage':{'matched_articles':len(articles),'returned_articles':len(selected),'offset':offset,
-                                'next_offset':offset+limit if offset+limit<len(articles) else None,
-                                'filtered':bool(keyword),'annex_body_collected':False},
-                    'warning':'페이지 밖 조문 및 별표 첨부 본문은 이 응답에서 검토하지 않았습니다.'}
+            if section=='articles':
+                items=[a for a in d.articles if not keyword or keyword in a.text or keyword in a.title]
+            elif section=='supplementary':
+                items=[v for v in d.supplementary if not keyword or keyword in v]
+            else:
+                items=[v for v in d.annexes if not keyword or keyword in json.dumps(v,ensure_ascii=False)]
+            result={'status':'retrieved','summary':d.summary(),'temporal_status':temporal_status(d,_date()),
+                    section:[], 'evidence':{},
+                    'coverage':{'section':section,'matched_items':len(items),'offset':offset,'filtered':bool(keyword),
+                                'section_counts':{'articles':len(d.articles),'supplementary':len(d.supplementary),'annexes':len(d.annexes)},
+                                'annex_body_collected':False},
+                    'warning':'선택 section의 반환 구간만 열람했습니다. 다른 조문·부칙과 별표 첨부 본문을 확인한 것으로 보고하지 마세요.'}
+            cursor=offset; next_char=0
+            for index in range(offset,min(len(items),offset+limit)):
+                item=items[index]
+                raw=item.text if section=='articles' else (item if section=='supplementary' else json.dumps(item,ensure_ascii=False,sort_keys=True))
+                begin=start_char if index==offset else 0
+                if begin>len(raw): raise ValueError('start_char_out_of_range')
+                finish=min(len(raw),begin+max_chars)
+                excerpt=raw[begin:finish]
+                partial=begin>0 or finish<len(raw)
+                location={'item_offset':index,'char_start':begin,'char_end':finish,'total_chars':len(raw),'excerpt_only':partial}
+                entry=None
+                if section=='articles':
+                    row={**item.model_dump(),'text':excerpt}
+                    entry=evidence(d,item)
+                    entry['text']=excerpt
+                    if partial:
+                        row['excerpt_location']=location
+                        entry['excerpt_location']=location
+                else:
+                    row={'text':excerpt,'format':'text' if section=='supplementary' else 'json_metadata',**location}
+                candidate={**result,section:result[section]+[row],'evidence':{**result['evidence'],**({entry['id']:entry} if entry else {})}}
+                if len(json.dumps(candidate,ensure_ascii=False,default=str))>22000 and result[section]:
+                    break
+                result=candidate
+                if finish<len(raw):
+                    cursor=index;next_char=finish
+                    break
+                cursor=index+1;next_char=0
+            result['coverage'].update({'returned_items':len(result[section]),'next_offset':cursor if cursor<len(items) else None,
+                                       'next_start_char':next_char if cursor<len(items) else None,
+                                       'continuation':'동일 reference/section/keyword에서 next_offset과 next_start_char를 offset/start_char로 사용하세요.'})
+            if section=='articles':
+                result['coverage'].update({'matched_articles':len(items),'returned_articles':len(result[section])})
+            return result
         return await _run(action)
 
     @tool('ordinance_linked','상위법 공식 ID와 조번호로 연결 조례 후보 조회. 연결 누락이나 간접 영향은 별도 확인.')

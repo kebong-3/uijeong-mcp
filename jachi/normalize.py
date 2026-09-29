@@ -143,7 +143,7 @@ def parse_document(data: Any, kind: str, document_id: str = "", mst: str = "",
     if not pick(meta, "자치법규ID" if kind == "ordinance" else "법령ID"):
         warnings.append("응답 ID 미확인: 요청 식별자 및 정식 제명 대조 필요")
     for n in nodes(data):
-        if pick(n, "조문여부") == "N":
+        if pick(n, "조문여부") in {"N", "전문"}:
             continue
         content = pick(n, "조내용", "조문내용")
         if content:

@@ -112,3 +112,46 @@ async def test_provided_document_official_url_does_not_make_official(functions):
     assert result['usage']['llm_calls']==0
     assert all(d['source_state']=='user_provided' for d in result['documents'])
     assert result['coverage']['baseline_confirmed'] is False
+
+@pytest.mark.anyio
+async def test_large_supplements_not_returned_by_default(functions,mock_client,document):
+    document.supplementary=['부칙'*30000]
+    result=await functions['ordinance_get_document'](DocumentRef(document_id='123'))
+    assert 'supplementary' not in result
+    assert len(__import__('json').dumps(result,ensure_ascii=False))<22000
+    assert result['summary']['content_hash']==document.content_hash
+
+@pytest.mark.anyio
+@pytest.mark.parametrize('section',['articles','supplementary','annexes'])
+async def test_section_character_traversal_no_loss(functions,mock_client,document,section):
+    import json
+    long='가나다라'*2000
+    document.articles=[Article(key='main:제1조',label='제1조',text=long)]
+    document.supplementary=[long,'마지막 부칙']
+    document.annexes=[{'title':'별표','text':long}]
+    expected=[long] if section=='articles' else (document.supplementary if section=='supplementary' else [json.dumps(document.annexes[0],ensure_ascii=False,sort_keys=True)])
+    collected={}; offset=start_char=0
+    for _ in range(100):
+        result=await functions['ordinance_get_document'](DocumentRef(document_id='123'),section=section,offset=offset,start_char=start_char,max_chars=500)
+        assert len(json.dumps(result,ensure_ascii=False))<22000
+        for i,row in enumerate(result[section]):
+            location=row.get('excerpt_location',row)
+            position=location.get('item_offset',offset+i)
+            collected[position]=collected.get(position,'')+row['text']
+        if result['coverage']['next_offset'] is None:break
+        offset=result['coverage']['next_offset'];start_char=result['coverage']['next_start_char']
+    assert [collected[i] for i in sorted(collected)]==expected
+
+def test_official_korean_heading_marker_is_not_duplicate_article():
+    from jachi.normalize import parse_document
+    payload={'법령':{'기본정보':{'법령ID':'001656','법령일련번호':'123456','법령명_한글':'지방자치법','시행일자':'20260101'},
+       '조문':{'조문단위':[
+         {'조문여부':'전문','조문번호':'1','조문내용':'제1장 총강'},
+         {'조문여부':'전문','조문번호':'1','조문내용':'제1절 총칙'},
+         {'조문여부':'조문','조문번호':'1','조문제목':'목적','조문내용':'제1조(목적) 시험 본문'},
+         {'조문여부':'조문','조문번호':'2','조문내용':'제2조 시험 본문'}]}}}
+    doc=parse_document(payload,'law')
+    assert [a.label for a in doc.articles]==['제1조','제2조']
+    payload['법령']['조문']['조문단위'].append({'조문여부':'조문','조문번호':'1','조문내용':'제1조 충돌 원문'})
+    with pytest.raises(ValueError,match='중복 조문키'):
+        parse_document(payload,'law')

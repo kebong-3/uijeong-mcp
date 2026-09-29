@@ -1632,6 +1632,18 @@
         "limit": {
           "annotation": "int",
           "default": 8
+        },
+        "section": {
+          "annotation": "Literal['articles', 'supplementary', 'annexes']",
+          "default": "articles"
+        },
+        "start_char": {
+          "annotation": "int",
+          "default": 0
+        },
+        "max_chars": {
+          "annotation": "int",
+          "default": 2000
         }
       },
       "required": [
