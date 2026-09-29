@@ -1,4 +1,4 @@
-"""v3.0 reliability layer; preserve the 21 public read-only tool contracts."""
+"""v3.0.1 stability layer; preserve the 21 public read-only tool contracts."""
 from __future__ import annotations
 import asyncio
 import copy
@@ -17,7 +17,7 @@ from typing import Any, Optional
 from urllib.parse import parse_qsl, urlsplit
 
 KST = dt.timezone(dt.timedelta(hours=9))
-VERSION = "3.0.0-public.1"
+VERSION = "3.0.1-public.1"
 METRICS = {"requests": 0, "cache_hits": 0, "coalesced": 0, "executions": 0, "errors": 0}
 _CACHE = OrderedDict()
 _FLIGHTS = {}
@@ -520,10 +520,11 @@ def install(U):
         if not isinstance(result,dict):
             return result
         result["capacity"] = {"cache_entries_are_user_limits":False,
-            "clik_cache_max_entries":U.CACHE_MAX,"site_cache_max_entries":U.SITE_DETAIL_CACHE_MAX,
+            "clik_cache_max_entries":U.CACHE_MAX,
             "short_result_cache":{"max_entries":CACHE_ENTRIES,"max_bytes":CACHE_BYTES,"ttl_seconds":CACHE_TTL,"current_entries":len(_CACHE)},
-            "public_concurrency":3,"public_requests_per_minute":120,"metrics_since_restart":dict(METRICS),
-            "note":"일일 이용자 수와 동시 요청 수는 다릅니다. 캐시 확대가 외부 API 한도를 늘리지는 않습니다."}
+            "transport_max_concurrent":8,"tool_max_concurrent":3,"public_requests_per_minute":360,
+            "metrics_since_restart":dict(METRICS),
+            "note":"MCP 연결·도구목록 요청에는 전송 여유를 두고, 무거운 조회는 최대 3개씩 처리합니다. 캐시 확대가 외부 API 한도를 늘리지는 않습니다."}
         result["last_integration_validation"] = copy.deepcopy(_LAST_CHECK)
         result["client_requirements"] = {"public_tools":21,"authentication":"none","web_distribution":"existing eligible app reference","cross_account_access_guaranteed":False}
         for checked in result.get("live_checks",[]):
