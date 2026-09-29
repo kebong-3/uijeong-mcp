@@ -83,7 +83,7 @@ class ProcurementResponseError(BudgetError):
 
 
 def procurement_diagnostic(payload):
-    """Only predefined envelope names and short numeric codes, never raw text.
+    """Bounded redacted envelope identifiers and short numeric codes, never raw text.
 
     Unknown property names are short identifier-only names, credential-redacted;
     values and free-form messages are never echoed. Alternate envelopes remain failures until their
@@ -121,6 +121,13 @@ def procurement_diagnostic(payload):
 
 
 def parse_procurement(payload):
+    error_wrapper = payload.get('nkoneps.com.response.ResponseError') if isinstance(payload,dict) else None
+    if isinstance(error_wrapper,dict):
+        error_header=error_wrapper.get('header',{})
+        error_code=str(error_header.get('resultCode','')) if isinstance(error_header,dict) else ''
+        error_code=error_code if re.fullmatch(r'[0-9]{1,4}',error_code) else 'UNKNOWN'
+        detail=' (조회 날짜 형식 오류: 계약 조회일자는 YYYYMMDD)' if error_code=='06' else ''
+        raise ProcurementResponseError('조달 API 제공기관 오류: '+error_code+detail, procurement_diagnostic(payload))
     response=payload.get('response',payload) if isinstance(payload,dict) else {}
     if not isinstance(response,dict):response={}
     header=response.get('header',{})
@@ -177,6 +184,9 @@ class Gateway(PublicClient):
         query=query.strip().lower()
         entries=[copy.deepcopy(e) for e in self.entries.values() if not query or query in (e['id']+' '+e['name']+' '+e['provider']).lower()]
         for e in entries:
+            if e['provider']=='procurement' and 'inqryBgnDate' in e.get('allowed_params',[]):
+                e['parameter_formats']={'inqryBgnDate':'YYYYMMDD (8자리 일자)', 'inqryEndDate':'YYYYMMDD (8자리 일자)'}
+                e['date_example']={'inqryDiv':'1','inqryBgnDate':'20260901','inqryEndDate':'20260901'}
             e['credential_configured']=bool(credential(e['credential_env']))
             e['authenticated_live_verified']=self.last_checks.get(e['id'],{}).get('authenticated_live_verified',False)
         return {'status':'CATALOG','items':entries,'note':'명세 확인·코드 구현·실키 응답 검증은 별개입니다. 카탈로그에 없는 URL/동작은 호출하지 않습니다.'}
@@ -215,6 +225,15 @@ class Gateway(PublicClient):
             p.update(Type='json',pIndex=page,pSize=5 if sample else page_size)
         elif entry['provider']=='procurement':
             p.update(type='json',pageNo=page,numOfRows=page_size)
+            if 'inqryBgnDate' in p or 'inqryEndDate' in p:
+                try:
+                    if any(not re.fullmatch(r'[0-9]{8}', str(p.get(k,''))) for k in ('inqryBgnDate','inqryEndDate')):
+                        raise ValueError('date length')
+                    begin=datetime.strptime(str(p['inqryBgnDate']),'%Y%m%d')
+                    end=datetime.strptime(str(p['inqryEndDate']),'%Y%m%d')
+                except (ValueError,KeyError):
+                    raise BudgetError('계약 조회기간은 시작·종료 YYYYMMDD 8자리 일자를 모두 지정하세요. YYYYMMDDHHMM 일시가 아닙니다.') from None
+                if end<begin:raise BudgetError('계약 조회 종료일자는 시작일자 이후여야 합니다.')
             if 'inqryBgnDt' in p or 'inqryEndDt' in p:
                 try:
                     begin=datetime.strptime(str(p['inqryBgnDt']),'%Y%m%d%H%M');end=datetime.strptime(str(p['inqryEndDt']),'%Y%m%d%H%M')

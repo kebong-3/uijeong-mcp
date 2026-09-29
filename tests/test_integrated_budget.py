@@ -73,3 +73,32 @@ def test_procurement_unknown_class_envelope_and_secret_property(monkeypatch):
     assert result['envelopes'][0]['other_key_names'] == ['Provider.ResponseError']
     assert 'AlphabeticSecret' not in json.dumps(result)
     assert 'never echo' not in json.dumps(result)
+
+
+def test_procurement_error_wrapper_exposes_verified_code_not_values():
+    import pytest
+    from budget_mcp.api import parse_procurement, ProcurementResponseError
+    with pytest.raises(ProcurementResponseError, match='06.*YYYYMMDD') as caught:
+        parse_procurement({'nkoneps.com.response.ResponseError': {'header': {'resultCode':'06', 'resultMsg':'private echo'}}})
+    assert 'private echo' not in str(caught.value)
+
+
+def test_contract_dates_use_eight_digits_and_fail_before_network(monkeypatch):
+    import pytest
+    from budget_mcp.api import Gateway
+    from budget_mcp.money import BudgetError
+    monkeypatch.setenv('DATA_GO_KR_SERVICE_KEY', 'PRIVATE_TEST_KEY_1234')
+    calls=[]
+    def fetch(url,params):
+        calls.append(params)
+        return json.dumps({'response':{'header':{'resultCode':'00'},'body':{'totalCount':0,'items':[]}}}).encode()
+    gateway=Gateway(fetch=fetch)
+    for begin,end in [('202609010000','202609012359'),('20260230','20260301'),('20260902','20260901')]:
+        with pytest.raises(BudgetError):
+            gateway.fetch_api('contracts_servc',{'inqryDiv':'1','inqryBgnDate':begin,'inqryEndDate':end})
+    assert calls==[]
+    result=gateway.fetch_api('contracts_servc',{'inqryDiv':'1','inqryBgnDate':'20260901','inqryEndDate':'20260901'})
+    assert result['status']=='EMPTY'
+    assert calls[0]['inqryBgnDate']=='20260901'
+    spec=gateway.api_catalog('contracts_servc')['items'][0]
+    assert 'YYYYMMDD' in spec['parameter_formats']['inqryBgnDate']
