@@ -18,7 +18,7 @@ def test_public_pages_are_html_and_named():
         assert status == 200
         assert content_type.startswith(b"text/html")
         text = body.decode("utf-8")
-        assert "지방의회MCP" in text
+        assert "지방의회·예산·조례 MCP" in text
         assert "전남광주통합특별시 서구청 펀온워크 AI혁신분과 에이블(AIBLE)" in text
 
 
@@ -63,7 +63,7 @@ def test_http_guard_serves_pages_before_mcp_boundary(env):
         ) as client:
             root = await client.get("/")
             assert root.status_code == 200
-            assert "지방의회MCP" in root.text
+            assert "지방의회·예산·조례 MCP" in root.text
             privacy = await client.get("/privacy")
             assert privacy.status_code == 200
             challenge = await client.get("/.well-known/openai-apps-challenge")

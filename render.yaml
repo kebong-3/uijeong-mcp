@@ -2,7 +2,7 @@ services:
   - type: web
     name: uijeong-mcp
     runtime: python
-    plan: free
+    plan: 0.5c-512mb
     buildCommand: pip install -r requirements.txt
     startCommand: python scripts/check_config.py --http --manifest && python uijeong_mcp.py --http
     healthCheckPath: /healthz
@@ -10,9 +10,25 @@ services:
       - key: CLIK_API_KEY
         sync: false
       - key: LAW_OC
-        sync: false
+        fromService:
+          type: web
+          name: jachi-mcp
+          envVarKey: LAW_OC
       - key: LOFIN_API_KEY
-        sync: false
+        fromService:
+          type: web
+          name: local-budget-mcp
+          envVarKey: LOFIN_API_KEY
+      - key: DATA_GO_KR_SERVICE_KEY
+        fromService:
+          type: web
+          name: local-budget-mcp
+          envVarKey: DATA_GO_KR_SERVICE_KEY
+      - key: KOSIS_API_KEY
+        fromService:
+          type: web
+          name: local-budget-mcp
+          envVarKey: KOSIS_API_KEY
       - key: FINANCE365_SERVICE_KEY
         sync: false
       - key: FINANCE365_API_URL
@@ -46,9 +62,9 @@ services:
       - key: UIJEONG_SNAPSHOT_MAX_TOTAL_BYTES
         value: "67108864"
 # Explicit anonymous public queries. The CLIK API key remains server-side.
-# Public launcher registers 21 curated read-only tools. Council retrieval is CLIK-only; Seo-gu website crawling is disabled.
+# One transport hosts council, budget and ordinance tools directly. No proxy to sleeping services.
 # Existing bearer/oauth/local paths remain available in the protected launcher.
-# Free instances sleep; cold starts can affect first connection. Consider a paid web-service instance for staff-wide production use.
+# Preserve the user-selected paid instance. Existing source services provide env values at Blueprint sync only.
 # A retained UIJEONG_BEARER_TOKEN is ignored only in explicit public mode.
 
 # LAW_OC: 국가법령정보 공동활용 API 인증값(OC)

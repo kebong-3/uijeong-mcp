@@ -12,7 +12,8 @@ from verify_deployment import verify, CheckError, decode_message
 import release_info as V
 
 def test_source_profiles_still_match_supported_tool_counts():
-    c=build();assert {k:len(v) for k,v in c['profiles'].items()}=={'core':5,'work':18,'lite':26,'full':38}
+    c=build();assert {k:len(c['profiles'][k]) for k in ('core','work','lite','full')}=={'core':5,'work':18,'lite':26,'full':38}
+    assert len(c['profiles']['public']) == 40
     defs={t['name']:t for t in c['tools']}
     assert 'department_aliases' in defs['council_department_brief']['parameters']
     assert 'period_mode' in defs['council_recurring_issues']['parameters']

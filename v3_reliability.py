@@ -526,7 +526,8 @@ def install(U):
             "metrics_since_restart":dict(METRICS),
             "note":"MCP 연결·도구목록 요청에는 전송 여유를 두고, 무거운 조회는 최대 3개씩 처리합니다. 캐시 확대가 외부 API 한도를 늘리지는 않습니다."}
         result["last_integration_validation"] = copy.deepcopy(_LAST_CHECK)
-        result["client_requirements"] = {"public_tools":21,"authentication":"none","web_distribution":"existing eligible app reference","cross_account_access_guaranteed":False}
+        from public_server import PUBLIC_TOOLS
+        result["client_requirements"] = {"public_tools":len(PUBLIC_TOOLS),"authentication":"none","web_distribution":"direct MCP URL or eligible app reference","cross_account_access_guaranteed":False}
         for checked in result.get("live_checks",[]):
             if checked.get("check",{}).get("status") in {"ERROR","PARTIAL","NOT_CONFIGURED"}:
                 result["status"] = "PARTIAL"

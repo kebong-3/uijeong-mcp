@@ -1,73 +1,54 @@
-# 의정소통 MCP 2.5.0-rc.1
+# 지방의회·예산·조례 MCP
 
-공무원의 지방의회 답변 준비를 돕는 근거 중심 MCP 서버입니다. 사용자 제공 2.4.0-rc.1을 바탕으로 개선했습니다.
+전국 지방행정 업무의 회의록 근거, 예산 수치, 조례 근거를 하나의 연결에서 다룹니다.
+개발·기획: 서구청 펀온워크 AI혁신분과 에이블(AIBLE).
 
-**새 기본 업무 흐름:** 사업·기간 지정 → 과거 질의답변 수집 → 현재 자료 연결 → 답변 초안 작성 → 문장별 근거 점검 → 회의 후 증빙 검토.
+- 통합 버전: `4.0.0-public.1`
+- 직원 연결 주소: `https://uijeong-mcp.onrender.com/mcp`
+- 인증: **없음**
+- 의회 21개 + 예산 8개 + 조례 9개 + 업무흐름 2개 = 공개 도구 40개
+- 공개자료 조회·계산·검토용 초안 생성. 전자결재·공포·내부 시스템 변경 없음.
 
-서버는 회의록과 검토 도구를 제공하고, 연결된 AI가 이 근거로 문장을 작성합니다. 별도의 생성형 AI API 키를 요구하지 않습니다. CLIK 전국 검색에는 기존 CLIK 키가 필요합니다.
+## 사용 흐름
 
-## 먼저 읽을 파일
+단순 질문은 필요한 도구를 바로 사용합니다. 복합 질문은 `local_workflow_plan`으로 지역·연도·시행일과 필요한 분야를 정리하고 실제 자료를 조회합니다. `local_evidence_review`는 제공된 근거의 누락을 점검하는 보조 도구로, 원문 사실 검증을 대신하지 않습니다.
 
-- [사용·교체 안내](docs/UPGRADE_v250_KO.md)
-- [기능·설계·검증보고서](docs/VERIFICATION_v250_KO.md)
-- [공식 자료 조사와 반영](docs/RESEARCH_v250_KO.md)
-- [복사해서 쓰는 요청 예시](docs/EXAMPLES_v250_KO.md)
-- [합성자료 실행 예시](docs/examples-v250/실행예시_합성자료.md)
+| 분야 | 하는 일 | 핵심 도구 |
+|---|---|---|
+| 의회 | 회의록, 발언 문맥, 부서·기간·유사 사례, 회기 준비 | `council_evidence_bundle`, `council_read_source`, `council_session_ready_pack` |
+| 예산 | 공식 API 조회, 정밀 산출·증감·재원분담·다년도 비용 검산 | `budget_api_catalog`, `budget_fetch_api`, `budget_calculate` |
+| 조례 | 공식 조문·버전 확인, 비교, 사업 검토, 일부개정문·신구대비 | `ordinance_search`, `ordinance_get_document`, `ordinance_review_project`, `ordinance_draft_amendment` |
 
-## 이번에 추가한 기능
+예시: “○○시의 경로당 지원사업을 2027년 본예산에 반영하려고 합니다. 과거 의원 질의, 예산 산출 조건, 현행 조례상 근거를 각각 확인하고 미확인 사항을 구분해 주세요.”
 
-| 도구 | 업무에 주는 도움 |
-|---|---|
-| `council_prepare_response` | 기간을 명시해 검색하고, 인용ID·과거 문답·제공 현황·준비질문·확인사항·보고서형 본문을 함께 반환 |
-| `council_audit_claims` | 문장별 발췌·초안 위치·숫자·조건 표현을 대조하고, 숫자가 없는 미연결 주장도 찾음 |
-| `council_compare_metrics` | 사업·대상·기간·회계기준을 대조한 후 금액 단위를 환산. 기준 불일치 시 계산 보류 |
-| `council_compare_evidence` | 여러 회의의 발언을 정확한 원문과 위치를 보존해 나란히 비교 |
+의회 발언은 법적 근거 자체가 아닙니다. 다른 지역의 조례를 우리 지역 근거로 적용하지 않으며, 예산액·집행액·계약액과 원·천원·백만원을 구분합니다. 조회 실패는 자료 없음·0원으로 표시하지 않습니다. 출처와 확인 범위를 함께 제시합니다.
 
-기존 부서별 정리, 반복 주제어, 후속조치 검토, 기관 서식 기능은 유지합니다. 새 프롬프트 `근거기반_의회답변`과 안내 리소스 2개도 제공합니다.
+## 연결과 운영
 
-## 실행
+직원은 기존 주소를 계속 사용합니다. 새 도구가 보이지 않으면 연결한 앱의 도구를 새로고침하거나 같은 주소로 다시 연결합니다. 표시 이름은 **지방의회·예산·조례 MCP**로 지정하면 됩니다. ChatGPT 계정별 앱 이용 가능 여부와 사용량 제한은 서버와 별개입니다. MCP는 무료 계정의 제한을 해제하거나 답변 정확성을 보장하지 않습니다.
 
-Python 3.11 이상을 사용합니다. 이번 실행 검증은 Python 3.12와 실제 MCP SDK 1.30.0으로 했습니다.
+한 Python 프로세스에서 세 패키지를 직접 실행합니다. 다른 무료 Render 서버를 중계하지 않습니다. 서버에서 Gemini 등 별도 생성형 AI를 호출하지 않으며, 호스트 AI가 실제 조회 근거와 계산 결과로 답변합니다. 큰 결과는 나누어 조회하고, 오류·시간초과·일부 결과를 구분합니다. 서구의회 홈페이지 직접 검색은 비활성입니다.
 
-```bash
-python -m pip install -r requirements.txt
-python uijeong_mcp.py
-```
+`render.yaml`은 사용자가 선택한 `0.5c-512mb` 인스턴스를 유지합니다. 기존 API 값을 Render 내부 `fromService`로 복사합니다. `LAW_OC`는 `jachi-mcp`, `LOFIN_API_KEY`·`DATA_GO_KR_SERVICE_KEY`·`KOSIS_API_KEY`는 `local-budget-mcp`에서 가져옵니다. CLIK와 기존 의회 환경변수는 유지합니다. 참조 서비스는 Blueprint 동기화에 필요하지만 실제 자료 조회 경로에는 없습니다. 참조 서비스를 삭제하기 전 환경변수를 독립 값 또는 공통 환경그룹으로 이전해야 합니다.
 
-HTTP 운영은 인증·허용 도메인을 설정한 뒤 실행합니다. 기존 `render.yaml`, `render.oauth.yaml`을 지원합니다. 상세 설정은 교체 안내에 있습니다.
+## API와 검증 범위
 
-```bash
-python scripts/check_config.py --http --manifest
-python uijeong_mcp.py --http
-```
+CLIK, 국가법령정보 공동활용, 지방재정365와 예산 API 카탈로그를 사용합니다. 카탈로그에는 조달·KOSIS 등 18개 항목이 있으며 항목별 명세·실조회 확인 상태가 다릅니다. 키가 설정돼 있다는 사실과 API 인증·데이터 반환 성공은 구분합니다. e호조+·보탬e 직접 연결은 없습니다.
 
-| 프로필 | 도구 수 | 용도 |
-|---|---:|---|
-| core | 5 | 검색·원문 확인 중심, 신규 업무도구 미노출 |
-| work | 18 | 공무원 답변 준비 권장 |
-| lite | 26 | 기존 호환 검색 도구까지 사용 |
-| full | 38 | 전체 도구·개발 검수 |
+조례의 검색 후보, 사용자가 제공한 초안, API로 조회한 원문을 구분합니다. 제정·개정안은 담당자 검토용이며 적법성 승인 결과가 아닙니다. PDF/HWP 자동 파싱이나 기관 내부자료 저장 도구는 공개하지 않습니다.
 
-`UIJEONG_PROFILE=work`를 권장합니다. 버전 문자열이나 개수만 보지 말고 `council_status(live=False)`의 코드 지문과 manifest 일치를 함께 확인합니다.
+## 개발·검증
 
-## 검증 재실행
+Python 3.12 권장. 실행 의존성은 `requirements.txt`에 고정합니다.
 
-```bash
-python -m pip install pytest==8.4.2
+```sh
+python -m pip install -r requirements.txt pytest==8.4.2
+python scripts/check_config.py --manifest
 python -m pytest -q
 python tests/protocol_smoke.py
-python tests/regression_r0.py
-python tests/offline_check.py
-python scripts/demo_response25.py
+python scripts/verify_unified.py https://uijeong-mcp.onrender.com/mcp
 ```
 
-`docs/verification/v250/`에 이번 로그를 보관합니다. 이전 버전 로그는 이번 통과 수에 더하지 않습니다. CI는 Python 3.11/3.12에서 실제 SDK로 재실행하도록 구성했습니다.
+공개 HTTP 실행에는 `UIJEONG_AUTH_MODE=public`, `UIJEONG_PUBLIC_READONLY=true`, 정확한 `UIJEONG_ALLOWED_HOSTS`가 필요합니다. `python uijeong_mcp.py --http`로 실행합니다. 운영 인증값을 Git·로그·응답에 넣지 않습니다.
 
-## 정확한 사용 범위
-
-- 원문·문자열·숫자 대조는 **의미상 입증 또는 최종 제출 승인과 다릅니다.** `ready_for_submission`은 자동 승인하지 않습니다.
-- 과거 발언, 담당자 제공 현황, 준비 제안을 구분합니다. 제공 문서는 서버가 직접 열람한 것이 아닙니다.
-- `PARTIAL`과 `ERROR`를 자료 없음으로 바꾸지 않습니다. 이어보기·미열람 회의·조회 오류를 확인합니다.
-- 공개 회의록만 사용자 범위별 SQLite 스냅샷에 보관합니다. 초안·현황자료 입력은 서버에 저장하지 않습니다. 이용 클라이언트의 보관 정책은 별도입니다.
-- 전국 회의록은 CLIK, 홈페이지 직접 수집 어댑터는 서구의회입니다. 전국 모든 홈페이지 자동수집·현재 법령 검증·PDF/HWP 자동 분석까지 구현한 것은 아닙니다.
-- 새 패키지는 운영 전 검수용 후보판입니다. GitHub·Render 배포와 ChatGPT 실제 로그인은 이번에 수행하지 않았습니다.
+설계·네 에이전트 교차검토: [통합 검토 기록](docs/INTEGRATED_RELEASE.md). 도구 흐름: [업무흐름 설명](docs/INTEGRATED_WORKFLOW.md).

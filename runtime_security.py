@@ -52,6 +52,7 @@ def redact_secrets(value: Any, extra_secrets: Iterable[str] = ()) -> str:
     known = [os.environ.get("CLIK_API_KEY", ""), os.environ.get("LAW_OC", ""),
              os.environ.get("LOFIN_API_KEY", ""), os.environ.get("FINANCE365_SERVICE_KEY", ""),
              os.environ.get("DATA_GO_KR_SEARCH_KEY", ""),
+             os.environ.get("DATA_GO_KR_SERVICE_KEY", ""), os.environ.get("KOSIS_API_KEY", ""),
              os.environ.get("UIJEONG_BEARER_TOKEN", ""),
              os.environ.get("UIJEONG_OAUTH_CLIENT_SECRET", ""),
              os.environ.get("UIJEONG_VERIFY_TOKEN", ""), *extra_secrets]

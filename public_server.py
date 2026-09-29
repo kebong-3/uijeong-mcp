@@ -14,8 +14,12 @@ from typing import Any, Optional
 import runtime_security as R
 import openai_compat as O
 import v3_reliability as V
+import integrated_budget as IB
+import integrated_ordinance as IO
+import integrated_workflow as IW
+from integrated_transport import Registry
 
-PUBLIC_TOOLS = (
+COUNCIL_TOOLS = (
     "search", "fetch",
     "council_find_council",
     "council_evidence_bundle", "council_evidence_search", "council_period_review",
@@ -26,7 +30,8 @@ PUBLIC_TOOLS = (
     "council_session_ready_pack",
     "council_peer_cases", "council_department_session_brief",
 )
-INSTRUCTIONS = """지방의회MCP 직원 배포용 공개 조회 모드 — 인증 없이 공개 지방의회 자료만 조회합니다.
+PUBLIC_TOOLS = COUNCIL_TOOLS + IB.TOOL_NAMES + IO.TOOL_NAMES + IW.TOOL_NAMES
+INSTRUCTIONS = """지방의회·예산·조례 MCP — 인증 없이 공개자료 조회·예산 검산·조례 검토를 지원합니다.
 개발·기획: 전남광주통합특별시 서구청 펀온워크 AI혁신분과 에이블(AIBLE).
 표준 지식검색/심층리서치 클라이언트는 search → fetch 흐름을 사용합니다.
 일반 ChatGPT 업무대화에서는 아래의 전문 도구를 사용합니다. 지방의회 회의록 검색의 기본 원천은 CLIK이며 서구의회 홈페이지 직접 자동수집은 사용하지 않습니다.
@@ -173,7 +178,7 @@ def build_server(backend: Any = None) -> Any:
 
     if not R.is_public_mode():
         raise R.SecurityError("공개 서버는 UIJEONG_AUTH_MODE=public에서만 실행합니다.")
-    server = FastMCP("uijeong_mcp", instructions=INSTRUCTIONS, stateless_http=True,
+    server = FastMCP("uijeong_mcp", instructions=IW.INTEGRATED_INSTRUCTIONS + '\n' + INSTRUCTIONS, stateless_http=True,
                      json_response=True, transport_security=R.transport_security_settings())
     annotations = ToolAnnotations(readOnlyHint=True, destructiveHint=False,
                                   idempotentHint=True, openWorldHint=True)
@@ -186,13 +191,17 @@ def build_server(backend: Any = None) -> Any:
         server.tool(name=name, annotations=annotations)(standard_function(fn))
 
     # Preserve the richer employee workflow tools without changing their contracts.
-    for name in PUBLIC_TOOLS:
+    for name in COUNCIL_TOOLS:
         if name in O.STANDARD_TOOL_NAMES:
             continue
         fn = getattr(backend, name, None)
         if not callable(fn):
             raise R.SecurityError(f"공개 조회 도구가 없습니다: {name}")
         server.tool(name=name, annotations=annotations)(wire_result(public_function(fn)))
+    registry = Registry(server)
+    IB.register(registry)
+    IO.register(registry)
+    IW.register(registry)
     # Status reports the actually exposed schemas, not the legacy registry.
     backend.mcp, backend.PROFILE = server, "public"
     return server

@@ -1,6 +1,6 @@
 {
   "generation_method": "AST_SOURCE_NOT_RUNTIME_SDK",
-  "version": "2.5.2-public.2",
+  "version": "4.0.0-public.1",
   "note": "SDK가 반환하는 JSON Schema의 실제 형식은 export_runtime_schemas.py 및 CI로 별도 확인.",
   "profiles": {
     "core": [
@@ -97,9 +97,216 @@
       "seogu_council_read",
       "seogu_council_recent",
       "seogu_council_search"
+    ],
+    "public": [
+      "budget_api_catalog",
+      "budget_api_status",
+      "budget_calculate",
+      "budget_calculation_schema",
+      "budget_checklist",
+      "budget_fetch_api",
+      "budget_review_project",
+      "budget_search_similar_projects",
+      "council_context_pack",
+      "council_data_sources",
+      "council_department_brief",
+      "council_department_session_brief",
+      "council_evidence_bundle",
+      "council_evidence_search",
+      "council_finance_context",
+      "council_find_council",
+      "council_get_evidence",
+      "council_legislation_context",
+      "council_open_record",
+      "council_peer_cases",
+      "council_period_review",
+      "council_prepare_pack",
+      "council_read_source",
+      "council_recurring_issues",
+      "council_search_minutes",
+      "council_session_ready_pack",
+      "council_status",
+      "fetch",
+      "local_evidence_review",
+      "local_workflow_plan",
+      "ordinance_compare",
+      "ordinance_diff_versions",
+      "ordinance_draft_amendment",
+      "ordinance_get_document",
+      "ordinance_guide",
+      "ordinance_linked",
+      "ordinance_review_project",
+      "ordinance_search",
+      "ordinance_verify_references",
+      "search"
     ]
   },
   "tools": [
+    {
+      "name": "budget_api_catalog",
+      "parameters": {
+        "query": {
+          "annotation": "str",
+          "default": ""
+        }
+      },
+      "required": [],
+      "description": "공식 재정·조달·통계 API의 ID, 필수 변수, 단위·출처를 조회. 외부 조회 전 필요 API만 검색."
+    },
+    {
+      "name": "budget_api_status",
+      "parameters": {},
+      "required": [],
+      "description": "예산 API 키 설정 여부와 실제 응답 확인 상태. 키 존재는 연결 성공을 뜻하지 않음."
+    },
+    {
+      "name": "budget_calculate",
+      "parameters": {
+        "operation": {
+          "annotation": "Operation"
+        },
+        "arguments": {
+          "annotation": "dict[str, Any]"
+        }
+      },
+      "required": [
+        "operation",
+        "arguments"
+      ],
+      "description": "산출·결산·증감·재원분담·다년도비용·단가비교·물가환산·집행계획 검산. schema로 입력 확인; 공란≠0."
+    },
+    {
+      "name": "budget_calculation_schema",
+      "parameters": {
+        "operation": {
+          "annotation": "Operation"
+        }
+      },
+      "required": [
+        "operation"
+      ],
+      "description": "선택한 예산 계산의 정확한 입력항목 확인. 금액은 숫자 문자열, 단위·산출근거를 명시."
+    },
+    {
+      "name": "budget_checklist",
+      "parameters": {
+        "topic": {
+          "annotation": "str"
+        },
+        "year": {
+          "annotation": "int"
+        }
+      },
+      "required": [
+        "topic",
+        "year"
+      ],
+      "description": "예산 사전절차 확인질문. topic=일반/보조금/시설/위탁/인건비/행사/기금. 법률상 의무 확정 아님."
+    },
+    {
+      "name": "budget_fetch_api",
+      "parameters": {
+        "api_id": {
+          "annotation": "str"
+        },
+        "params": {
+          "annotation": "dict[str, Any]"
+        },
+        "page": {
+          "annotation": "int",
+          "default": 1
+        },
+        "page_size": {
+          "annotation": "int",
+          "default": 20
+        }
+      },
+      "required": [
+        "api_id",
+        "params"
+      ],
+      "description": "카탈로그의 공식 API 한 페이지 조회. ERROR/EMPTY/PAGE_ONLY 구분; 연도·단위·조회범위 보존."
+    },
+    {
+      "name": "budget_left",
+      "parameters": {
+        "self": {
+          "annotation": "Any"
+        }
+      },
+      "required": [
+        "self"
+      ],
+      "description": ""
+    },
+    {
+      "name": "budget_review_project",
+      "parameters": {
+        "title": {
+          "annotation": "str"
+        },
+        "year": {
+          "annotation": "int"
+        },
+        "components": {
+          "annotation": "list[dict[str, Any]]"
+        },
+        "topic": {
+          "annotation": "str",
+          "default": "일반"
+        },
+        "unit": {
+          "annotation": "str",
+          "default": "원"
+        },
+        "context": {
+          "annotation": "dict[str, Any] | None",
+          "default": null
+        }
+      },
+      "required": [
+        "title",
+        "year",
+        "components"
+      ],
+      "description": "신규사업 산출안 검산. components: name,basis,unit_price,quantity[,count,periods]. 규칙 기반 검토이며 승인 아님."
+    },
+    {
+      "name": "budget_search_similar_projects",
+      "parameters": {
+        "query": {
+          "annotation": "str"
+        },
+        "fiscal_year": {
+          "annotation": "int"
+        },
+        "execution_date": {
+          "annotation": "str"
+        },
+        "local_gov_code": {
+          "annotation": "str",
+          "default": ""
+        },
+        "region_code": {
+          "annotation": "str",
+          "default": ""
+        },
+        "page": {
+          "annotation": "int",
+          "default": 1
+        },
+        "page_size": {
+          "annotation": "int",
+          "default": 20
+        }
+      },
+      "required": [
+        "query",
+        "fiscal_year",
+        "execution_date"
+      ],
+      "description": "지방재정365 사업명 후보 조회. 회계연도와 집행기준일 YYYYMMDD 필수. 명칭 일치만으로 동일사업 확정 금지."
+    },
     {
       "name": "council_analyze_text",
       "parameters": {
@@ -397,7 +604,7 @@
       "required": [
         "keyword"
       ],
-      "description": "근거 중심 통합검색. source=auto|clik|site. 네 검색모드에 동일한 발언 규칙 적용.\nmax_docs=출처·검색어별 최대 상세 건수(1~15); search_terms=사용자가 승인한 추가 검색어 최대2개.\nsnapshot_id+item_offset으로 동일 결과를 재조회 없이 이어보기. 원래 검색조건도 그대로 전달.\ncoverage.next_offset/source_offset, next_page/site_start_page로 미조회 목록을 계속 검색.\n검색 결과의 PARTIAL·오류·미확인 범위를 최종 답변에 반드시 포함한다."
+      "description": "근거 중심 CLIK 검색. source=auto|clik이며 auto도 CLIK만 사용한다.\n서구의회 홈페이지 직접 자동수집은 안정성을 위해 제거했다.\nmax_docs=검색어별 최대 상세 건수(1~15); search_terms=사용자가 승인한 추가 검색어 최대2개.\nsnapshot_id+item_offset으로 동일 결과를 재조회 없이 이어보기.\nsource_offset으로 CLIK 목록 이어검색. site_start_page는 기존 호출 호환용으로 남아 있지만 사용하지 않는다.\n검색 결과의 PARTIAL·오류·미확인 범위를 최종 답변에 반드시 포함한다."
     },
     {
       "name": "council_evidence_search",
@@ -984,7 +1191,7 @@
       "required": [
         "ref"
       ],
-      "description": "CLIK docid, site:key 또는 서구의회 공식 URL에서 원문 발언을 끝까지 이어읽기.\nnext_start_turn/next_start_char를 그대로 전달한다. body_hash가 바뀌면 원문이 갱신된 것이다."
+      "description": "CLIK docid로 원문 발언을 끝까지 이어읽기.\n서구의회 홈페이지 URL/site:key 직접 조회는 안정성을 위해 제거했다.\nnext_start_turn/next_start_char를 그대로 전달한다. body_hash가 바뀌면 원문이 갱신된 것이다."
     },
     {
       "name": "council_recurring_issues",
@@ -1295,6 +1502,240 @@
         "keyword"
       ],
       "description": "현안(주제어)이 의회에서 언제·어떤 회의에서 다뤄졌는지 연도별 흐름을 보여줍니다.\n집계 단위는 의회·연도·회의유형뿐이며 의원 개인 단위 집계는 하지 않습니다.\nArgs:\n  keyword: 현안 주제어(예: '복합쇼핑몰', '생활인구')\n  councils: 의회명 목록(비우면 전국). 의회당 API 약 1~3회\n  date_from: 시작일(선택, 기본 최근 4년)\n  include_bills: 관련 의안(조례안·건의안 등)도 함께 볼지\n  date_to: 종료일(선택)"
+    },
+    {
+      "name": "local_evidence_review",
+      "parameters": {
+        "evidence": {
+          "annotation": "list[EvidenceItem]"
+        },
+        "jurisdiction": {
+          "annotation": "str",
+          "default": ""
+        },
+        "fiscal_year": {
+          "annotation": "int | None",
+          "default": null
+        },
+        "required_domains": {
+          "annotation": "list[Domain] | None",
+          "default": null
+        }
+      },
+      "required": [
+        "evidence"
+      ],
+      "description": "조회 후 제공된 근거의 출처·범위·상태 누락 점검. 원문을 조회하거나 사실·적법성을 인증하지 않습니다."
+    },
+    {
+      "name": "local_workflow_plan",
+      "parameters": {
+        "question": {
+          "annotation": "str"
+        },
+        "jurisdiction": {
+          "annotation": "str",
+          "default": ""
+        },
+        "fiscal_year": {
+          "annotation": "int | None",
+          "default": null
+        },
+        "as_of": {
+          "annotation": "str",
+          "default": ""
+        },
+        "domains": {
+          "annotation": "list[Domain] | None",
+          "default": null
+        }
+      },
+      "required": [
+        "question"
+      ],
+      "description": "복합 의회·예산·조례 질문의 실행 계획. API를 조회하지 않으며 실제 근거를 생성하지 않습니다.\ndomains로 필요한 분야를 직접 지정할 수 있습니다. 지역/연도 미지정은 추정하지 않습니다."
+    },
+    {
+      "name": "ordinance_compare",
+      "parameters": {
+        "baseline": {
+          "annotation": "DocumentRef"
+        },
+        "comparisons": {
+          "annotation": "list[DocumentRef]"
+        },
+        "as_of": {
+          "annotation": "str",
+          "default": ""
+        }
+      },
+      "required": [
+        "baseline",
+        "comparisons"
+      ],
+      "description": ""
+    },
+    {
+      "name": "ordinance_diff_versions",
+      "parameters": {
+        "old": {
+          "annotation": "DocumentRef"
+        },
+        "new": {
+          "annotation": "DocumentRef"
+        }
+      },
+      "required": [
+        "old",
+        "new"
+      ],
+      "description": ""
+    },
+    {
+      "name": "ordinance_draft_amendment",
+      "parameters": {
+        "baseline": {
+          "annotation": "DocumentRef"
+        },
+        "operations": {
+          "annotation": "list[ChangeOperation]"
+        },
+        "expected_hash": {
+          "annotation": "str"
+        },
+        "supporting_sources": {
+          "annotation": "list[DocumentRef] | None",
+          "default": null
+        }
+      },
+      "required": [
+        "baseline",
+        "operations",
+        "expected_hash"
+      ],
+      "description": ""
+    },
+    {
+      "name": "ordinance_get_document",
+      "parameters": {
+        "reference": {
+          "annotation": "DocumentRef"
+        },
+        "keyword": {
+          "annotation": "str",
+          "default": ""
+        },
+        "offset": {
+          "annotation": "int",
+          "default": 0
+        },
+        "limit": {
+          "annotation": "int",
+          "default": 8
+        }
+      },
+      "required": [
+        "reference"
+      ],
+      "description": ""
+    },
+    {
+      "name": "ordinance_guide",
+      "parameters": {},
+      "required": [],
+      "description": ""
+    },
+    {
+      "name": "ordinance_linked",
+      "parameters": {
+        "law_id": {
+          "annotation": "str"
+        },
+        "article": {
+          "annotation": "str",
+          "default": ""
+        },
+        "max_pages": {
+          "annotation": "int",
+          "default": 1
+        }
+      },
+      "required": [
+        "law_id"
+      ],
+      "description": ""
+    },
+    {
+      "name": "ordinance_review_project",
+      "parameters": {
+        "params": {
+          "annotation": "ReviewInput"
+        }
+      },
+      "required": [
+        "params"
+      ],
+      "description": ""
+    },
+    {
+      "name": "ordinance_search",
+      "parameters": {
+        "query": {
+          "annotation": "str"
+        },
+        "kind": {
+          "annotation": "Literal['ordinance', 'law']",
+          "default": "ordinance"
+        },
+        "jurisdiction": {
+          "annotation": "str",
+          "default": ""
+        },
+        "body": {
+          "annotation": "bool",
+          "default": false
+        },
+        "page": {
+          "annotation": "int",
+          "default": 1
+        },
+        "max_pages": {
+          "annotation": "int",
+          "default": 1
+        },
+        "limit": {
+          "annotation": "int",
+          "default": 10
+        },
+        "offset": {
+          "annotation": "int",
+          "default": 0
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "description": ""
+    },
+    {
+      "name": "ordinance_verify_references",
+      "parameters": {
+        "text": {
+          "annotation": "str"
+        },
+        "parents": {
+          "annotation": "list[DocumentRef]"
+        },
+        "as_of": {
+          "annotation": "str",
+          "default": ""
+        }
+      },
+      "required": [
+        "text",
+        "parents"
+      ],
+      "description": ""
     },
     {
       "name": "seogu_council_read",

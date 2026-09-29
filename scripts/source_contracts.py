@@ -9,10 +9,11 @@ sys.path.insert(0,str(ROOT))
 
 def build(root=ROOT):
     funcs={}; names={}
-    for filename in ('uijeong_mcp.py','service_v2.py','workbench_tools.py','response_tools.py'):
+    for filename in ('uijeong_mcp.py','service_v2.py','workbench_tools.py','response_tools.py',
+                     'integrated_budget.py','integrated_ordinance.py','integrated_workflow.py'):
         tree=ast.parse((root/filename).read_text())
         for node in ast.walk(tree):
-            if isinstance(node,(ast.FunctionDef,ast.AsyncFunctionDef)) and node.name.startswith(('council_','seogu_council_')):
+            if isinstance(node,(ast.FunctionDef,ast.AsyncFunctionDef)) and node.name.startswith(('council_','seogu_council_','budget_','ordinance_','local_')):
                 funcs[node.name]=node
         if filename=='uijeong_mcp.py':
             for node in tree.body:
@@ -34,9 +35,10 @@ def build(root=ROOT):
                 except (ValueError,TypeError):props[arg.arg]['default_expression']=ast.unparse(default)
         definitions.append({'name':name,'parameters':props,'required':required,
                             'description':ast.get_docstring(node) or ''})
+    from public_server import PUBLIC_TOOLS
     return {'generation_method':'AST_SOURCE_NOT_RUNTIME_SDK','version':__import__('release_info').VERSION,
        'note':'SDK가 반환하는 JSON Schema의 실제 형식은 export_runtime_schemas.py 및 CI로 별도 확인.',
-       'profiles':{k:sorted(v) for k,v in {'core':core,'work':work,'lite':lite,'full':set(funcs)}.items()},
+       'profiles':{k:sorted(v) for k,v in {'core':core,'work':work,'lite':lite,'full':{n for n in funcs if n.startswith(('council_','seogu_council_'))},'public':set(PUBLIC_TOOLS)}.items()},
        'tools':definitions}
 if __name__=='__main__':
     target=ROOT/'docs/source-tool-contracts.json'
