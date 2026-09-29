@@ -115,6 +115,9 @@ def public_function(fn: Any) -> Any:
             if isinstance(value, int) and value > cap:
                 return {"status": "INVALID_INPUT", "code": "PUBLIC_QUERY_LIMIT",
                         "message": f"공개 서버에서는 {name}을(를) {cap} 이하로 지정하세요."}
+        # A local status probe must still respond while heavy searches are occupied.
+        if fn.__name__ == "council_status" and bound.arguments.get("live", False) is False:
+            return _scrub(await asyncio.wait_for(V.run_public(fn, args, kwargs), timeout=5))
         sem = _tool_semaphore()
         try:
             await asyncio.wait_for(sem.acquire(), timeout=20)
@@ -137,6 +140,30 @@ def public_function(fn: Any) -> Any:
     return wrapped
 
 
+def standard_function(fn: Any) -> Any:
+    """Apply the shared query gate without losing search/fetch output models."""
+    @functools.wraps(fn)
+    async def wrapped(*args: Any, **kwargs: Any) -> Any:
+        sem = _tool_semaphore()
+        try:
+            await asyncio.wait_for(sem.acquire(), timeout=5)
+        except asyncio.TimeoutError:
+            raise RuntimeError("PUBLIC_BUSY: 조회가 혼잡합니다. 잠시 후 다시 조회하세요.") from None
+        try:
+            return await asyncio.wait_for(fn(*args, **kwargs), timeout=TOOL_TIMEOUT_SECONDS)
+        except asyncio.TimeoutError:
+            raise RuntimeError("PUBLIC_QUERY_TIMEOUT: 조회 범위를 줄여 다시 요청하세요.") from None
+        finally:
+            sem.release()
+    annotations = inspect.get_annotations(fn, eval_str=True)
+    wrapped.__annotations__ = annotations
+    wrapped.__signature__ = inspect.signature(fn).replace(
+        parameters=[param.replace(annotation=annotations.get(param.name, param.annotation))
+                    for param in inspect.signature(fn).parameters.values()],
+        return_annotation=annotations.get("return", inspect.Signature.empty))
+    return wrapped
+
+
 def build_server(backend: Any = None) -> Any:
     from mcp.server.fastmcp import FastMCP
     from mcp.types import ToolAnnotations
@@ -156,7 +183,7 @@ def build_server(backend: Any = None) -> Any:
     standard = O.build_tools(backend)
     for name in O.STANDARD_TOOL_NAMES:
         fn = standard[name]
-        server.tool(name=name, annotations=annotations)(fn)
+        server.tool(name=name, annotations=annotations)(standard_function(fn))
 
     # Preserve the richer employee workflow tools without changing their contracts.
     for name in PUBLIC_TOOLS:

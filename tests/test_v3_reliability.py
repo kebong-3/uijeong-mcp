@@ -92,7 +92,7 @@ def test_40_identical_simultaneous_calls_share_one_execution():
         assert len(calls)==1
         assert len({r['mcp_receipt']['request_id'] for r in results})==40
         assert sum(r['mcp_receipt']['result_reuse']=='coalesced' for r in results)==39
-        assert all(r['mcp_receipt']['server_version']=='3.0.1-public.1' for r in results)
+        assert all(r['mcp_receipt']['server_version']==V.VERSION for r in results)
         cached=await V.run_public(lookup,(),{'query':'same'})
         assert cached['mcp_receipt']['result_reuse']=='short_cache'
         results[0]['items'].clear()

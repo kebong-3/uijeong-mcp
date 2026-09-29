@@ -549,18 +549,6 @@ class HTTPGuard:
             if token and not hmac.compare_digest(auth.encode(), ("Bearer " + token).encode()):
                 await self._reject(send,401,'MCP Bearer 인증 필요; CLIK_API_KEY와 다른 인증입니다.');return
             identity = key_scope(token,"http") if token else "local"
-        now = time.monotonic()
-        for existing,q in list(self.requests.items()):
-            if not q or q[-1]<=now-60:self.requests.pop(existing,None)
-        if identity not in self.requests and len(self.requests)>=1000:
-            await self._reject(send,429,'동시 인증 주체 한도 초과');return
-        queue = self.requests.setdefault(identity, collections.deque())
-        while queue and queue[0] <= now - 60:
-            queue.popleft()
-        if len(queue) >= self.requests_per_minute:
-            await self._reject(send, 429, "분당 요청 한도 초과")
-            return
-        queue.append(now)
         try:
             declared = int(headers.get("content-length", ["0"])[0])
         except ValueError:
@@ -585,6 +573,37 @@ class HTTPGuard:
             events.append(event)
             if not event.get("more_body", False):
                 break
+        if self.policy.get("auth_mode") == "public":
+            control = False
+            if path.rstrip("/") == "/mcp" and method == "POST":
+                try:
+                    message = json.loads(b"".join(e.get("body", b"") for e in events))
+                    if isinstance(message, dict):
+                        rpc_method = message.get("method")
+                        control = rpc_method in ("initialize", "ping", "tools/list", "resources/list",
+                                                 "resources/templates/list", "prompts/list",
+                                                 "notifications/initialized", "notifications/cancelled")
+                        params = message.get("params")
+                        if rpc_method == "tools/call" and isinstance(params, dict):
+                            arguments = params.get("arguments", {})
+                            control = (params.get("name") == "council_status" and
+                                       isinstance(arguments, dict) and arguments.get("live", False) is False)
+                except (ValueError, TypeError, UnicodeError):
+                    pass  # SDK returns the protocol error; never elevate malformed bodies.
+            scope = dict(scope, uijeong_control_request=control)
+            identity = identity + (":control" if control else ":query")
+        now = time.monotonic()
+        for existing,q in list(self.requests.items()):
+            if not q or q[-1]<=now-60:self.requests.pop(existing,None)
+        if identity not in self.requests and len(self.requests)>=1000:
+            await self._reject(send,429,'동시 인증 주체 한도 초과');return
+        queue = self.requests.setdefault(identity, collections.deque())
+        while queue and queue[0] <= now - 60:
+            queue.popleft()
+        if len(queue) >= self.requests_per_minute:
+            await self._reject(send, 429, "분당 요청 한도 초과")
+            return
+        queue.append(now)
         index = 0
         async def replay() -> Any:
             nonlocal index
@@ -672,6 +691,8 @@ class PublicBoundary:
         self.app, self.max_concurrent, self.active = app, max_concurrent, 0
         self.max_waiting, self.queue_timeout, self.waiting = max_waiting, queue_timeout, 0
         self._slots = asyncio.Semaphore(max_concurrent)
+        self._control_slots = asyncio.Semaphore(8)
+        self.control_waiting = 0
 
     async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
         if scope["type"] != "http":
@@ -683,6 +704,25 @@ class PublicBoundary:
         if scope.get("method") not in ("POST","GET","DELETE"):
             await _public_reply(send, 405, {"authentication": "none", "public_readonly": True,
                 "message": "MCP Streamable HTTP는 POST/GET/DELETE를 지원합니다. 서버 상태 확인 주소는 /healthz입니다."})
+            return
+        if scope.get("uijeong_control_request"):
+            if self.control_waiting >= 16:
+                await _public_reply(send, 503, {"error": "PUBLIC_CONTROL_BUSY"})
+                return
+            self.control_waiting += 1
+            try:
+                await asyncio.wait_for(self._control_slots.acquire(), timeout=2)
+            except asyncio.TimeoutError:
+                await _public_reply(send, 503, {"error": "PUBLIC_CONTROL_BUSY"})
+                return
+            finally:
+                self.control_waiting -= 1
+            context_token = REQUEST_SCOPE.set("public-readonly-v1")
+            try:
+                await self.app(scope, receive, send)
+            finally:
+                REQUEST_SCOPE.reset(context_token)
+                self._control_slots.release()
             return
         if self.waiting >= self.max_waiting and self._slots.locked():
             await _public_reply(send, 503, {"error": "PUBLIC_BUSY", "message": "동시 조회 중입니다. 잠시 후 다시 시도하세요."})

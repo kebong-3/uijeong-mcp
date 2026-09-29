@@ -4,7 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 
-VERSION = "3.0.1-public.1"
+VERSION = "3.0.2-public.1"
 CAPABILITIES = ["one_call_response_preparation", "exact_source_claim_audit",
                 "dimension_checked_metric_comparison", "side_by_side_evidence_comparison",
                 "date_bounded_department_aliases", "recurring_topic_cues_not_verdicts",
