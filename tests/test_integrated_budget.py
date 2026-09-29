@@ -39,3 +39,26 @@ def test_mcp_registered_tool_call():
         content = await mcp.call_tool('budget_calculate', {'operation':'change','arguments':{'before':'100','after':'150'}})
         assert '50' in str(content)
     asyncio.run(run())
+
+
+def test_procurement_unknown_envelope_diagnostic_is_safe(monkeypatch):
+    from budget_mcp.api import Gateway
+    monkeypatch.setenv('DATA_GO_KR_SERVICE_KEY', 'PRIVATE_TEST_KEY_1234')
+    payload = {'error': {'code': '20', 'message': 'PRIVATE_TEST_KEY_1234',
+                          'PRIVATE_TEST_KEY_1234': 'echo'}, 'PRIVATE_TEST_KEY_1234': 'echo'}
+    gateway = Gateway(fetch=lambda url,params:json.dumps(payload).encode())
+    result = gateway.fetch_api('contracts_servc', {'inqryDiv':'1'})
+    assert result['status'] == 'ERROR'
+    assert result['coverage'] == 'REQUEST_FAILED'
+    assert result['provider_diagnostic']['provider_codes'] == [{'path':'$.error.code', 'code':'20'}]
+    assert 'PRIVATE_TEST_KEY_1234' not in json.dumps(result)
+
+
+def test_procurement_diagnostics_do_not_accept_alternate_success():
+    import pytest
+    from budget_mcp.api import parse_procurement, ProcurementResponseError
+    for payload in ({'header': {'rsltCd':'00'}}, {'response': []}, {'response':{'header':[]}}, []):
+        with pytest.raises(ProcurementResponseError):
+            parse_procurement(payload)
+    assert parse_procurement({'response': {'header': {'resultCode': '00'},
+                              'body': {'totalCount':0, 'items':[]}}}) == ([],0)

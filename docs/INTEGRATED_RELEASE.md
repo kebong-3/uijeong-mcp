@@ -35,4 +35,4 @@
 기존 main 기준: `10ffde8bed3cea34642c2d842828b62b4ceedd7e`.
 유료 인스턴스와 기존 MCP 주소를 유지한다. 원본 예산·조례 저장소 및 서비스는 수정하거나 삭제하지 않는다. 필요 시 이전 의회 버전 커밋으로 되돌릴 수 있으나, 이전 render.yaml의 무료 plan을 그대로 재적용하지 않도록 주의한다.
 
-API 키는 Render 내부 참조로 가져오며 소스나 문서에 기록하지 않는다. 코드 변경 뒤 `python scripts/build_manifest.py`를 실행하고 런타임 해시를 배포 서버와 대조한다.
+API 키는 Render 내부 참조로 복사하고 설정 확인 후 `sync: false`로 전환해 유지한다. 소스나 문서에 비밀값을 기록하지 않는다. 코드 변경 뒤 `python scripts/build_manifest.py`를 실행하고 런타임 해시를 배포 서버와 대조한다.

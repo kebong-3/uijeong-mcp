@@ -76,10 +76,53 @@ def parse_lofin(payload):
     return rows,totals[0] if totals else 0
 
 
+class ProcurementResponseError(BudgetError):
+    def __init__(self, message, diagnostic):
+        super().__init__(message)
+        self.diagnostic = diagnostic
+
+
+def procurement_diagnostic(payload):
+    """Only predefined envelope names and short numeric codes, never raw text.
+
+    Unknown property names could themselves contain credentials, so they are
+    counted rather than echoed. Alternate envelopes remain failures until their
+    success contract has been verified against official specifications.
+    """
+    containers = {'response', 'header', 'body', 'error', 'result',
+                  'OpenAPI_ServiceResponse', 'cmmMsgHeader'}
+    code_fields = {'resultCode', 'rsltCd', 'returnReasonCode', 'code',
+                   'returnCode', 'errCd', 'statusCode', 'status'}
+    known = containers | code_fields | {'resultMsg', 'rsltMsg', 'returnAuthMsg',
+             'errMsg', 'message', 'name', 'reason', 'detail', 'totalCount', 'items', 'item', 'pageNo', 'numOfRows'}
+    shapes, codes = [], []
+    def walk(node, path='$', depth=0):
+        if not isinstance(node, dict) or depth > 4:
+            return
+        shapes.append({'path': path, 'known_keys': sorted(k for k in node if k in known),
+                       'other_key_count': sum(k not in known for k in node)})
+        for k in sorted(code_fields):
+            if k in node:
+                value = str(node[k])
+                codes.append({'path': path + '.' + k,
+                              'code': value if re.fullmatch(r'[0-9]{1,4}', value) else 'UNRECOGNIZED'})
+        for k in sorted(containers):
+            if k in node:
+                walk(node[k], path + '.' + k, depth + 1)
+    walk(payload)
+    return {'envelopes': shapes, 'provider_codes': codes,
+            'payload_type': type(payload).__name__, 'raw_values_disclosed': False}
+
+
 def parse_procurement(payload):
     response=payload.get('response',payload) if isinstance(payload,dict) else {}
-    header=response.get('header',{});code=str(header.get('resultCode',''))
-    if code not in ('00','0','0000'):raise BudgetError('조달 API 인증/요청 오류: '+(code if re.fullmatch(r'[0-9A-Z_-]{1,30}',code) else 'UNKNOWN'))
+    if not isinstance(response,dict):response={}
+    header=response.get('header',{})
+    if not isinstance(header,dict):header={}
+    code=str(header.get('resultCode',''))
+    if code not in ('00','0','0000'):
+        safe_code=code if re.fullmatch(r'[0-9]{1,4}',code) else 'UNKNOWN'
+        raise ProcurementResponseError('조달 API 인증/요청 오류: '+safe_code, procurement_diagnostic(payload))
     body=response.get('body')
     if not isinstance(body,dict) or 'totalCount' not in body:raise BudgetError('조달 API 본문/총건수 구조 오류')
     total=int(body['totalCount'])
@@ -201,7 +244,8 @@ class Gateway(PublicClient):
             message=str(exc) if isinstance(exc,BudgetError) else '제공기관 응답 형식 오류'
             state={'status':'ERROR','authenticated_live_verified':False,'checked_at':datetime.now(timezone.utc).isoformat()}
             self.last_checks[api_id]=state
-            return {'status':'ERROR','api_id':api_id,'message':redact(message),'items':[],'authenticated_live_verified':False,
+            diagnostic={'provider_diagnostic':exc.diagnostic} if isinstance(exc,ProcurementResponseError) else {}
+            return {'status':'ERROR','api_id':api_id,**diagnostic,'message':redact(message),'items':[],'authenticated_live_verified':False,
                     'coverage':'REQUEST_FAILED','source_url':entry['application_url'],'note':'조회 실패이며 사업이 없다는 뜻이 아닙니다.'}
         delivered=rows[:(5 if sample else page_size)]
         next_page=page+1 if not sample and entry['provider']!='kosis' and page*page_size<total else None

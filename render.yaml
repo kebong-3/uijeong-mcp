@@ -10,25 +10,13 @@ services:
       - key: CLIK_API_KEY
         sync: false
       - key: LAW_OC
-        fromService:
-          type: web
-          name: jachi-mcp
-          envVarKey: LAW_OC
+        sync: false
       - key: LOFIN_API_KEY
-        fromService:
-          type: web
-          name: local-budget-mcp
-          envVarKey: LOFIN_API_KEY
+        sync: false
       - key: DATA_GO_KR_SERVICE_KEY
-        fromService:
-          type: web
-          name: local-budget-mcp
-          envVarKey: DATA_GO_KR_SERVICE_KEY
+        sync: false
       - key: KOSIS_API_KEY
-        fromService:
-          type: web
-          name: local-budget-mcp
-          envVarKey: KOSIS_API_KEY
+        sync: false
       - key: FINANCE365_SERVICE_KEY
         sync: false
       - key: FINANCE365_API_URL
@@ -64,7 +52,7 @@ services:
 # Explicit anonymous public queries. The CLIK API key remains server-side.
 # One transport hosts council, budget and ordinance tools directly. No proxy to sleeping services.
 # Existing bearer/oauth/local paths remain available in the protected launcher.
-# Preserve the user-selected paid instance. Existing source services provide env values at Blueprint sync only.
+# Preserve the user-selected paid instance. API values were copied by the first v4 Blueprint sync; now retained as independent service secrets.
 # A retained UIJEONG_BEARER_TOKEN is ignored only in explicit public mode.
 
 # LAW_OC: 국가법령정보 공동활용 API 인증값(OC)

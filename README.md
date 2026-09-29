@@ -29,7 +29,7 @@
 
 한 Python 프로세스에서 세 패키지를 직접 실행합니다. 다른 무료 Render 서버를 중계하지 않습니다. 서버에서 Gemini 등 별도 생성형 AI를 호출하지 않으며, 호스트 AI가 실제 조회 근거와 계산 결과로 답변합니다. 큰 결과는 나누어 조회하고, 오류·시간초과·일부 결과를 구분합니다. 서구의회 홈페이지 직접 검색은 비활성입니다.
 
-`render.yaml`은 사용자가 선택한 `0.5c-512mb` 인스턴스를 유지합니다. 기존 API 값을 Render 내부 `fromService`로 복사합니다. `LAW_OC`는 `jachi-mcp`, `LOFIN_API_KEY`·`DATA_GO_KR_SERVICE_KEY`·`KOSIS_API_KEY`는 `local-budget-mcp`에서 가져옵니다. CLIK와 기존 의회 환경변수는 유지합니다. 참조 서비스는 Blueprint 동기화에 필요하지만 실제 자료 조회 경로에는 없습니다. 참조 서비스를 삭제하기 전 환경변수를 독립 값 또는 공통 환경그룹으로 이전해야 합니다.
+`render.yaml`은 사용자가 선택한 `0.5c-512mb` 인스턴스를 유지합니다. 기존 API 값은 Render 내부 참조를 통해 한 차례 복사하고 운영 서버에서 설정을 확인한 뒤 `sync: false`로 유지합니다. `LAW_OC`는 조례 서버, `LOFIN_API_KEY`·`DATA_GO_KR_SERVICE_KEY`·`KOSIS_API_KEY`는 예산 서버의 기존 값을 사용합니다. CLIK와 기존 의회 환경변수도 유지합니다. 비밀값은 GitHub·대화에 노출하지 않았습니다. 기존 예산·조례 서비스는 복구용으로 남겨두었으며 통합 서버는 이들 서버를 호출하지 않습니다.
 
 ## API와 검증 범위
 
