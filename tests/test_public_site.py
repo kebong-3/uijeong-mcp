@@ -19,7 +19,7 @@ def test_public_pages_are_html_and_named():
         assert content_type.startswith(b"text/html")
         text = body.decode("utf-8")
         assert "지방의회MCP" in text
-        assert "전남광주통합특별시 서구청 펀온워크 케빈정" in text
+        assert "전남광주통합특별시 서구청 펀온워크 AI혁신분과 에이블(AIBLE)" in text
 
 
 def test_challenge_returns_exact_token(monkeypatch):
