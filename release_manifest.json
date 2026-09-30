@@ -76,11 +76,11 @@
     "sources.py": "4a884dac90906dbbf501fd4fb9eb25b2fb2d85894058fe766c4e2dc3d4513dbf",
     "term_core.py": "264b166a085be6cadd0ef62cf69f836e58130f6295c5982f38076f564b96ae0c",
     "uijeong_mcp.py": "37a78e8c507036714ad6ea0f1271fbf64304184b1353c7a7124151f5bfd5d935",
-    "v3_reliability.py": "5164a1107e829d96b8207dfc2253b7d8eb6fd24da7c6f020a571be91b7b243ff",
+    "v3_reliability.py": "16689bde7f631c52e4b5d9e6c30f07a48ba4078ce7bec13f61444c1f01ca3f14",
     "workbench_tools.py": "4c542a2eba57571993ca4b8c0a9339c783f5920e3dd1000c3f9a144f552f4355",
     "workflow_core.py": "180b52f2b2dffb57d7d53625c1f19fe1f779c79a6a24d52c8977a03688c39be8"
   },
-  "runtime_fingerprint": "166018df5eafae0a5c0f6ab102d33a81206b68fa3847b9e00c7f259fc78f37bf",
+  "runtime_fingerprint": "5126fc494264e72798298d14ce924f560e40d1c21bbe15a60006856eb0433846",
   "profile_tool_counts": {
     "core": 5,
     "work": 18,
@@ -220,12 +220,12 @@
     "tests/test_workbench22.py": "5bb75c51139c6b882a4247ddd1d2b82a2d7d2fa12a4216254eb2893f6bf03ebd",
     "tests/test_workflows.py": "687cb7dc1119cbdd86534cb38514ead3882657a6459f8e8d5fda2550fcc2dc52",
     "uijeong_mcp.py": "37a78e8c507036714ad6ea0f1271fbf64304184b1353c7a7124151f5bfd5d935",
-    "v3_reliability.py": "5164a1107e829d96b8207dfc2253b7d8eb6fd24da7c6f020a571be91b7b243ff",
+    "v3_reliability.py": "16689bde7f631c52e4b5d9e6c30f07a48ba4078ce7bec13f61444c1f01ca3f14",
     "workbench_tools.py": "4c542a2eba57571993ca4b8c0a9339c783f5920e3dd1000c3f9a144f552f4355",
     "workflow_core.py": "180b52f2b2dffb57d7d53625c1f19fe1f779c79a6a24d52c8977a03688c39be8",
     "budget_evidence.py": "8ab939b8f08c7d449cbbffaa5c411aece3fd2455cb4c5156b9454b14a64fe1df",
     "evidence_links.py": "b5747db24398dc60df86b330e4e41a6e862bd5ba26ccad9b6c36834c89f58a43",
-    "tests/test_fiscal_evidence.py": "539f4ef1da6e86cb32c80981ca678a0c2c0e53cdeee5bc21ebb2b4c83f524e91",
+    "tests/test_fiscal_evidence.py": "62854d252be6ef2c534548f4b7cc29dbfde13566b77a2b172d5f4096134ff46b",
     "tests/test_evidence_link_output.py": "a44aaac14a69ff8ccc36853afb2fc475423b1689ac32fd940dab49408718fa98",
     "docs/FISCAL_EVIDENCE.md": "f97df5e735e7bc58161b32b3a804120bc3f0cd0636fdf3cd16e7faa0b3c8a7fd"
   },

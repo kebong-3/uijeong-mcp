@@ -136,3 +136,17 @@ def test_standalone_context_uses_same_snapshot_and_budget_rules(setup):
     result=asyncio.run(F.context("세큰대","광주 서구",2026,budget_stage="draft"))
     assert result["status"]=="PARTIAL"
     assert result["budget_basis"]["returned_stage"]=="current"
+
+@pytest.mark.parametrize("source,target",[
+    ("전남광주서구","전남광주통합특별시 서구의회"),
+    ("서울용산구","서울특별시 용산구의회"),
+    ("부산서구","부산광역시 서구의회"),
+    ("경기광주시","경기도 광주시의회"),
+    ("서울본청","서울특별시의회"),
+])
+def test_province_abbreviations_preserve_full_government_identity(source,target):
+    assert V.finance_belongs({"laf_hg_nm":source},target)
+
+@pytest.mark.parametrize("source",["서구","부산서구","대전서구","인천서구"])
+def test_ambiguous_and_other_seogu_never_match_gwangju(source):
+    assert not V.finance_belongs({"laf_hg_nm":source},"광주 서구")

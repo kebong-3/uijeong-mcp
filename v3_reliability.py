@@ -205,10 +205,30 @@ def number(value):
         return None
 
 
+def finance_jurisdiction(value):
+    """Expand published LOFIN province abbreviations, never bare district names."""
+    name = canonical_jurisdiction(value)
+    prefixes = (
+        ("전남광주", "전남광주통합특별시"), ("서울", "서울특별시"),
+        ("부산", "부산광역시"), ("대구", "대구광역시"), ("인천", "인천광역시"),
+        ("대전", "대전광역시"), ("울산", "울산광역시"), ("세종", "세종특별자치시"),
+        ("경기", "경기도"), ("강원", "강원특별자치도"), ("충북", "충청북도"),
+        ("충남", "충청남도"), ("전북", "전북특별자치도"), ("전남", "전라남도"),
+        ("경북", "경상북도"), ("경남", "경상남도"), ("제주", "제주특별자치도"),
+    )
+    full_names = tuple(full for _, full in prefixes) + ("광주광역시",)
+    if not name.startswith(full_names):
+        for short, full in prefixes:
+            if name.startswith(short):
+                name = full + name[len(short):]
+                break
+    return name[:-2] if name.endswith("본청") else name
+
+
 def finance_belongs(row, council):
     if not council:
         return True
-    return canonical_jurisdiction(row.get("laf_hg_nm", "")) == canonical_jurisdiction(council)
+    return finance_jurisdiction(row.get("laf_hg_nm", "")) == finance_jurisdiction(council)
 
 
 def result_code(payload):
