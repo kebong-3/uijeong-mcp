@@ -287,7 +287,7 @@ def _public_row(row: dict[str, Any]) -> dict[str, Any]:
     budget = _num(row.get("bdg_cash_amt"))
     spent = _num(row.get("ep_amt"))
     rate = None
-    if isinstance(budget, (int, float)) and budget:
+    if isinstance(budget, (int, float)) and budget > 0 and isinstance(spent, (int, float)):
         rate = round((float(spent or 0) / float(budget)) * 100, 1)
     return {
         "fiscal_year": str(row.get("fyr") or ""),
@@ -306,112 +306,16 @@ def _public_row(row: dict[str, Any]) -> dict[str, Any]:
         "district_fund": _num(row.get("sggep")),
         "other_fund": _num(row.get("etc_amt")),
         "expenditure": spent,
-        "appropriated_amount": _num(row.get("cpl_amt")),
+        "appropriated_amount": None,
+        "unverified_fields": {"cpl_amt": row.get("cpl_amt")},
         "execution_rate_percent": rate,
     }
 
 
 async def context(topic: str, council: str = "", fiscal_year: int | None = None,
-                  limit: int = 20, search_terms: list[str] | None = None) -> dict[str, Any]:
-    if not isinstance(topic, str) or not topic.strip() or len(topic) > 200:
-        return {"status": "INVALID_INPUT", "message": "topic은 1~200자 문자열이어야 합니다."}
-    if type(limit) is not int or not 1 <= limit <= 50:
-        return {"status": "INVALID_INPUT", "message": "limit은 1~50입니다."}
-    cfg = configuration()
-    if not cfg["configured"]:
-        return {
-            "status": "NOT_CONFIGURED",
-            "message": "지방재정365 OpenAPI 인증키가 아직 설정되지 않았습니다.",
-            "configuration": cfg,
-            "query": {"topic": topic, "council": council or None, "fiscal_year": fiscal_year},
-            "items": [],
-            "limitations": [
-                "재정 API가 미설정이어도 CLIK·법령·조례 검색은 정상 작동합니다.",
-                "지방재정365에서 OpenAPI 인증키를 발급받아 Render의 LOFIN_API_KEY에 입력하면 활성화됩니다.",
-            ],
-        }
-
-    year = fiscal_year or dt.date.today().year
-    terms = [topic.strip()]
-    for term in (search_terms or []):
-        if isinstance(term, str) and term.strip() and term.strip() not in terms and len(term.strip()) <= 100:
-            terms.append(term.strip())
-        if len(terms) >= 3:
-            break
-    try:
-        exe_ymd = _snapshot_date(int(year))
-        attempts = []
-        combined_rows = []
-        seen_rows = set()
-        total_upstream = 0
-        last_code = "INFO-200"
-        last_message = ""
-        for idx, term in enumerate(terms):
-            parsed = await _request({
-                "fyr": str(year),
-                "dbiz_nm": term,
-                "exe_ymd": exe_ymd,
-            })
-            last_code, last_message = parsed["result_code"], parsed["message"]
-            total_upstream += int(parsed.get("total_count") or 0)
-            matched_term = [row for row in parsed["rows"] if _belongs(row, council)] if council else parsed["rows"]
-            attempts.append({"term": term, "upstream_total": parsed["total_count"],
-                             "matched_local_government": len(matched_term),
-                             "response_code": parsed["result_code"]})
-            for row in matched_term:
-                key = (str(row.get("laf_cd") or ""), str(row.get("dbiz_cd") or ""),
-                       str(row.get("exe_ymd") or ""), str(row.get("acnt_dv_cd") or ""))
-                if key not in seen_rows:
-                    seen_rows.add(key)
-                    combined_rows.append(row)
-            if combined_rows:
-                break  # progressive widening: exact or first successful synonym only
-        parsed = {"rows": combined_rows, "total_count": total_upstream,
-                  "result_code": last_code, "message": last_message}
-    except (ValueError, FinanceContextError) as exc:
-        return {
-            "status": "ERROR" if not isinstance(exc, ValueError) else "INVALID_INPUT",
-            "message": str(exc),
-            "configuration": cfg,
-            "query": {"topic": topic, "council": council or None, "fiscal_year": year},
-            "items": [],
-            "limitations": ["API 오류를 해당 사업의 예산·집행이 없다는 뜻으로 해석하지 마세요."],
-        }
-
-    rows = parsed["rows"]
-    matched = rows
-    items = [_public_row(row) for row in matched[:limit]]
-    return {
-        "status": "COMPLETE" if items else "EMPTY",
-        "source": "행정안전부 지방재정365 세부사업별 세출현황",
-        "service_code": SERVICE_CODE,
-        "dataset_url": DATASET_URL,
-        "query": {
-            "topic": topic.strip(),
-            "council": council or None,
-            "fiscal_year": year,
-            "snapshot_date": exe_ymd,
-            "search_terms": terms,
-        },
-        "search_strategy": {
-            "exact_first": True,
-            "progressive_widening": len(attempts) > 1,
-            "attempts": attempts,
-            "rule": "정확 사업명 검색 후 미발견일 때만 보조어를 순차 검색하고, 첫 매칭에서 중단",
-        },
-        "upstream_total": parsed["total_count"],
-        "matched_local_government_count": len(matched),
-        "items": items,
-        "coverage": {
-            "response_code": parsed["result_code"],
-            "message": parsed["message"],
-            "p_size": 1000,
-            "local_government_filter": sorted(_council_aliases(council)) if council else [],
-        },
-        "limitations": [
-            "세부사업별 세출현황은 조회일 기준 일일자료입니다. 과거 회계연도는 12월 31일 스냅샷을 사용합니다.",
-            "사업명 검색과 자치단체명 필터 결과이므로 세부사업명이 다른 동일·유사 사업은 누락될 수 있습니다.",
-            "EMPTY는 이번 검색조건에서 미발견이라는 뜻이며 해당 사업 예산이 전혀 없다는 결론이 아닙니다.",
-            "예산현액·지출액 등 금액의 최종 행정답변은 예산서·추경서·결산서와 담당부서 자료를 함께 확인하세요.",
-        ],
-    }
+                  limit: int = 20, search_terms: list[str] | None = None,
+                  snapshot_date: str = "", budget_stage: str = "current") -> dict[str, Any]:
+    """Use the same date-aware implementation in standalone and public paths."""
+    from v3_reliability import finance_context
+    return await finance_context(topic, council, fiscal_year, limit, search_terms,
+                                 snapshot_date=snapshot_date, budget_stage=budget_stage)

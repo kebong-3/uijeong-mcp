@@ -10,6 +10,12 @@ INTEGRATED_INSTRUCTIONS = """
 복합 질문은 local_workflow_plan으로 필요한 분야만 정리한 뒤 실제 조회 도구를 실행하세요.
 계획·설정된 API 키·사용자 입력은 공식 조회 증거가 아닙니다. 조회하지 않았으면 조회했다고 말하지 마세요.
 지역을 광주 서구로 임의 가정하지 말고, 회계연도·본예산/추경/결산·금액 단위·조례 시행일을 맞추세요.
+사업 예산 질문은 council_finance_context로 자료 제공일·사업명 후보를 먼저 확인하세요.
+예산안 설명액, 의결된 본예산·추경액, 예산현액, 지출액, 확정 결산액을 바꿔 부르지 마세요.
+API current 금액은 original/draft/supplementary/settlement 단계의 확정 증거가 아닙니다.
+각 핵심 수치·발언·조문 뒤에 해당 source_links.markdown 또는 source_link.markdown을 붙이세요.
+원문 URL이 없으면 공식 검색/데이터셋 링크와 사업코드·회의일·문서ID를 표시하고 원문 미확인이라고 알리세요.
+링크만 있는 자료를 열람했다고 하지 말고, 시행일·예산 기준일·단위는 확인한 범위만 설명하세요.
 의회 발언은 정책 결정이나 법적 근거 그 자체가 아닙니다. 조례 근거와 예산 편성·집행 가능성을 각각 확인하세요.
 필요한 근거만 소량 조회하고 원문·후속 페이지는 필요한 때 읽으세요. 검색 0건, 조회 오류, 일부 확인을 구분하세요.
 local_evidence_review는 제공된 근거 메타데이터의 누락 점검이며 사실 또는 적법성 검증이 아닙니다.
@@ -69,8 +75,8 @@ def local_workflow_plan(question: str, jurisdiction: str = '', fiscal_year: int 
                           'arguments_template': {'keyword': '<질문의 핵심 사업명>', 'council': jurisdiction or '<확인 필요>', 'max_docs': 3, 'limit': 5},
                           'next': '필요한 발언만 council_read_source로 문맥 확인. 회의일·발언자·원문 주소 유지.'})
         elif domain == 'budget':
-            steps.append({'domain': domain, 'tool': 'budget_api_catalog', 'arguments_template': {'query': '<예산/집행 등 필요한 항목>'},
-                          'next': '카탈로그의 실제 API와 지역 코드·연도 파라미터로 budget_fetch_api. 산술은 budget_calculate; 인자 형식을 모를 때만 budget_calculation_schema 확인.',
+            steps.append({'domain': domain, 'tool': 'council_finance_context', 'arguments_template': {'topic': '<핵심 사업명>', 'council': jurisdiction or '<확인 필요>', 'fiscal_year': fiscal_year, 'budget_stage': '<current/original/supplementary/draft/settlement>'},
+                          'next': '자료 제공일·사업명 후보 확인 뒤 사업코드·회계·단위를 대조. 본예산/추경/예산안/결산은 해당 공식 문서로 확인. 추가 API가 필요할 때만 budget_api_catalog와 budget_fetch_api. 산술은 budget_calculate. 수치별 링크 표시.',
                           'scope': {'fiscal_year': fiscal_year, 'jurisdiction': jurisdiction, 'required': ['본예산/추경/결산 구분', '금액 단위', '집행 기준일(필요 시)']}})
         else:
             steps.append({'domain': domain, 'tool': 'ordinance_search',

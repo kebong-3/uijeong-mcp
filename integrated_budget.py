@@ -39,6 +39,13 @@ def invoke(name: str, arguments: dict[str, Any]) -> dict:
     try:
         validate_schema(arguments, spec['inputSchema'])
         result = redact(getattr(service(), spec['method'])(**arguments))
+        if result.get('api_id') == 'lofin_projects':
+            from budget_evidence import fiscal_basis
+            params = result.get('public_params', {})
+            result['budget_basis'] = fiscal_basis('current', str(params.get('exe_ymd', '')))
+            result['answer_guidance'] = ['예산현액·지출액을 본예산·예산안·확정 결산으로 표시하지 마세요.',
+                '일반 사업 검색은 council_finance_context로 날짜·사업명 변형을 보정하세요.',
+                '수치 뒤에 공식 자료 확인 링크와 실제 조회조건을 표시하세요.']
         if len(json.dumps(result, ensure_ascii=False, allow_nan=False).encode()) > MAX_OUTPUT_BYTES:
             return {'status': 'OUTPUT_LIMIT', 'message': '응답이 큽니다. 페이지 크기나 대상 수를 줄이세요.',
                     'note': '반환되지 않은 항목은 확인되지 않았습니다.'}

@@ -366,64 +366,13 @@ async def legal_context(query: str, jurisdiction: str = "", include_articles: bo
 
 
 async def finance_context(topic: str, council: str = "", fiscal_year: Optional[int] = None,
-                          limit: int = 20, search_terms: Optional[list[str]] = None) -> dict[str, Any]:
+                          limit: int = 20, search_terms: Optional[list[str]] = None,
+                          snapshot_date: str = "", budget_stage: str = "current") -> dict[str, Any]:
     import finance_context as F
-    if not isinstance(topic, str) or not topic.strip() or len(topic) > 200 or type(limit) is not int or not 1 <= limit <= 50:
-        return {"status": "INVALID_INPUT", "items": []}
-    year = today().year if fiscal_year is None else fiscal_year
-    if type(year) is not int or not 2016 <= year <= today().year:
-        return {"status": "INVALID_INPUT", "message": "회계연도는 2016년부터 현재연도 사이입니다.", "items": []}
-    cfg = F.configuration()
-    if not cfg["configured"]:
-        return {"status": "NOT_CONFIGURED", "configuration": cfg, "items": []}
-    if search_terms is not None and (not isinstance(search_terms,list) or any(not isinstance(t,str) or len(t)>100 for t in search_terms)):
-        return {"status":"INVALID_INPUT", "items":[]}
-    terms = [topic.strip()]
-    for term in search_terms or expansions(topic, "finance"):
-        if term.strip() and term.strip() not in terms:
-            terms.append(term.strip())
-        if len(terms) == 3:
-            break
-    date = today().strftime("%Y%m%d") if year == today().year else f"{year}1231"
-    attempts, found, errors, seen = [], [], [], set()
-    incomplete = False
-    for term in terms:
-        checked = await stage(F._request({"fyr": str(year), "dbiz_nm": term, "exe_ymd": date, "pSize":1000}), 16)
-        if checked.get("status") == "ERROR":
-            errors.append(checked)
-            break
-        rows = checked.get("rows", [])
-        total = int(checked.get("total_count") or 0)
-        incomplete |= total > len(rows)
-        local = [r for r in rows if finance_belongs(r, council) and str(r.get("fyr") or year) == str(year)]
-        attempts.append({"term": term, "upstream_total": total, "rows_received": len(rows), "matched_local_government":len(local), "response_code":checked.get("result_code")})
-        for row in local:
-            key = (str(row.get("laf_cd") or row.get("laf_hg_nm")), str(row.get("dbiz_cd") or row.get("dbiz_nm")), str(row.get("exe_ymd")), str(row.get("acnt_dv_nm")))
-            if key in seen:
-                continue
-            seen.add(key)
-            item = F._public_row(row)
-            item["match_status"] = "RELATED_PROJECT_CANDIDATE" if term != topic.strip() else "PROJECT_NAME_MATCH_CANDIDATE"
-            item["matched_query"] = term
-            item["same_project_verified"] = False
-            found.append(item)
-        if found:
-            break
-    if errors:
-        status = "PARTIAL" if found or attempts else "ERROR"
-    elif incomplete or len(found) > limit:
-        status = "PARTIAL"
-    else:
-        status = "COMPLETE" if found else "EMPTY"
-    result = {"status": status, "source": "행정안전부 지방재정365 세부사업별 세출현황", "service_code": F.SERVICE_CODE,
-              "dataset_url": F.DATASET_URL, "query": {"topic": topic, "council": council, "fiscal_year": year, "snapshot_date": date},
-              "items": found[:limit], "upstream_total": sum(x["upstream_total"] for x in attempts), "matched_local_government_count": len(found),
-              "search_strategy": {"exact_first": True, "progressive_widening": len(attempts) > 1, "attempts": attempts},
-              "coverage": {"limited": incomplete or len(found) > limit, "is_exhaustive": False, "scanned_pages_per_query":1, "has_unread_pages":incomplete},
-              "errors": errors, "configured": True,
-              "limitations": ["조회일 자료가 아직 제공되지 않거나 사업명이 다를 수 있습니다. 미발견을 예산 없음으로 단정하지 않습니다.", "서로 다른 지출일 자료를 합산하지 않습니다. 본예산·추경 의결액은 예산서와 별도로 대조하세요.", "관련 세부사업 후보는 동일 사업·동일 회계의 확정 근거가 아닙니다."]}
-    _LAST_CHECK["finance365"] = {"status": status, "items": len(found), "checked_at":dt.datetime.now(KST).isoformat()}
-    return result
+    import budget_evidence as B
+    import sys
+    return await B.context(topic, council, fiscal_year, limit, search_terms, snapshot_date,
+                           budget_stage, F, sys.modules[__name__])
 
 
 async def finance_ping() -> dict[str, Any]:

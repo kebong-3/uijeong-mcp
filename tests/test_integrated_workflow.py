@@ -49,5 +49,5 @@ def test_complete_composite_plan_and_interface_templates():
     plan = local_workflow_plan('의회 예산 조례 검토', '광주 서구', 2026, '2026-09-30')
     assert plan['status'] == 'PLAN_ONLY'
     assert plan['missing_context'] == []
-    assert [s['tool'] for s in plan['steps']] == ['council_evidence_bundle', 'budget_api_catalog', 'ordinance_search']
+    assert [s['tool'] for s in plan['steps']] == ['council_evidence_bundle', 'council_finance_context', 'ordinance_search']
     assert 'reference' in plan['steps'][2]['next']

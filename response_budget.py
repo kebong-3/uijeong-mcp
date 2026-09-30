@@ -190,6 +190,7 @@ def _trim_all_strings(node: Any, keep: int, log: list[dict], path: str = "") -> 
 
 
 _ESSENTIAL = ("status", "message", "snapshot_id", "keyword", "council", "topic", "source_link",
+              "source_links", "link_guidance", "budget_basis", "query", "date_resolution",
               "requested_council", "mode", "total_items", "next_item_offset", "ref",
               "source_url", "limitations", "reason", "recovery", "item_offset", "collection",
               "next_start_turn", "next_start_char", "offset", "next_offset",

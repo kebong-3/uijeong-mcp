@@ -13,7 +13,7 @@ from __future__ import annotations
 import asyncio
 import json
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Optional, Literal
 
 import finance_context as F
 import legal_context as L
@@ -202,13 +202,18 @@ def install(U: Any) -> None:
         council: str = "광주 서구",
         fiscal_year: Optional[int] = None,
         limit: int = 20,
+        snapshot_date: str = "",
+        budget_stage: Literal["current", "original", "supplementary", "draft", "settlement"] = "current",
     ) -> dict[str, Any]:
-        """지방재정365 세부사업별 세출현황에서 예산현액·재원구성·지출액·집행률을 조회합니다.
-        검색 미발견과 API 오류를 구분하며 최종 예산답변은 공식 예산서·추경서·결산서 확인이 필요합니다."""
+        """지방재정365 사업 예산·집행 조회. 최근 자료 제공일과 사업명 띄어쓰기·약칭을 보정합니다.
+        지역과 fiscal_year를 지정하세요. snapshot_date는 선택 기준일 YYYYMMDD/ YYYY-MM-DD.
+        budget_stage: current=예산현액, original=본예산, supplementary=추경, draft=예산안, settlement=결산.
+        API는 예산현액을 반환하므로 다른 단계는 공식 예산서 대조 전 미확인입니다.
+        실제 기준일·단위·사업코드를 확인하고 수치 뒤에 source_links의 확인 링크를 붙이세요."""
         cid,cname,error=U.pick_council(council)
         if error:
             return {"status":"INVALID_INPUT","message":error}
-        result=await F.context(topic,cname,fiscal_year,limit)
+        result=await F.context(topic,cname,fiscal_year,limit,snapshot_date=snapshot_date,budget_stage=budget_stage)
         result["council"]={"id":cid,"name":cname}
         result["execution_trace"]={"mcp_tool":"council_finance_context","source":"FINANCE365","used":True}
         return result

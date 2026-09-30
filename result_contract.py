@@ -21,6 +21,8 @@ def wire_result(fn):
         from mcp.types import CallToolResult, TextContent
         result = await fn(*args, **kwargs)
         if isinstance(result, dict):
+            from evidence_links import attach_source_links
+            result = attach_source_links(result, fn.__name__)
             bounded = B.apply_budget(result)
             code = bounded.get('status')
             raw = json.dumps(bounded, ensure_ascii=False)
