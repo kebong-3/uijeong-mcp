@@ -61,13 +61,14 @@ def test_finance_progressive_widening_stops_after_first_match(monkeypatch):
     calls = []
     monkeypatch.setenv("LOFIN_API_KEY", "dummy")
     async def fake_request(params):
-        calls.append(params["dbiz_nm"])
-        if params["dbiz_nm"] == "휴라운지":
+        if "dbiz_nm" in params:
+            calls.append(params["dbiz_nm"])
+        if params.get("dbiz_nm") == "휴라운지":
             return {"result_code":"INFO-200","message":"없음","total_count":0,"rows":[]}
         return {
             "result_code":"INFO-000","message":"정상","total_count":1,
             "rows":[{
-                "fyr":"2026","exe_ymd":"20260926","laf_hg_nm":"광주서구","laf_cd":"X",
+                "fyr":"2026","exe_ymd":params["exe_ymd"],"laf_hg_nm":"광주서구","laf_cd":"X",
                 "dbiz_cd":"B","dbiz_nm":"직원 후생복지","acnt_dv_nm":"일반회계",
                 "bdg_cash_amt":"1000000","ep_amt":"500000","cpl_amt":"1000000",
             }]

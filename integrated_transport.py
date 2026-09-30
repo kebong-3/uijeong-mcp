@@ -36,11 +36,16 @@ def wrap(fn):
                 else: result=await anyio.to_thread.run_sync(functools.partial(fn,*args,**kwargs),abandon_on_cancel=True)
             if not isinstance(result,dict): result={'result':result}
             result=scrub(result)
+            from evidence_links import attach_source_links
+            result=attach_source_links(result, fn.__name__)
             raw=json.dumps(result,ensure_ascii=False,allow_nan=False,default=str)
             if len(raw)>MAX_RESULT_CHARS:
                 result={'status':'OUTPUT_LIMIT','original_chars':len(raw),
                     'message':'결과가 응답 한도를 넘었습니다. 페이지 크기·비교 문서·조문 수를 줄여 다시 조회하세요.',
-                    'tool':fn.__name__,'evidence_returned':False}
+                    'tool':fn.__name__,'evidence_returned':False,
+                    'source_links':result.get('source_links',[])[:5],
+                    'link_guidance':result.get('link_guidance',{}),
+                    'budget_basis':result.get('budget_basis')}
         except TimeoutError:
             result={'status':'TIMEOUT','message':'조회 시간 초과. 범위를 줄여 재시도하세요. 자료 없음이 아닙니다.'}
         except Exception as exc:

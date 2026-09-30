@@ -3,7 +3,7 @@
 전국 지방행정 업무의 회의록 근거, 예산 수치, 조례 근거를 하나의 연결에서 다룹니다.
 개발·기획: 서구청 펀온워크 AI혁신분과 에이블(AIBLE).
 
-- 통합 버전: `4.0.0-public.1`
+- 통합 버전: `4.0.1-public.1`
 - 직원 연결 주소: `https://uijeong-mcp.onrender.com/mcp`
 - 인증: **없음**
 - 의회 21개 + 예산 8개 + 조례 9개 + 업무흐름 2개 = 공개 도구 40개
@@ -52,3 +52,11 @@ python scripts/verify_unified.py https://uijeong-mcp.onrender.com/mcp
 공개 HTTP 실행에는 `UIJEONG_AUTH_MODE=public`, `UIJEONG_PUBLIC_READONLY=true`, 정확한 `UIJEONG_ALLOWED_HOSTS`가 필요합니다. `python uijeong_mcp.py --http`로 실행합니다. 운영 인증값을 Git·로그·응답에 넣지 않습니다.
 
 설계·네 에이전트 교차검토: [통합 검토 기록](docs/INTEGRATED_RELEASE.md). 도구 흐름: [업무흐름 설명](docs/INTEGRATED_WORKFLOW.md).
+
+## 예산 조회와 직원의 원문 확인
+
+사업 예산 질문은 `council_finance_context`로 지역·회계연도를 지정합니다. 오늘 자료가 아직 제공되지 않으면 최대 7일 전까지 자료 제공일을 확인하고, 하나의 실제 기준일에서 사업명·띄어쓰기·약칭 후보를 순차 검색합니다. 검색어 미발견만으로 과거 날짜로 이동하지 않습니다. 최대 10회·25초, 첫 페이지 1,000건 범위이며 누락·오류는 명시합니다.
+
+`budget_stage`는 current(예산현액), original(의결된 본예산), supplementary(의결된 추경), draft(예산안), settlement(확정 결산)을 구분합니다. 이 API는 예산현액·지출액을 제공하므로 다른 단계의 금액은 해당 예산서·결산서에서 확인할 때까지 미확인입니다. `snapshot_date`로 기준일을 지정할 수 있습니다. `cpl_amt`를 본예산·확정 편성액으로 해석하지 않습니다. 금액 단위는 공식 명세에서 별도로 확인합니다.
+
+회의록·조례·예산 결과의 `source_links`에는 클릭할 수 있는 Markdown 링크와 자료 종류·확인 상태를 함께 반환합니다. 원문 주소가 있으면 원문에 연결하고, 없으면 공식 데이터셋·목록·검색 링크와 문서 식별자 및 조회조건을 제공합니다. 데이터셋 안내 링크는 개별 예산서 원문이 아닙니다. 링크 제공과 본문 열람·검증도 구분합니다. 무료 계정의 응답 문구는 호스트 AI가 작성하므로 지침과 근거를 제공해 돕지만 표시 자체를 보장하지 않습니다.

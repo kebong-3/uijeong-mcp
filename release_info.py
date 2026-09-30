@@ -4,7 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 
-VERSION = "4.0.0-public.1"
+VERSION = "4.0.1-public.1"
 CAPABILITIES = ["one_call_response_preparation", "exact_source_claim_audit",
                 "dimension_checked_metric_comparison", "side_by_side_evidence_comparison",
                 "date_bounded_department_aliases", "recurring_topic_cues_not_verdicts",
@@ -29,7 +29,9 @@ CAPABILITIES = ["one_call_response_preparation", "exact_source_claim_audit",
                 "clik_only_council_retrieval", "connection_query_concurrency_separation",
                 "streamable_http_get_delete_compatibility", "unified_council_budget_ordinance",
                 "stateless_decimal_budget_calculations", "official_ordinance_version_review",
-                "cross_domain_evidence_workflow", "no_additional_llm_calls"]
+                "cross_domain_evidence_workflow", "no_additional_llm_calls",
+                "latest_available_fiscal_snapshot", "fiscal_stage_separation",
+                "cross_domain_clickable_source_references"]
 
 
 def runtime_files(root: Path) -> list[Path]:
