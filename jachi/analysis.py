@@ -256,7 +256,11 @@ PROCEDURES=[
 
 
 def procedure_checklist(project:str) -> dict:
+    from .procedure import procedure_guide
+    guide = procedure_guide()
     return {"steps":[{"name":a,"applicability":b,"owner_role":c,"check":d,"completed":False} for a,b,c,d in PROCEDURES],
+            "sequencing_rules":guide['rules'],"needed_evidence":guide['needed_evidence'],
+            "source_links":guide['source_links'],
             "budget_template":{"beneficiaries":None,"unit_cost":None,"frequency":None,"operating_cost":None,
                                "formula":"지원대상 수 × 단가 × 지원횟수 + 운영비 (사업에 맞게 수정)",
                                "amounts_are_estimates":True},

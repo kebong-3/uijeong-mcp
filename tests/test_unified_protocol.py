@@ -56,6 +56,13 @@ def test_three_domains_over_real_anonymous_http(env):
                     assert not result.get('isError'),result
                     assert len(json.dumps(result,ensure_ascii=False))<100_000
                     assert unpack(result)
+                screened=await rpc(a,'tools/call',{'name':'ordinance_guide','arguments':{
+                    'as_of':'2026-10-01','procedure':{'jurisdiction':'광주 북구','action':'promulgate',
+                    'basis_kind':'ordinance_amendment','basis_title':'가상 지원 조례','basis_article':'제2조',
+                    'ordinance_stage':'submitted','dates':{'rule_promulgation':'2026-09-15'}}}})
+                assert not screened.get('isError'),screened
+                assert 'NO_PLENARY_ADOPTION' in unpack(screened)['procedure_screening']['hold_codes']
+                assert unpack(screened)['procedure_screening']['legal_approval'] is False
                 # Two unrelated clients perform different calculations without session state.
                 results=await asyncio.gather(*(rpc(client,'tools/call',{'name':'budget_calculate','arguments':{'operation':'change','arguments':{'before':'100','after':after,'unit':'천원'}}}) for client,after in [(a,'120'),(b,'130')]))
                 assert '20000' in json.dumps(unpack(results[0]))
