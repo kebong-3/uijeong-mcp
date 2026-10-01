@@ -164,5 +164,20 @@ async def test_mismatched_procedure_region_refused():
     result=await registry.tools['ordinance_review_project'](params)
     assert result['status']=='unavailable'
 
+@pytest.mark.anyio
+async def test_rule_draft_cannot_be_generated_in_ordinance_format(monkeypatch):
+    from jachi.models import DocumentRef, ChangeOperation
+    doc=Document(kind='ordinance',document_id='123',title='시험 시행규칙',articles=[Article(key='1',label='제1조',text='종전')])
+    class Client:
+        def __init__(self,*a,**kw): pass
+        async def __aenter__(self): return self
+        async def __aexit__(self,*a): pass
+        async def get_document(self,ref): return doc
+    monkeypatch.setattr(tools,'LawClient',Client)
+    registry=Registry();tools.register(registry)
+    r=await registry.tools['ordinance_draft_amendment'](DocumentRef(document_id='123'),
+        [ChangeOperation(operation='replace_article',article='제1조',expected_text='종전',new_text='개정',reason='시험')],doc.content_hash)
+    assert r['code']=='unsupported_drafting_format'
+
 @pytest.fixture
 def anyio_backend(): return 'asyncio'

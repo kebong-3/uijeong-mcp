@@ -39,9 +39,9 @@
     "evidence_links.py": "b5747db24398dc60df86b330e4e41a6e862bd5ba26ccad9b6c36834c89f58a43",
     "finance_context.py": "6370d0214bb045ff55d9be91cc22af3ef701c7e0dba9a4740928e0f49eede22b",
     "integrated_budget.py": "b5a6a9c589ce8af6b8c3b3a1d16769cb38637e54322e1d9827cbc66614d6177b",
-    "integrated_ordinance.py": "05a6ec5b06254e9a2e960874887ef45a0f58deff610df65c07f70a416e9e2ffb",
+    "integrated_ordinance.py": "340aecbff5a4ca0a7a6726b97969b765e8f8af1d7f67c359ba9b4d6573d22c54",
     "integrated_transport.py": "fc0ebd72b7cb3c02fa0883cf08f967ab3a8aa3ee471ae36826c876d083ec28fb",
-    "integrated_workflow.py": "016e4452a0d249cf414cfa11af4709df3ca4fe64db8ac81b3aab1b30dc96a365",
+    "integrated_workflow.py": "6009c35f5b81ff4842c21df2ea60a8e0574c6fb4a3d7d940935ac072907fd1b4",
     "jachi/__init__.py": "4f9db89af929bbcc8533bbed43a710e4a645add7285516f8a2851f8fed086261",
     "jachi/agents.py": "0b3b213d59b4fb55705822e65486b815e7b7e83a9f59e9997aa607c88f3768da",
     "jachi/analysis.py": "87040dc2d40e3b1f33d55e162f3515a813399a0e70dfd3a8ac90eda41bf9a79a",
@@ -81,7 +81,7 @@
     "workbench_tools.py": "4c542a2eba57571993ca4b8c0a9339c783f5920e3dd1000c3f9a144f552f4355",
     "workflow_core.py": "180b52f2b2dffb57d7d53625c1f19fe1f779c79a6a24d52c8977a03688c39be8"
   },
-  "runtime_fingerprint": "a292434cbbc9d489d880a4f16074c2a0ddef293b6039ea4c20498d933d982ea7",
+  "runtime_fingerprint": "49934338ee2d125e3071e52c990c265df814bd4f961392f6eae1754ce20bbc93",
   "profile_tool_counts": {
     "core": 5,
     "work": 18,
@@ -138,9 +138,9 @@
     "evidence_core.py": "8b6538f1b5732b2e46ea6ef2d6b4b425f69d26e2286f5f8fa9e4dba8d93232b2",
     "finance_context.py": "6370d0214bb045ff55d9be91cc22af3ef701c7e0dba9a4740928e0f49eede22b",
     "integrated_budget.py": "b5a6a9c589ce8af6b8c3b3a1d16769cb38637e54322e1d9827cbc66614d6177b",
-    "integrated_ordinance.py": "05a6ec5b06254e9a2e960874887ef45a0f58deff610df65c07f70a416e9e2ffb",
+    "integrated_ordinance.py": "340aecbff5a4ca0a7a6726b97969b765e8f8af1d7f67c359ba9b4d6573d22c54",
     "integrated_transport.py": "fc0ebd72b7cb3c02fa0883cf08f967ab3a8aa3ee471ae36826c876d083ec28fb",
-    "integrated_workflow.py": "016e4452a0d249cf414cfa11af4709df3ca4fe64db8ac81b3aab1b30dc96a365",
+    "integrated_workflow.py": "6009c35f5b81ff4842c21df2ea60a8e0574c6fb4a3d7d940935ac072907fd1b4",
     "jachi/__init__.py": "4f9db89af929bbcc8533bbed43a710e4a645add7285516f8a2851f8fed086261",
     "jachi/agents.py": "0b3b213d59b4fb55705822e65486b815e7b7e83a9f59e9997aa607c88f3768da",
     "jachi/analysis.py": "87040dc2d40e3b1f33d55e162f3515a813399a0e70dfd3a8ac90eda41bf9a79a",
@@ -230,8 +230,8 @@
     "tests/test_evidence_link_output.py": "a44aaac14a69ff8ccc36853afb2fc475423b1689ac32fd940dab49408718fa98",
     "docs/FISCAL_EVIDENCE.md": "f97df5e735e7bc58161b32b3a804120bc3f0cd0636fdf3cd16e7faa0b3c8a7fd",
     "jachi/procedure.py": "21729097182bc43e2de13dc101946f538170c237c29eae20c76b0a2ef12c4592",
-    "docs/LEGISLATIVE_PROCEDURE.md": "cf15bf31e6d686c5369863a46188e256ac15d3f848d54b6b22a6bb5eef8c198a",
-    "tests/test_legislative_procedure.py": "8052fc5cc06b2453a775effed9d02b4edd0c8dac869329116fa0c582c1e68573"
+    "docs/LEGISLATIVE_PROCEDURE.md": "96284a3041491dc52c8a3d51d6d408d26b83dbb317079ccc02c2abcaaf0a54bc",
+    "tests/test_legislative_procedure.py": "220502901485f86b2eff6fc40da88e036274c9fcf343c88c3633a8a5032843f9"
   },
   "integrity_note": "내용 일치 검사이며 제작자 서명·원격 배포 증명은 아닙니다.",
   "verification_reference": "docs/verification/v250/verification-summary.json",
