@@ -17,6 +17,12 @@ API current 금액은 original/draft/supplementary/settlement 단계의 확정 �
 원문 URL이 없으면 공식 검색/데이터셋 링크와 사업코드·회의일·문서ID를 표시하고 원문 미확인이라고 알리세요.
 링크만 있는 자료를 열람했다고 하지 말고, 시행일·예산 기준일·단위는 확인한 범위만 설명하세요.
 의회 발언은 정책 결정이나 법적 근거 그 자체가 아닙니다. 조례 근거와 예산 편성·집행 가능성을 각각 확인하세요.
+조례·시행규칙 입안/공포/시행 질문은 ordinance_guide로 행정절차와 procedure 입력 형식을 확인하세요.
+단계·날짜가 주어지면 procedure로 근거 유형·본회의 의결·공포·시행 시점·필수 협의를 대조하고 보류 권고를 먼저 알리세요.
+현행 법률/조례에 근거한 규칙과 미의결 개정 조례에 의존한 규칙을 구분하세요. 규칙 모두에 의회 의결이 필요하다고 하지 마세요.
+초안·예고 준비 병행과 공포·실제 업무 적용을 구분하세요. 상임위 통과·결재·미래 예정일은 의결 완료 증거가 아닙니다.
+ordinance_draft_amendment는 조례 개정문 형식입니다. 시행규칙 초안이나 공포문을 조례안으로 생성해 제출하지 마세요.
+뉴스·사용자 날짜·공식 URL 입력만으로 진행상태를 검증했다고 하지 마세요. 공식 원문은 조회 도구로 확인하고 의결문·공보는 미확인 시 담당자 증빙을 요청하세요.
 필요한 근거만 소량 조회하고 원문·후속 페이지는 필요한 때 읽으세요. 검색 0건, 조회 오류, 일부 확인을 구분하세요.
 local_evidence_review는 제공된 근거 메타데이터의 누락 점검이며 사실 또는 적법성 검증이 아닙니다.
 답변은 확인된 결론, 분야별 원문 근거, 계산 조건, 미확인 사항과 다음 조치 순으로 간결하게 작성하세요.
@@ -57,7 +63,7 @@ def local_workflow_plan(question: str, jurisdiction: str = '', fiscal_year: int 
     if not selected:
         words = {'council': ('의회', '의원', '질의', '회의록', '행감', '행정사무감사'),
                  'budget': ('예산', '추경', '본예산', '결산', '사업비', '산출', '집행', '보조금'),
-                 'ordinance': ('조례', '개정', '제정', '상위법', '법적 근거', '법령')}
+                 'ordinance': ('조례', '규칙', '개정', '제정', '상위법', '법적 근거', '법령', '입법예고', '공포')}
         selected = [d for d, terms in words.items() if any(t in question for t in terms)]
     missing = []
     if not selected:
@@ -81,7 +87,7 @@ def local_workflow_plan(question: str, jurisdiction: str = '', fiscal_year: int 
         else:
             steps.append({'domain': domain, 'tool': 'ordinance_search',
                           'arguments_template': {'query': '<조례명 또는 핵심 주제>', 'jurisdiction': jurisdiction, 'limit': 5},
-                          'next': '검색에서 반환한 kind 및 document_id 또는 mst를 reference 객체로 전달하여 ordinance_get_document. 법령 mst 조회에는 effective_date 필요. 시행일·현행/연혁·상위법 조문을 확인하고 개정은 확인된 원문에 한정.',
+                          'next': '검색에서 반환한 kind 및 document_id 또는 mst를 reference 객체로 전달하여 ordinance_get_document. 법령 mst 조회에는 effective_date 필요. 시행일·현행/연혁·상위법 조문 확인. 입안·공포·시행이면 ordinance_guide의 procedure로 근거 유형·단계·의결/공포/시행 날짜·협의상태 점검; 실제 원문을 선택한 ordinance_review_project에서도 params.procedure로 재대조. 공식 의안·공보 증빙이 없으면 미확인 표시.',
                           'scope': {'as_of': as_of}})
     return {'status': 'NEEDS_CONTEXT' if missing else 'PLAN_ONLY', 'evidence_retrieved': False,
             'domains': selected, 'missing_context': missing, 'steps': steps,

@@ -6,6 +6,7 @@ from datetime import date, datetime, timezone
 from typing import Any, Literal
 from zoneinfo import ZoneInfo
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from .procedure import ProcedureInput
 
 
 def utcnow() -> str:
@@ -121,6 +122,7 @@ class ReviewInput(Strict):
     new_parent: DocumentRef | None = None
     provided_documents: list[UserText] = Field(default_factory=list, max_length=12)
     mode: Literal["review", "compare", "enact", "amend", "impact"] = "review"
+    procedure: ProcedureInput | None = Field(default=None, description="조례·규칙 의존관계·진행단계·날짜·협의상태 점검. 입력은 증빙 확인 전 미검증")
     auto_search: bool = True
     reasoning: Literal["rules", "gemini"] = "rules"
     allow_external_llm: bool = False

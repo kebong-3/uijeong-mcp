@@ -17,6 +17,7 @@ from .drafting import draft_outline
 from .audit import quality_gate, markdown_report
 from .llm import GeminiRoles
 from . import __version__
+from .procedure import screen_procedure
 
 ROLES=[
  ('A1','사업·입법기획','사업 목적·대상·수단을 구조화하고 제정/개정/기존 근거 활용의 대안을 설정한다.'),
@@ -203,6 +204,8 @@ async def run_review(request:ReviewInput, settings:Settings|None=None, client:La
             'status':'version_pair_missing','impacts':[],'warning':'구·신 상위법의 식별자·시행일이 필요합니다.'}
     legal_out,comparison,impact_out,feasibility=await asyncio.gather(
         role(2,legal),role(3,compare),role(4,impact),role(5,lambda:procedure_checklist(request.project)))
+    if request.procedure:
+        feasibility['procedure_screening']=screen_procedure(request.procedure,request.as_of,w.docs)
     def draft_with_team():
         outline=draft_outline(request.project,request.jurisdiction,w.baseline,comparison,request.mode,request.topic)
         outline['constraints_from_team']={
@@ -219,6 +222,10 @@ async def run_review(request:ReviewInput, settings:Settings|None=None, client:La
     await role(7,before_gate)
     # Recompute AFTER A8 so its own rejected claims/failure cannot bypass the final gate.
     final_gate=before_gate()
+    if request.procedure:
+        screening=feasibility['procedure_screening']
+        final_gate['procedure_hold_codes']=screening['hold_codes']
+        final_gate['blocking_or_pending_items'] += [f['message'] for f in screening['findings'] if f['severity']=='hold']
     report={'schema_version':'2.0','version':__version__,'report_id':'R-'+digest([request.model_dump(mode='json'),utcnow()])[:20],
         'generated_at':utcnow(),'project':request.project,'jurisdiction':request.jurisdiction,
         'as_of':request.as_of.isoformat(),'reasoning':request.reasoning,
