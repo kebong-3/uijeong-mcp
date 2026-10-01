@@ -14,11 +14,11 @@ ChatGPT Sites의 Cloudflare Workers에서 14개 MCP 도구를 직접 실행합�
 
 필요 인증값: `CLIK_API_KEY`, `LAW_OC`, `LOFIN_API_KEY`, `DATA_GO_KR_SERVICE_KEY`, `KOSIS_API_KEY`.
 
-현 단계에서 Render 비밀값 읽기를 지원하는 연결 도구가 없어 키 이전은 미완료입니다. 공식 API 호출은 NOT_CONFIGURED를 반환합니다. 키가 없는 상태를 실제 조회 성공으로 표시하지 않습니다.
+2026-10-01 Render 화면에서 이전 대상 API 인증값 5개만 개별 확인해 Sites runtime secret으로 이전했습니다. Render의 운영 설정과 main은 변경하지 않았습니다. 키가 없는 상태를 실제 조회 성공으로 표시하지 않습니다.
 
 ## 검증
 
-`node tests/mcp.test.mjs`: 26개 검증(프로토콜, 6개 화면, 인증 차단, 큰 금액 정확성, 재원검산, 미설정 오류, 공식 API 어댑터 모의 응답, 비밀값 비노출). 인증된 공식 API 실조회는 아직 미실시입니다.
+`node tests/mcp.test.mjs`: 26개 검증(프로토콜, 6개 화면, 인증 차단, 큰 금액 정확성, 재원검산, 미설정 오류, 공식 API 어댑터 모의 응답, 비밀값 비노출). 2026-10-01 배포된 Sites 플러그인을 통해 인증된 실호출 확인: CLIK 회의록 상세, 법제처 조례 검색·본문, 지방재정365 전국 세출 페이지 2행. 예산 검산 4,160,000원 확인. 광주 서구 세출 조회는 지역코드 불일치 조건에서 EMPTY였으므로 사업 부재나 예산 0원으로 해석하지 않았습니다. CLIK 목록은 실제 배열/LIST/ROW 응답 구조를 기준으로 파서를 보완했습니다.
 
 `bash scripts/build.sh`와 `node scripts/validate-artifact.mjs`: ESM Worker 배포 형식 확인.
 
