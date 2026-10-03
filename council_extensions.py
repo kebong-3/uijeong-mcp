@@ -185,8 +185,11 @@ def install(U: Any) -> None:
         jurisdiction: Optional[str] = None,
         include_articles: bool = True,
     ) -> dict[str, Any]:
-        """의회 대응에 필요한 상위법·자치법규 근거 후보를 조회합니다.
-        검색 결과는 법적 결론이 아니라 공식 근거 후보이며, 최종 조례 제·개정 검토는 전문 입법검토가 필요합니다."""
+        """복합 자연어를 법령명·조문·정책기능 검색어로 분해해 의회 대응용 법령·자치법규 후보를 조회합니다.
+
+        jurisdiction이 지정되면 해당 지역 자치법규 후보와 전국 기능 유사 후보를 분리합니다.
+        검색후보는 법적 적용·적법성 결론이 아니며 최종 제·개정 검토는 전문 입법검토가 필요합니다.
+        """
         if not isinstance(topic,str) or not topic.strip() or len(topic)>200:
             return {"status":"INVALID_INPUT","message":"topic은 1~200자 문자열이어야 합니다."}
         cid,cname,error=U.pick_council(council)
@@ -194,49 +197,122 @@ def install(U: Any) -> None:
             return {"status":"INVALID_INPUT","message":error}
         wanted=jurisdiction or _jurisdiction_from_council(cname)
         plan=Q.legal_search_plan(topic.strip(),wanted,6)
+
         queries=[]
         for query in plan["law_queries"][:2]:
-            queries.append(("law",query,L.search(query,"law","",4,True)))
-        for query in plan["ordinance_queries"][:2]:
-            queries.append(("ordinance",query,L.search(query,"ordinance",wanted,6,True)))
+            queries.append(("law",query,L.search(query,"law","",6,True)))
+        for query in plan["ordinance_queries"][:3]:
+            queries.append(("ordinance",query,L.search(query,"ordinance",wanted,8,True)))
         if not queries:
-            queries=[("law",topic.strip(),L.search(topic.strip(),"law","",4,True)),
-                     ("ordinance",topic.strip(),L.search(topic.strip(),"ordinance",wanted,6,True))]
+            queries=[("law",topic.strip(),L.search(topic.strip(),"law","",6,True)),
+                     ("ordinance",topic.strip(),L.search(topic.strip(),"ordinance",wanted,8,True))]
+
         raw=await asyncio.gather(*(task for _,_,task in queries),return_exceptions=True)
-        laws=[];ordinances=[];errors=[];attempts=[];seen=set()
+        exact_laws=[]; related_laws=[]; local_ordinances=[]; nationwide_ordinances=[]
+        errors=[];attempts=[];seen=set()
+        explicit_law_norms={_norm(name) for name in plan.get("law_names",[])}
+
         for (kind,query,_),value in zip(queries,raw):
             if isinstance(value,Exception):
                 errors.append({"kind":kind,"query":query,"message":R.safe_error(value)})
                 attempts.append({"kind":kind,"query":query,"status":"ERROR"})
                 continue
+            items=value.get("items",[])
             attempts.append({"kind":kind,"query":query,"status":value.get("status"),
-                             "returned":len(value.get("items",[]))})
-            for item in value.get("items",[]):
-                key=(kind,item.get("document_id"),item.get("mst"),item.get("title"))
-                if key in seen: continue
+                             "returned":len(items),
+                             "jurisdiction_match":value.get("jurisdiction_match")})
+            for original in items:
+                item=dict(original,matched_query=query,match_status="CANDIDATE")
+                key=(kind,item.get("document_id"),item.get("mst"),item.get("title"),item.get("jurisdiction"))
+                if key in seen:
+                    continue
                 seen.add(key)
-                item=dict(item,matched_query=query,match_status="CANDIDATE")
-                (laws if kind=="law" else ordinances).append(item)
+                if kind=="law":
+                    if explicit_law_norms and _norm(item.get("title")) in explicit_law_norms:
+                        item["match_status"]="EXACT_LAW_TITLE"
+                        exact_laws.append(item)
+                    else:
+                        item["match_status"]="RELATED_LAW_CANDIDATE"
+                        related_laws.append(item)
+                else:
+                    if value.get("jurisdiction_match"):
+                        item["match_status"]="LOCAL_ORDINANCE_CANDIDATE"
+                        local_ordinances.append(item)
+                    else:
+                        item["match_status"]="NATIONWIDE_FUNCTIONAL_CANDIDATE"
+                        item["role"]="COMPARATIVE_DISCOVERY_ONLY"
+                        nationwide_ordinances.append(item)
+
+        laws=(exact_laws+related_laws)[:6]
+        local_ordinances=local_ordinances[:8]
+        nationwide_ordinances=nationwide_ordinances[:12]
+
         if include_articles:
-            candidates=[*laws[:2],*ordinances[:3]]
-            if candidates:
-                checked=await asyncio.gather(*(L.detail(item,item.get("matched_query") or topic.strip(),4)
-                                                for item in candidates),return_exceptions=True)
-                enriched={}
-                for item,value in zip(candidates,checked):
-                    if not isinstance(value,Exception):
-                        enriched[(item.get("kind"),item.get("document_id"),item.get("mst"),item.get("title"))]=value
-                laws=[enriched.get((x.get("kind"),x.get("document_id"),x.get("mst"),x.get("title")),x) for x in laws]
-                ordinances=[enriched.get((x.get("kind"),x.get("document_id"),x.get("mst"),x.get("title")),x) for x in ordinances]
-        status="PARTIAL" if errors and (laws or ordinances) else "ERROR" if errors else "COMPLETE" if (laws or ordinances) else "EMPTY"
-        result={"status":status,"query":topic.strip(),"jurisdiction":wanted,
-                "query_plan":plan,"laws":laws,"ordinances":ordinances,
-                "coverage":{"attempts":attempts,"law_candidates":len(laws),"ordinance_candidates":len(ordinances),
-                            "national_exhaustive":False,"semantic_coverage_complete":False},
-                "errors":errors,
-                "limitations":["복합 자연어는 법령명·조문·정책기능 검색어로 분해해 조회합니다.",
-                               "검색 후보는 법적 적용·적법성 결론이 아닙니다. 시행일·부칙·위임범위를 원문에서 최종 확인하세요.",
-                               "전수 요청을 감지해도 national_exhaustive=false인 동안 전국 전체라고 표현하지 않습니다."]}
+            candidates=[]
+            for item in laws[:3]:
+                article_query=(plan.get("article_refs") or [item.get("matched_query") or topic.strip()])[0]
+                candidates.append(("law",item,article_query))
+            for item in local_ordinances[:3]:
+                candidates.append(("local_ordinance",item,item.get("matched_query") or topic.strip()))
+            checked=await asyncio.gather(*(L.detail(item,query,5) for _,item,query in candidates),return_exceptions=True)
+            enriched={}
+            for (role,item,query),value in zip(candidates,checked):
+                key=(item.get("kind"),item.get("document_id"),item.get("mst"),item.get("title"),item.get("jurisdiction"))
+                if isinstance(value,Exception):
+                    errors.append({"kind":role,"query":query,"title":item.get("title"),"message":R.safe_error(value)})
+                else:
+                    value["matched_query"]=item.get("matched_query")
+                    value["match_status"]=item.get("match_status")
+                    value["article_query"]=query
+                    enriched[key]=value
+            def apply(rows):
+                out=[]
+                for item in rows:
+                    key=(item.get("kind"),item.get("document_id"),item.get("mst"),item.get("title"),item.get("jurisdiction"))
+                    out.append(enriched.get(key,item))
+                return out
+            laws=apply(laws)
+            local_ordinances=apply(local_ordinances)
+
+        local_missing=bool(wanted) and not local_ordinances
+        if errors and not (laws or local_ordinances or nationwide_ordinances):
+            status="ERROR"
+        elif errors or local_missing:
+            status="PARTIAL"
+        elif laws or local_ordinances or nationwide_ordinances:
+            status="COMPLETE"
+        else:
+            status="EMPTY"
+
+        result={
+            "status":status,
+            "query":topic.strip(),
+            "jurisdiction":wanted,
+            "query_plan":plan,
+            "laws":laws,
+            "local_ordinances":local_ordinances,
+            "nationwide_ordinance_candidates":nationwide_ordinances,
+            # Backward-compatible alias: ordinances means local candidates only from v4.1.1.
+            "ordinances":local_ordinances,
+            "coverage":{
+                "attempts":attempts,
+                "exact_law_candidates":len(exact_laws),
+                "related_law_candidates":len(related_laws),
+                "local_ordinance_candidates":len(local_ordinances),
+                "nationwide_functional_candidates":len(nationwide_ordinances),
+                "local_ordinance_match_found":bool(local_ordinances),
+                "national_exhaustive":False,
+                "semantic_coverage_complete":False,
+            },
+            "errors":errors,
+            "limitations":[
+                "명시된 법령명이 있으면 정확 제명 일치를 우선하고 유사 제명 법령은 별도 관련 후보로 취급합니다.",
+                "대상 지자체 조례와 전국 기능 유사 조례를 분리합니다. 전국 후보는 대상 지자체의 직접 근거가 아닙니다.",
+                "복합 자연어는 법령명·조문·정책기능 검색어로 분해해 조회합니다.",
+                "검색 후보는 법적 적용·적법성 결론이 아닙니다. 시행일·부칙·위임범위를 공식 원문에서 최종 확인하세요.",
+                "전수 요청을 감지해도 national_exhaustive=false인 동안 전국 전체라고 표현하지 않습니다.",
+            ],
+        }
         result["council"]={"id":cid,"name":cname}
         result["usage_note"]="의회 답변의 법적 근거 후보 확인용입니다. 조문 적법성·위임범위·개정안 작성은 ordinance_review_project 등 전문 입법검토에서 심화하세요."
         return result
