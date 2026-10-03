@@ -83,7 +83,7 @@ def _articles(question: str) -> list[str]:
 
 def _quoted_or_named_chunks(question: str) -> list[str]:
     chunks=[]
-    for pattern in (r"["'“”‘’]([^"'“”‘’]{2,60})["'“”‘’]", r"([가-힣A-Za-z0-9]{2,20}(?:·[가-힣A-Za-z0-9]{2,20})+)"):
+    for pattern in (r'["\\'“”‘’]([^"\\'“”‘’]{2,60})["\\'“”‘’]', r'([가-힣A-Za-z0-9]{2,20}(?:·[가-힣A-Za-z0-9]{2,20})+)'):
         for match in re.findall(pattern,question):
             chunks.extend(re.split(r"·|/|,",match))
     return [x.strip() for x in chunks if x.strip() and x.strip() not in _QUESTION_WORDS]
