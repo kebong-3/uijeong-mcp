@@ -1,6 +1,10 @@
 {
+  "rewrites": [
+    { "source": "/", "destination": "/api/view" }
+  ],
   "functions": {
-    "api/law.js": { "maxDuration": 30 }
+    "api/law.js": { "maxDuration": 30 },
+    "api/view.js": { "maxDuration": 30 }
   },
   "headers": [
     {
