@@ -81,12 +81,20 @@ def _articles(question: str) -> list[str]:
         out.append(f"제{a}조"+(f"의{b}" if b else ""))
     return _unique(out)
 
+def _strip_particle(value: str) -> str:
+    value=value.strip()
+    for suffix in ("에서","으로","에게","부터","까지","처럼","보다","을","를","은","는","이","가","과","와","의","에"):
+        if value.endswith(suffix) and len(value) > len(suffix)+1:
+            return value[:-len(suffix)]
+    return value
+
 def _quoted_or_named_chunks(question: str) -> list[str]:
     chunks=[]
     for pattern in (r"[\\\"'“”‘’]([^\\\"'“”‘’]{2,60})[\\\"'“”‘’]", r"([가-힣A-Za-z0-9]{2,20}(?:·[가-힣A-Za-z0-9]{2,20})+)"):
         for match in re.findall(pattern,question):
             chunks.extend(re.split(r"·|/|,",match))
-    return [x.strip() for x in chunks if x.strip() and x.strip() not in _QUESTION_WORDS]
+    cleaned=[_strip_particle(x) for x in chunks]
+    return [x for x in cleaned if x and x not in _QUESTION_WORDS]
 
 def functional_axes(question: str) -> list[dict[str,Any]]:
     n=_norm(question)
