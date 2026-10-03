@@ -197,7 +197,7 @@ def install(U: Any) -> None:
         queries=[]
         for query in plan["law_queries"][:2]:
             queries.append(("law",query,L.search(query,"law","",4,True)))
-        for query in plan["ordinance_queries"][:2]:
+        for query in plan["ordinance_queries"][:4]:
             queries.append(("ordinance",query,L.search(query,"ordinance",wanted,6,True)))
         if not queries:
             queries=[("law",topic.strip(),L.search(topic.strip(),"law","",4,True)),
@@ -209,19 +209,30 @@ def install(U: Any) -> None:
                 errors.append({"kind":kind,"query":query,"message":R.safe_error(value)})
                 attempts.append({"kind":kind,"query":query,"status":"ERROR"})
                 continue
+            items=value.get("items",[])
+            local_items=items
+            if kind=="ordinance" and wanted:
+                local_items,_=L._filter_jurisdiction(items,wanted)
             attempts.append({"kind":kind,"query":query,"status":value.get("status"),
-                             "returned":len(value.get("items",[]))})
-            for item in value.get("items",[]):
+                             "returned":len(items),"local_returned":len(local_items) if kind=="ordinance" else None})
+            for item in local_items:
                 key=(kind,item.get("document_id"),item.get("mst"),item.get("title"))
                 if key in seen: continue
                 seen.add(key)
                 item=dict(item,matched_query=query,match_status="CANDIDATE")
                 (laws if kind=="law" else ordinances).append(item)
+        law_targets={Q._norm(x) for x in plan.get("law_queries",[])}
+        laws.sort(key=lambda x:(0 if Q._norm(x.get("title","")) in law_targets else 1,
+                                len(x.get("title",""))))
         if include_articles:
-            candidates=[*laws[:2],*ordinances[:3]]
+            candidates=[*laws[:3],*ordinances[:3]]
             if candidates:
-                checked=await asyncio.gather(*(L.detail(item,item.get("matched_query") or topic.strip(),4)
-                                                for item in candidates),return_exceptions=True)
+                async def check_detail(item):
+                    query=item.get("matched_query") or topic.strip()
+                    if item.get("kind")=="law" and plan.get("article_refs"):
+                        query=" ".join(plan["article_refs"]+plan.get("core_terms",[])[:2])
+                    return await L.detail(item,query,4)
+                checked=await asyncio.gather(*(check_detail(item) for item in candidates),return_exceptions=True)
                 enriched={}
                 for item,value in zip(candidates,checked):
                     if not isinstance(value,Exception):
@@ -235,6 +246,7 @@ def install(U: Any) -> None:
                             "national_exhaustive":False,"semantic_coverage_complete":False},
                 "errors":errors,
                 "limitations":["복합 자연어는 법령명·조문·정책기능 검색어로 분해해 조회합니다.",
+                               "자치법규 컨텍스트는 요청 지자체와 정확히 일치한 후보만 반환합니다. 전국 유사조례 비교는 ordinance_search를 별도로 사용하세요.",
                                "검색 후보는 법적 적용·적법성 결론이 아닙니다. 시행일·부칙·위임범위를 원문에서 최종 확인하세요.",
                                "전수 요청을 감지해도 national_exhaustive=false인 동안 전국 전체라고 표현하지 않습니다."]}
         result["council"]={"id":cid,"name":cname}
