@@ -225,10 +225,18 @@ def _article_rows(data: Any, query: str, limit: int = 5) -> list[dict[str,str]]:
             continue
         label = _pick(node, "조문번호")
         title = _pick(node, "조제목", "조문제목")
-        hay = re.sub(r"\s+","", title+" "+body)
-        score = sum(1 for t in tokens if re.sub(r"\s+","",t) in hay)
+        canonical_label = label
+        digits = re.fullmatch(r"\s*(\d+)\s*", label or "")
+        if digits:
+            canonical_label = f"제{digits.group(1)}조"
+        hay = re.sub(r"\s+","", canonical_label+" "+label+" "+title+" "+body)
+        score = 0
+        for token in tokens:
+            nt = re.sub(r"\s+","",token)
+            if nt and nt in hay:
+                score += 5 if nt == re.sub(r"\s+","",canonical_label) else 1
         if score:
-            candidates.append((score, {"article":label, "title":title, "text":body[:1800]}))
+            candidates.append((score, {"article":canonical_label or label, "title":title, "text":body[:1800]}))
     candidates.sort(key=lambda x:(-x[0], x[1]["article"]))
     return [item for _,item in candidates[:limit]]
 
@@ -247,6 +255,12 @@ async def search(query: str, kind: str, jurisdiction: str = "", limit: int = 6,
     data = await _request("search", params)
     rows = _listing_rows(data, kind)
     total = _total_count(data)
+    if kind == "law":
+        qn = re.sub(r"[^0-9A-Za-z가-힣]", "", query).casefold()
+        def law_rank(row):
+            tn = re.sub(r"[^0-9A-Za-z가-힣]", "", row.get("title","")).casefold()
+            return (0 if tn == qn else 1 if tn.startswith(qn) else 2 if qn and qn in tn else 3, len(tn))
+        rows.sort(key=law_rank)
     matched, jurisdiction_match = _filter_jurisdiction(rows, jurisdiction)
     selected = matched if jurisdiction and matched else rows
     used_body=False
