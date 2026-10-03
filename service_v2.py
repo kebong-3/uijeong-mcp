@@ -240,20 +240,75 @@ def install(U):
                                     period_mode=period_mode,date_from=date_from,date_to=date_to)
         except ValueError as exc:return invalid(str(exc))
         search_terms=Q.council_search_terms(keyword,3)
+
+        def compact_turn(turn):
+            if not isinstance(turn,dict):
+                return turn
+            out={k:copy.deepcopy(v) for k,v in turn.items() if k not in ('text',)}
+            text=str(turn.get('text') or '')
+            out['text']=text[:700]+('…' if len(text)>700 else '')
+            return out
+
+        def compact_event(event):
+            if not isinstance(event,dict):
+                return event
+            return {
+                'event_id':event.get('event_id'),
+                'kind':event.get('kind'),
+                'docid':event.get('docid'),
+                'metadata':copy.deepcopy(event.get('metadata',{})),
+                'matched_query':event.get('matched_query'),
+                'evidence_state':event.get('evidence_state'),
+                'alternate_docids':copy.deepcopy(event.get('alternate_docids',[])),
+                'duplicate_reason':event.get('duplicate_reason'),
+                'question':compact_turn(event.get('question')),
+                'answers':[compact_turn(x) for x in (event.get('answers') or [])[:2]],
+                'speech':compact_turn(event.get('speech')),
+                'linkage':copy.deepcopy(event.get('linkage')),
+                'provenance':copy.deepcopy(event.get('provenance')),
+            }
+
+        def compact_year(window,r):
+            items=r.get('items') or []
+            shown=[compact_event(x) for x in items[:4]]
+            return {
+                **window,
+                'status':r.get('status'),
+                'total_items':r.get('total_items',len(items)),
+                'shown_items':len(shown),
+                'omitted_items':max(0,int(r.get('total_items') or len(items))-len(shown)),
+                'items':shown,
+                'coverage':copy.deepcopy(r.get('coverage',[])),
+                'coverage_summary':copy.deepcopy(r.get('coverage_summary',{})),
+                'errors':copy.deepcopy(r.get('errors',[])),
+                'snapshot_id':r.get('snapshot_id'),
+                'next_item_offset':r.get('next_item_offset'),
+                'retrieval':{
+                    'more_events':'같은 snapshot_id와 item_offset으로 council_evidence_bundle 이어보기',
+                    'full_context':'docid로 council_read_source 원문 문맥 확인',
+                },
+            }
+
         results=[]
+        raw_statuses=[]
+        count=0
         for window in period['windows']:
             r=await council_evidence_bundle(keyword,council,mode,answerer,committee,
                     window['date_from'],window['date_to'],max_docs_per_year,
                     search_terms=search_terms[1:])
-            results.append({**window,**r})
             if r['status']=='INVALID_INPUT':return r
-        count=sum(r.get('total_items',0) for r in results)
-        return {'status':C.combine_statuses([r['status'] for r in results],count),
+            raw_statuses.append(r['status'])
+            count+=int(r.get('total_items') or 0)
+            results.append(compact_year(window,r))
+        return {'status':C.combine_statuses(raw_statuses,count),
                 'as_of':period['as_of'],'period':period,'year_basis':'회의연도',
                 'include_current_year':include_current_year,'observed_items':count,
+                'response_profile':'PERIOD_SUMMARY',
                 'query_plan':{'exact_query':keyword,'search_terms':search_terms,
                               'rule':'원문 질의를 먼저 시도하고, 실패·미발견을 보완하기 위해 규칙기반 검색어를 최대 2개 추가합니다.'},
-                'results':results,'limitations':LIMITS}
+                'results':results,
+                'coverage_interpretation':'각 연도 items는 최대 4건의 검토용 발췌입니다. observed_items와 snapshot 이어보기를 사용해야 전체 확인 범위를 재구성할 수 있습니다.',
+                'limitations':LIMITS}
 
     @register
     async def council_department_brief(department:str,council:str='광주 서구',date_from:Optional[str]=None,

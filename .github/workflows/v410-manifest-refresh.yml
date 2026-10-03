@@ -1,16 +1,17 @@
 name: v4.1 manifest refresh
-# rerun after query parser correction
-# second rerun after regex escape correction
 on:
   push:
-    branches: [v4.1-query-evidence-orchestration]
+    branches:
+      - 'v4.1*'
     paths:
+      - '**.py'
+      - 'requirements.txt'
       - '.github/workflows/v410-manifest-refresh.yml'
   workflow_dispatch:
 permissions:
   contents: write
 concurrency:
-  group: v410-manifest-refresh
+  group: v41-manifest-refresh-${{ github.ref_name }}
   cancel-in-progress: false
 jobs:
   refresh:
@@ -19,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: v4.1-query-evidence-orchestration
+          ref: ${{ github.ref_name }}
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
@@ -31,7 +32,7 @@ jobs:
         run: python scripts/build_manifest.py
       - name: Verify regenerated manifest
         run: python scripts/check_config.py --manifest
-      - name: Run focused v4.1 tests
+      - name: Run focused query/evidence tests
         run: python -m pytest -q tests/test_query_orchestration_v410.py
       - name: Commit generated integrity files
         run: |
@@ -42,5 +43,5 @@ jobs:
             echo 'Manifest already current.'
           else
             git commit -m 'v4.1: regenerate tested release manifest'
-            git push origin HEAD:v4.1-query-evidence-orchestration
+            git push origin HEAD:${GITHUB_REF_NAME}
           fi
