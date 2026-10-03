@@ -19,6 +19,7 @@ import finance_context as F
 import legal_context as L
 import public_data_discovery as D
 import runtime_security as R
+import query_decomposition as Q
 from result_contract import wire_result
 
 _TERMS_PATH = Path(__file__).parent / "data" / "administrative_terms.json"
@@ -192,9 +193,52 @@ def install(U: Any) -> None:
         if error:
             return {"status":"INVALID_INPUT","message":error}
         wanted=jurisdiction or _jurisdiction_from_council(cname)
-        result=await L.context(topic.strip(),wanted,include_articles=include_articles)
+        plan=Q.legal_search_plan(topic.strip(),wanted,6)
+        queries=[]
+        for query in plan["law_queries"][:2]:
+            queries.append(("law",query,L.search(query,"law","",4,True)))
+        for query in plan["ordinance_queries"][:2]:
+            queries.append(("ordinance",query,L.search(query,"ordinance",wanted,6,True)))
+        if not queries:
+            queries=[("law",topic.strip(),L.search(topic.strip(),"law","",4,True)),
+                     ("ordinance",topic.strip(),L.search(topic.strip(),"ordinance",wanted,6,True))]
+        raw=await asyncio.gather(*(task for _,_,task in queries),return_exceptions=True)
+        laws=[];ordinances=[];errors=[];attempts=[];seen=set()
+        for (kind,query,_),value in zip(queries,raw):
+            if isinstance(value,Exception):
+                errors.append({"kind":kind,"query":query,"message":R.safe_error(value)})
+                attempts.append({"kind":kind,"query":query,"status":"ERROR"})
+                continue
+            attempts.append({"kind":kind,"query":query,"status":value.get("status"),
+                             "returned":len(value.get("items",[]))})
+            for item in value.get("items",[]):
+                key=(kind,item.get("document_id"),item.get("mst"),item.get("title"))
+                if key in seen: continue
+                seen.add(key)
+                item=dict(item,matched_query=query,match_status="CANDIDATE")
+                (laws if kind=="law" else ordinances).append(item)
+        if include_articles:
+            candidates=[*laws[:2],*ordinances[:3]]
+            if candidates:
+                checked=await asyncio.gather(*(L.detail(item,item.get("matched_query") or topic.strip(),4)
+                                                for item in candidates),return_exceptions=True)
+                enriched={}
+                for item,value in zip(candidates,checked):
+                    if not isinstance(value,Exception):
+                        enriched[(item.get("kind"),item.get("document_id"),item.get("mst"),item.get("title"))]=value
+                laws=[enriched.get((x.get("kind"),x.get("document_id"),x.get("mst"),x.get("title")),x) for x in laws]
+                ordinances=[enriched.get((x.get("kind"),x.get("document_id"),x.get("mst"),x.get("title")),x) for x in ordinances]
+        status="PARTIAL" if errors and (laws or ordinances) else "ERROR" if errors else "COMPLETE" if (laws or ordinances) else "EMPTY"
+        result={"status":status,"query":topic.strip(),"jurisdiction":wanted,
+                "query_plan":plan,"laws":laws,"ordinances":ordinances,
+                "coverage":{"attempts":attempts,"law_candidates":len(laws),"ordinance_candidates":len(ordinances),
+                            "national_exhaustive":False,"semantic_coverage_complete":False},
+                "errors":errors,
+                "limitations":["복합 자연어는 법령명·조문·정책기능 검색어로 분해해 조회합니다.",
+                               "검색 후보는 법적 적용·적법성 결론이 아닙니다. 시행일·부칙·위임범위를 원문에서 최종 확인하세요.",
+                               "전수 요청을 감지해도 national_exhaustive=false인 동안 전국 전체라고 표현하지 않습니다."]}
         result["council"]={"id":cid,"name":cname}
-        result["usage_note"]="의회 답변의 법적 근거 후보 확인용입니다. 조문 적법성·위임범위·개정안 작성은 조례뿌시기 등 전문 입법검토에서 심화하세요."
+        result["usage_note"]="의회 답변의 법적 근거 후보 확인용입니다. 조문 적법성·위임범위·개정안 작성은 ordinance_review_project 등 전문 입법검토에서 심화하세요."
         return result
 
     async def council_finance_context(

@@ -1,6 +1,7 @@
 """Bounded, credential-safe ordinance tools for the unified public MCP."""
 from __future__ import annotations
 import asyncio
+import copy
 import json
 from dataclasses import replace
 from datetime import date, datetime
@@ -27,6 +28,50 @@ def _settings():
 
 def _date(value=''):
     return date.fromisoformat(value) if value else datetime.now(ZoneInfo('Asia/Seoul')).date()
+
+def _compact_value(value, *, list_cap:int, string_cap:int, evidence_cap:int, depth:int=0, stats:dict|None=None):
+    """Create a bounded review view without claiming omitted material was reviewed by the caller."""
+    stats = stats if stats is not None else {"lists_omitted":0,"strings_truncated":0,"evidence_omitted":0}
+    if depth > 8:
+        return {"omitted":"depth_limit"}
+    if isinstance(value, dict):
+        out={}
+        for key,item in value.items():
+            if key=="evidence" and isinstance(item,dict):
+                rows=list(item.items())
+                kept=rows[:evidence_cap]
+                stats["evidence_omitted"] += max(0,len(rows)-len(kept))
+                out[key]={k:_compact_value(v,list_cap=list_cap,string_cap=string_cap,evidence_cap=evidence_cap,depth=depth+1,stats=stats) for k,v in kept}
+                continue
+            out[key]=_compact_value(item,list_cap=list_cap,string_cap=string_cap,evidence_cap=evidence_cap,depth=depth+1,stats=stats)
+        return out
+    if isinstance(value,list):
+        kept=value[:list_cap]
+        stats["lists_omitted"] += max(0,len(value)-len(kept))
+        return [_compact_value(x,list_cap=list_cap,string_cap=string_cap,evidence_cap=evidence_cap,depth=depth+1,stats=stats) for x in kept]
+    if isinstance(value,str) and len(value)>string_cap:
+        stats["strings_truncated"] += 1
+        return value[:string_cap]+"…[요약 응답에서 생략]"
+    return copy.deepcopy(value)
+
+def _compact_review(result:dict, detail_level:str, max_evidence:int) -> dict:
+    if detail_level=="full":
+        result=copy.deepcopy(result)
+        result["detail_level"]="full"
+        return result
+    if detail_level not in {"summary","standard"} or not 1<=max_evidence<=20:
+        raise ValueError("detail_level_or_max_evidence")
+    stats={"lists_omitted":0,"strings_truncated":0,"evidence_omitted":0}
+    cap=4 if detail_level=="summary" else 8
+    string_cap=1200 if detail_level=="summary" else 3000
+    compact=_compact_value(result,list_cap=cap,string_cap=string_cap,evidence_cap=max_evidence,stats=stats)
+    compact["detail_level"]=detail_level
+    compact["response_budget"]={
+        **stats,
+        "max_evidence":max_evidence,
+        "note":"응답 크기만 줄였으며 생략된 근거를 검토 완료로 간주하지 않습니다. 필요한 공식 원문은 ordinance_get_document로 별도 조회하세요."
+    }
+    return compact
 
 async def _run(action):
     try:
@@ -166,12 +211,15 @@ def register(mcp):
             return await asyncio.to_thread(diff_documents,*docs)
         return await _run(action)
 
-    @tool('ordinance_review_project','사업·조례/시행규칙의 권한·절차·초안 검토. params.procedure로 선행 조례·본회의/공포/시행 날짜·진행상태·필수 협의 점검. 보류는 법적 위법 판정 아님. 추가 AI 호출 없음. 먼저 공식 ID를 선택; 형식은 ordinance_guide.')
-    async def ordinance_review_project(params:ReviewInput) -> dict:
+    @tool('ordinance_review_project','사업·조례/시행규칙의 권한·절차·초안 검토. detail_level=summary|standard|full로 응답 크기를 조절하고 max_evidence로 핵심근거 수를 제한. params.procedure로 선행 조례·본회의/공포/시행 날짜·진행상태·필수 협의 점검. 보류는 법적 위법 판정 아님. 추가 AI 호출 없음. 먼저 공식 ID를 선택; 형식은 ordinance_guide.')
+    async def ordinance_review_project(params:ReviewInput, detail_level:Literal['summary','standard','full']='standard',
+                                       max_evidence:int=8) -> dict:
         async def action(c):
             if params.reasoning!='rules' or params.allow_external_llm: raise ValueError('external_llm_disabled')
             if params.procedure and params.procedure.jurisdiction != params.jurisdiction: raise ValueError('procedure_jurisdiction_mismatch')
             if len(params.comparisons)+len(params.parents)+len(params.provided_documents)>6: raise ValueError('narrow_scope')
+            if detail_level not in {'summary','standard','full'} or type(max_evidence) is not int or not 1<=max_evidence<=20:
+                raise ValueError('detail_level_or_max_evidence')
             result=await run_review(params.model_copy(update={'budget_calls':12}),_settings(),client=c,include_markdown=False)
             # Role records duplicate the same evidence/results; expose only compact role status.
             result['agents']=[{k:a[k] for k in ('id','name','method','status')} for a in result['agents']]
@@ -181,7 +229,7 @@ def register(mcp):
                 entry['role']=='baseline' and entry['selection']=='explicit_identifier' and entry['document_identity'] in official_ids
                 for entry in result['selection_log']) and not any(e.get('code')=='baseline_region_mismatch' for e in result['errors']))
             result['status']='partial' if result['errors'] else 'review_completed'
-            return result
+            return _compact_review(result,detail_level,max_evidence)
         return await _run(action)
 
     @tool('ordinance_verify_references','제공 텍스트의 법령명·조번호 존재를 선택한 상위법 원문과 대조. 위임 적합성·항호 의미 확정 아님.')

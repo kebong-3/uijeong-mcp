@@ -21,6 +21,7 @@ import department_aliases as A
 import period_core as P
 import coverage_core as C
 import release_info as RELEASE
+import query_decomposition as Q
 from citation_links import set_link
 from result_contract import wire_result
 
@@ -238,16 +239,20 @@ def install(U):
             period=P.resolve_period(years=years,include_current_year=include_current_year,as_of=as_of,
                                     period_mode=period_mode,date_from=date_from,date_to=date_to)
         except ValueError as exc:return invalid(str(exc))
+        search_terms=Q.council_search_terms(keyword,3)
         results=[]
         for window in period['windows']:
             r=await council_evidence_bundle(keyword,council,mode,answerer,committee,
-                    window['date_from'],window['date_to'],max_docs_per_year)
+                    window['date_from'],window['date_to'],max_docs_per_year,
+                    search_terms=search_terms[1:])
             results.append({**window,**r})
             if r['status']=='INVALID_INPUT':return r
         count=sum(r.get('total_items',0) for r in results)
         return {'status':C.combine_statuses([r['status'] for r in results],count),
                 'as_of':period['as_of'],'period':period,'year_basis':'회의연도',
                 'include_current_year':include_current_year,'observed_items':count,
+                'query_plan':{'exact_query':keyword,'search_terms':search_terms,
+                              'rule':'원문 질의를 먼저 시도하고, 실패·미발견을 보완하기 위해 규칙기반 검색어를 최대 2개 추가합니다.'},
                 'results':results,'limitations':LIMITS}
 
     @register
