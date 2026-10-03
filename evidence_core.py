@@ -631,13 +631,22 @@ def record_events(record: dict, keyword: str = "", mode: str = "질의답변", a
     turns = record.get("turns", [])
     events = []
     def append_event(kind, *, q=None, answers=None, speech=None, commitment=None, linkage=None):
+        alternate_docids = []
+        for alias in record.get("aliases", []):
+            alt = alias.get("docid") if isinstance(alias, dict) else None
+            if alt and alt != record.get("docid") and alt not in alternate_docids:
+                alternate_docids.append(alt)
         event = {"kind": kind, "record_id": record["record_id"], "docid": record.get("docid"),
                  "metadata": copy.deepcopy(record.get("metadata", {})),
                  "question": turn_evidence(record, q) if q else None,
                  "answers": [turn_evidence(record, a) for a in (answers or [])],
                  "speech": turn_evidence(record, speech) if speech else None, "commitment": commitment,
                  "source_kind": record.get("source_kind"), "provenance": copy.deepcopy(record.get("provenance", {})),
-                 "coverage_note": "확인한 본문 범위의 규칙 기반 후보입니다. 전체 의회 자료의 전수 결과나 이행 확인이 아닙니다.",
+                 "matched_query": keyword or None,
+                 "evidence_state": "VERIFIED_MATCH" if keyword else "VERIFIED_SOURCE_SCOPE",
+                 "alternate_docids": alternate_docids,
+                 "duplicate_reason": record.get("dedup_basis"),
+                 "coverage_note": "상세 회의록 파싱 범위에서 검색어·발언구조를 확인한 근거입니다. 전체 의회 자료의 전수 결과나 이행 확인이 아닙니다.",
                  "linkage": linkage}
         event["event_id"] = "evt_" + _digest({"record": record["record_id"], "kind": kind,
                                                 "q": q["idx"] if q else None,
@@ -694,10 +703,15 @@ def evidence_status(*, items: int, attempted: int, succeeded: int, errors: Optio
         status = "PARTIAL"
     else:
         status = "COMPLETE" if items else "EMPTY"
+    query_complete = not unresolved and not limited
     return {"status": status,
             "coverage": {"documents_attempted": attempted, "documents_succeeded": succeeded,
                          "body_unavailable": body_unavailable, "parse_failed": parse_failed,
-                         "matched_items": items, "limited": bool(limited), "complete_requested_scope": not unresolved and not limited,
+                         "matched_items": items, "limited": bool(limited),
+                         "complete_requested_scope": query_complete,
+                         "query_complete": query_complete,
+                         "scope_complete": query_complete,
+                         "semantic_coverage": "INCOMPLETE_BY_DESIGN",
                          "is_exhaustive_council_archive": False},
             "errors": copy.deepcopy(errors),
-            "interpretation": "미발견은 확인한 범위에 한정되며 조회 실패·본문 미제공은 미발견으로 간주하지 않습니다."}
+            "interpretation": "COMPLETE는 지정한 검색조건·확인범위의 완료를 뜻하며 의미상 모든 표현이나 의회 전체 전수를 뜻하지 않습니다. 미발견은 확인한 범위에 한정되며 조회 실패·본문 미제공은 미발견으로 간주하지 않습니다."}
