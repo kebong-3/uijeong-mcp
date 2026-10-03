@@ -407,5 +407,6 @@
   "integrity_note": "내용 일치 검사이며 제작자 서명·원격 배포 증명은 아닙니다.",
   "verification_reference": "docs/verification/v250/verification-summary.json",
   "runtime_protocol_claim": "SEE_VERIFICATION_SUMMARY",
-  "deployment_performed_in_this_build": false
+  "deployment_performed_in_this_build": false,
+  "validation_trigger": "owner-rerun-2026-10-03"
 }
