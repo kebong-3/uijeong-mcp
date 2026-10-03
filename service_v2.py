@@ -244,15 +244,23 @@ def install(U):
         for window in period['windows']:
             r=await council_evidence_bundle(keyword,council,mode,answerer,committee,
                     window['date_from'],window['date_to'],max_docs_per_year,
-                    search_terms=search_terms[1:])
-            results.append({**window,**r})
+                    search_terms=search_terms[1:],limit=3)
             if r['status']=='INVALID_INPUT':return r
+            compact={k:r[k] for k in (
+                'status','snapshot_id','item_offset','total_items','items','next_item_offset',
+                'coverage','coverage_summary','errors','limitations','warnings'
+            ) if k in r}
+            compact['records_checked']=len(r.get('records',[]))
+            compact['detail_level']='period_summary'
+            results.append({**window,**compact})
         count=sum(r.get('total_items',0) for r in results)
         return {'status':C.combine_statuses([r['status'] for r in results],count),
                 'as_of':period['as_of'],'period':period,'year_basis':'회의연도',
                 'include_current_year':include_current_year,'observed_items':count,
                 'query_plan':{'exact_query':keyword,'search_terms':search_terms,
                               'rule':'원문 질의를 먼저 시도하고, 실패·미발견을 보완하기 위해 규칙기반 검색어를 최대 2개 추가합니다.'},
+                'response_policy':{'items_per_year':3,
+                                   'detail_retrieval':'각 연도의 snapshot_id와 next_item_offset으로 추가 근거를 이어 조회하고, 원문은 council_read_source로 확인합니다.'},
                 'results':results,'limitations':LIMITS}
 
     @register
