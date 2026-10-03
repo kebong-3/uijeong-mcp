@@ -18,9 +18,9 @@ _QUESTION_WORDS = {
     "전국","모든","전체","사례","조례","법령","근거","어떻게","무엇","뭐가","유의점","사항","설치","운영",
 }
 _LAW_PATTERNS = [
-    re.compile(r"([가-힣A-Za-z0-9·s]{2,60}?(?:기본법|특별법|법률|법|시행령|시행규칙))(?=s|제d+조|에|의|을|를|,|.|$)")
+    re.compile(r"([가-힣A-Za-z0-9·\s]{2,60}?(?:기본법|특별법|법률|법|시행령|시행규칙))(?=\s|제\d+조|에|의|을|를|,|\.|$)")
 ]
-_ARTICLE = re.compile(r"제s*(d+)s*조(?:의s*(d+))?")
+_ARTICLE = re.compile(r"제\s*(\d+)\s*조(?:의\s*(\d+))?")
 
 # Function-oriented expansion.  These are search axes, not claims that the
 # concepts are legally equivalent.
