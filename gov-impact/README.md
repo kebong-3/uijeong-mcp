@@ -17,11 +17,12 @@
 
 ## Vercel 배포
 
-1. 이 폴더를 GitHub 저장소에 업로드
-2. Vercel에서 저장소 Import
-3. Project Settings → Environment Variables
-4. `LAW_OC` = 법제처 OPEN API 인증값 등록
-5. 재배포
+현재 배포 소스는 `gov-impact-mvp` 브랜치의 `gov-impact/` 폴더입니다.
+
+Vercel Deploy Button을 사용하면 이 하위폴더를 별도 GitHub 저장소와 별도 Vercel 프로젝트로 복제할 수 있습니다.
+
+배포 중 필요한 환경변수:
+- `LAW_OC` = 법제처 OPEN API 인증값
 
 기본 기관코드:
 - 광주광역시: `6290000`
