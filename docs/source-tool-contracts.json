@@ -1,6 +1,6 @@
 {
   "generation_method": "AST_SOURCE_NOT_RUNTIME_SDK",
-  "version": "4.0.2-public.1",
+  "version": "4.1.0-public.1",
   "note": "SDK가 반환하는 JSON Schema의 실제 형식은 export_runtime_schemas.py 및 CI로 별도 확인.",
   "profiles": {
     "core": [
@@ -1691,6 +1691,14 @@
       "parameters": {
         "params": {
           "annotation": "ReviewInput"
+        },
+        "detail_level": {
+          "annotation": "Literal['summary', 'standard', 'full']",
+          "default": "standard"
+        },
+        "max_evidence": {
+          "annotation": "int",
+          "default": 8
         }
       },
       "required": [
