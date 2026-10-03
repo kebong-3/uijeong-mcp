@@ -1,4 +1,5 @@
 name: v4.1 manifest refresh
+# rerun after query parser correction
 on:
   push:
     branches: [v4.1-query-evidence-orchestration]
