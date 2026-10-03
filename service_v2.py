@@ -241,13 +241,33 @@ def install(U):
         except ValueError as exc:return invalid(str(exc))
         search_terms=Q.council_search_terms(keyword,3)
 
+        def compact_metadata(meta):
+            if not isinstance(meta,dict):
+                return {}
+            keys=('council_id','council_name','term','session','sitting','meeting_date',
+                  'meeting_name','committee','fiscal_year')
+            out={k:copy.deepcopy(meta.get(k)) for k in keys if k in meta}
+            agenda=str(meta.get('agenda_title') or '')
+            if agenda:
+                out['agenda_title']=agenda[:300]+('…' if len(agenda)>300 else '')
+            return out
+
         def compact_turn(turn):
             if not isinstance(turn,dict):
                 return turn
-            out={k:copy.deepcopy(v) for k,v in turn.items() if k not in ('text',)}
+            citation=turn.get('citation') if isinstance(turn.get('citation'),dict) else {}
+            kept_citation={k:copy.deepcopy(citation.get(k)) for k in (
+                'docid','turn_index','citation_url','citation_markdown','citation_status','source_kind'
+            ) if citation.get(k) is not None}
             text=str(turn.get('text') or '')
-            out['text']=text[:700]+('…' if len(text)>700 else '')
-            return out
+            return {
+                'turn_index':turn.get('turn_index'),
+                'label':turn.get('label'),
+                'role':turn.get('role'),
+                'act':turn.get('act'),
+                'text':text[:350]+('…' if len(text)>350 else ''),
+                'citation':kept_citation,
+            }
 
         def compact_event(event):
             if not isinstance(event,dict):
@@ -256,21 +276,20 @@ def install(U):
                 'event_id':event.get('event_id'),
                 'kind':event.get('kind'),
                 'docid':event.get('docid'),
-                'metadata':copy.deepcopy(event.get('metadata',{})),
+                'metadata':compact_metadata(event.get('metadata')),
                 'matched_query':event.get('matched_query'),
                 'evidence_state':event.get('evidence_state'),
                 'alternate_docids':copy.deepcopy(event.get('alternate_docids',[])),
                 'duplicate_reason':event.get('duplicate_reason'),
                 'question':compact_turn(event.get('question')),
-                'answers':[compact_turn(x) for x in (event.get('answers') or [])[:2]],
+                'answers':[compact_turn(x) for x in (event.get('answers') or [])[:1]],
                 'speech':compact_turn(event.get('speech')),
                 'linkage':copy.deepcopy(event.get('linkage')),
-                'provenance':copy.deepcopy(event.get('provenance')),
             }
 
         def compact_year(window,r):
             items=r.get('items') or []
-            shown=[compact_event(x) for x in items[:4]]
+            shown=[compact_event(x) for x in items[:2]]
             return {
                 **window,
                 'status':r.get('status'),
@@ -307,7 +326,7 @@ def install(U):
                 'query_plan':{'exact_query':keyword,'search_terms':search_terms,
                               'rule':'원문 질의를 먼저 시도하고, 실패·미발견을 보완하기 위해 규칙기반 검색어를 최대 2개 추가합니다.'},
                 'results':results,
-                'coverage_interpretation':'각 연도 items는 최대 4건의 검토용 발췌입니다. observed_items와 snapshot 이어보기를 사용해야 전체 확인 범위를 재구성할 수 있습니다.',
+                'coverage_interpretation':'각 연도 items는 최대 2건의 대표 발췌이며 중요도 순위가 아닙니다. observed_items와 snapshot 이어보기를 사용해야 전체 확인 범위를 재구성할 수 있습니다.',
                 'limitations':LIMITS}
 
     @register
