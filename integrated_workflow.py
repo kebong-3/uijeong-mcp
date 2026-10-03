@@ -4,6 +4,7 @@ from __future__ import annotations
 from datetime import date
 from typing import Literal
 from pydantic import BaseModel, Field
+from query_decomposition import decompose, council_search_terms, legal_search_plan
 
 INTEGRATED_INSTRUCTIONS = """
 지방의회·예산·조례를 하나의 업무 흐름으로 지원합니다. 단순 질문은 해당 조회 도구를 바로 사용하고,
@@ -59,6 +60,10 @@ def local_workflow_plan(question: str, jurisdiction: str = '', fiscal_year: int 
             return {'status': 'INVALID_INPUT', 'message': '기준일은 YYYY-MM-DD로 입력하세요.'}
     if domains is not None and any(d not in ('council', 'budget', 'ordinance') for d in domains):
         return {'status': 'INVALID_INPUT', 'message': '분야는 council, budget, ordinance입니다.'}
+    try:
+        decomposition=decompose(question,jurisdiction,max_terms=6)
+    except ValueError as exc:
+        return {'status':'INVALID_INPUT','message':str(exc)}
     selected = list(dict.fromkeys(domains or []))
     if not selected:
         words = {'council': ('의회', '의원', '질의', '회의록', '행감', '행정사무감사'),
@@ -77,22 +82,35 @@ def local_workflow_plan(question: str, jurisdiction: str = '', fiscal_year: int 
     steps = []
     for domain in selected:
         if domain == 'council':
+            council_terms=council_search_terms(question,3)
             steps.append({'domain': domain, 'tool': 'council_evidence_bundle',
-                          'arguments_template': {'keyword': '<질문의 핵심 사업명>', 'council': jurisdiction or '<확인 필요>', 'max_docs': 3, 'limit': 5},
+                          'arguments_template': {'keyword': council_terms[0], 'search_terms': council_terms[1:],
+                                                 'council': jurisdiction or '<확인 필요>', 'max_docs': 3, 'limit': 5},
+                          'query_plan': {'exact_first':True,'terms':council_terms,
+                                         'verification':'목록 후보가 아니라 상세 회의록을 파싱한 발언만 근거로 채택'},
                           'next': '필요한 발언만 council_read_source로 문맥 확인. 회의일·발언자·원문 주소 유지.'})
         elif domain == 'budget':
-            steps.append({'domain': domain, 'tool': 'council_finance_context', 'arguments_template': {'topic': '<핵심 사업명>', 'council': jurisdiction or '<확인 필요>', 'fiscal_year': fiscal_year, 'budget_stage': '<current/original/supplementary/draft/settlement>'},
+            budget_topic=(decomposition['named_policy_terms'] or decomposition['search_terms'] or [question.strip()])[0]
+            steps.append({'domain': domain, 'tool': 'council_finance_context', 'arguments_template': {'topic': budget_topic, 'council': jurisdiction or '<확인 필요>', 'fiscal_year': fiscal_year, 'budget_stage': '<current/original/supplementary/draft/settlement>'},
                           'next': '자료 제공일·사업명 후보 확인 뒤 사업코드·회계·단위를 대조. 본예산/추경/예산안/결산은 해당 공식 문서로 확인. 추가 API가 필요할 때만 budget_api_catalog와 budget_fetch_api. 산술은 budget_calculate. 수치별 링크 표시.',
                           'scope': {'fiscal_year': fiscal_year, 'jurisdiction': jurisdiction, 'required': ['본예산/추경/결산 구분', '금액 단위', '집행 기준일(필요 시)']}})
         else:
+            legal_plan=legal_search_plan(question,jurisdiction,6)
             steps.append({'domain': domain, 'tool': 'ordinance_search',
-                          'arguments_template': {'query': '<조례명 또는 핵심 주제>', 'jurisdiction': jurisdiction, 'limit': 5},
-                          'next': '검색에서 반환한 kind 및 document_id 또는 mst를 reference 객체로 전달하여 ordinance_get_document. 법령 mst 조회에는 effective_date 필요. 시행일·현행/연혁·상위법 조문 확인. 입안·공포·시행이면 ordinance_guide의 procedure로 근거 유형·단계·의결/공포/시행 날짜·협의상태 점검; 실제 원문을 선택한 ordinance_review_project에서도 params.procedure로 재대조. 공식 의안·공보 증빙이 없으면 미확인 표시.',
+                          'arguments_template': {'law_queries': legal_plan['law_queries'],
+                                                 'article_refs': legal_plan['article_refs'],
+                                                 'ordinance_queries': legal_plan['ordinance_queries'][:6],
+                                                 'jurisdiction': jurisdiction, 'limit': 5},
+                          'query_plan': {'function_axes':legal_plan['functional_axes'],
+                                         'exhaustive_intent':legal_plan['exhaustive_intent'],
+                                         'coverage_contract':legal_plan['coverage_contract']},
+                          'next': '법령명·조문과 정책기능 검색을 분리해 조회합니다. 검색에서 반환한 kind 및 document_id 또는 mst를 reference 객체로 전달하여 ordinance_get_document. 전수 요청도 national_exhaustive=false인 동안 전국 전체라고 표현하지 않습니다. 시행일·현행/연혁·상위법 조문 확인. 입안·공포·시행이면 ordinance_guide의 procedure로 근거 유형·단계·의결/공포/시행 날짜·협의상태 점검.',
                           'scope': {'as_of': as_of}})
     return {'status': 'NEEDS_CONTEXT' if missing else 'PLAN_ONLY', 'evidence_retrieved': False,
-            'domains': selected, 'missing_context': missing, 'steps': steps,
+            'domains': selected, 'missing_context': missing, 'decomposition':decomposition, 'steps': steps,
             'execution': '단순 질문은 계획 도구를 생략. 누락값은 대화에서 확인한 값으로 보완. arguments_template의 <...>는 실행 인자가 아니므로 실제 검색어로 치환. 지역이 모호하면 확인 전 해당 지역 조회를 실행하지 않음. 관련 없는 분야는 호출하지 않음.',
-            'cross_checks': ['지자체·사업명·연도 일치', '회의 발언과 확정된 결정 구분', '조례 근거와 예산 편성·집행 요건 구분'],
+            'cross_checks': ['지자체·사업명·연도 일치', '회의 발언과 확정된 결정 구분', '조례 근거와 예산 편성·집행 요건 구분',
+                             '검색후보와 원문검증 근거 구분', '전수 요청 시 검색어별 Coverage와 미조회 가능성 표시'],
             'answer_order': ['확인된 결론', '원문 근거와 기준일', '계산 조건(있는 경우)', '미확인 사항·다음 조치']}
 
 
