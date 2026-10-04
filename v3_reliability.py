@@ -409,6 +409,45 @@ async def finance_ping() -> dict[str, Any]:
             "note":"접속 응답과 실제 사업자료 검증은 별개입니다."}
 
 
+def compact_discovery(kind, candidate, result):
+    """Return review essentials once, with executable recovery and source locators."""
+    candidates = candidate if isinstance(candidate,list) else [candidate]
+    hints = []
+    for item in candidates[:3]:
+        hints.append({k:copy.deepcopy(item[k]) for k in ('term','kind','quote','citation','locator','source_event_id',
+                     'same_project_verified','applicability_verified','amount_attribution_verified') if k in item})
+        quote = hints[-1].get('quote','')
+        if len(quote)>250:
+            hints[-1]['quote']=quote[:250]
+            hints[-1]['quote_display']={'kept_chars':250,'original_chars':len(quote),'excerpt_only':True}
+    rows=[]
+    for row in result.get('items',[])[:3]:
+        # Keep every scalar identity/amount/unit/state field. Large article text
+        # is retrieved by document reference instead of copied repeatedly.
+        small={k:copy.deepcopy(v) for k,v in row.items() if not isinstance(v,(dict,list))}
+        for key in ('source_link','unverified_fields','detail_error'):
+            if key in row:small[key]=copy.deepcopy(row[key])
+        if row.get('document_summary'):
+            small['document_summary']={k:v for k,v in row['document_summary'].items()
+                                      if k in ('kind','document_id','title','jurisdiction','version','source_url','effective_date','content_hash')}
+        small['recovery']={'tool':'ordinance_get_document','arguments':{'reference':{
+            'kind':'ordinance','document_id':row.get('document_id',''),'mst':row.get('mst',''),
+            'title_hint':row.get('title','')},'limit':3,'max_chars':2000}} if kind=='ordinance' else {
+            'tool':'council_finance_context','arguments':{k:v for k,v in {
+                'topic':row.get('project_name'), 'council':row.get('local_government'),
+                'fiscal_year':int(row['fiscal_year']) if str(row.get('fiscal_year','')).isdigit() else None,
+                'snapshot_date':row.get('execution_date'),
+                'budget_stage':'current','limit':3}.items() if v not in (None,'')}}
+        rows.append(small)
+    slim={k:copy.deepcopy(result[k]) for k in ('status','code','elapsed_ms','budget_basis','query','date_resolution') if k in result}
+    slim['items']=rows
+    slim['errors']=[{k:e[k] for k in ('stage','code','status','message') if k in e}
+                    for e in (result.get('errors') or result.get('failures') or [])[:3]]
+    slim['coverage']={'source_items':len(result.get('items',[])), 'shown_items':len(rows),'is_exhaustive':False,
+                      'summary_only':True, 'original_status':result.get('status')}
+    return {'domain':kind,'candidate':hints,'result':slim,'same_project_verified':False,'applicability_verified':False}
+
+
 async def context_pack(U, topic: str, council: str = "광주 서구", date_from: Optional[str] = None,
                        date_to: Optional[str] = None, include_legal: bool = True, include_finance: bool = True,
                        include_public_data: bool = False, fiscal_year: Optional[int] = None, max_docs: int = 4) -> dict[str, Any]:
@@ -464,8 +503,7 @@ async def context_pack(U, topic: str, council: str = "광주 서구", date_from:
             followup_keys.append(("budget", candidates["budget"]))
             followup_tasks.append(F.context(topic.strip(),cname,fiscal_year,3,search_terms=terms))
     followed = await asyncio.gather(*(stage(task,12) for task in followup_tasks))
-    discoveries = [{"domain":kind,"candidate":candidate,"result":result,
-                    "same_project_verified":False,"applicability_verified":False}
+    discoveries = [compact_discovery(kind,candidate,result)
                    for (kind,candidate), result in zip(followup_keys,followed)]
     legal_candidates = [row for item in discoveries if item["domain"] == "ordinance"
                         for row in item["result"].get("items",[])]

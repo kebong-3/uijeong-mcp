@@ -1,4 +1,4 @@
-# 공개 호출 계약 — 4.1.4-public.1
+# 공개 호출 계약 — 4.1.4-public.2
 
 운영 endpoint: `https://uijeong-mcp.onrender.com/mcp`. 인증 없음, 공개자료 읽기 전용. MCP SDK 1.30.0, stateless Streamable HTTP JSON. initialize → tools/list → tools/call을 POST로 전송한다. 독립 GET은 405이며 장애가 아니다. 원문 제한 초과는 정상 입력 거절이다.
 

@@ -117,9 +117,19 @@ def _best_council(query: str) -> tuple[str, set[str]]:
         if ranked:
             raise ValueError("의회명이 모호합니다. 시·도와 시·군·구를 함께 지정하세요.")
         from jurisdiction_identity import resolve_jurisdiction
+        local = []
         for token in re.findall(r"[가-힣]+", query):
-            if resolve_jurisdiction(token)['state'] == 'ambiguous':
+            resolved = resolve_jurisdiction(token)
+            if resolved['state'] == 'ambiguous':
                 raise ValueError("지역명이 모호합니다. 시·도와 시·군·구를 함께 지정하세요.")
+            if resolved['state'] == 'resolved':
+                local.append((token,resolved))
+        ids = {r['council_id'] for _,r in local}
+        if len(ids)>1:
+            raise ValueError("여러 지역명이 있어 모호합니다. 대상 의회를 하나로 지정하세요.")
+        if local:
+            token,resolved = local[0]
+            return resolved['normalized']+'의회', {t for t,_ in local}
         return default, set()
 
     row, matched_name = chosen[2], chosen[3]

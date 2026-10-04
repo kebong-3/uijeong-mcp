@@ -68,3 +68,9 @@ def test_formal_report_after_greeting_is_not_an_answer():
     text = '안녕하십니까? 건축과장입니다. 위원님들의 노고에 감사드립니다. 건축과 소관 사항에 대한 2026년도 주요 업무추진실적 보고를 드리겠습니다. 사업비는 2억원입니다.'
     assert E.classify_act('executive','건축과장',text) == 'report'
     assert E.classify_act('executive','건축과장','위원님 질문에 답변드리겠습니다. 다음 회기에 보고하겠습니다.') == 'answer_candidate'
+
+
+def test_unambiguous_city_shortform_does_not_use_default():
+    council,drop=O._best_council('수원 공동주택 회의록')
+    assert council == '경기도 수원시의회'
+    assert O._keyword('수원 공동주택 회의록',drop) == '공동주택'

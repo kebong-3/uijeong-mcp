@@ -197,7 +197,8 @@ _ESSENTIAL = ("status", "message", "snapshot_id", "keyword", "council", "topic",
               "period", "classification", "same_request_confirmed", "coverage_summary",
               "observed_repeat_candidates", "snapshot_unavailable", "recovery", "source_status",
               "readiness", "ready_for_submission", "semantic_support", "mechanical_issues_count",
-              "unlinked_span_count", "evidence_total", "event_offset", "next_event_offset")
+              "unlinked_span_count", "evidence_total", "event_offset", "next_event_offset",
+              "linked_review", "search_strategy", "execution_trace")
 
 
 def _minimal(payload: dict, cap: int, log: list[dict]) -> dict:
