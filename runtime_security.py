@@ -680,7 +680,7 @@ async def _public_reply(send: Any, status: int, payload: dict[str, Any]) -> None
     if status == 503:
         headers.append((b"retry-after", b"2"))
     if status == 405:
-        headers.append((b"allow", b"POST, GET, DELETE"))
+        headers.append((b"allow", b"POST, DELETE"))
     await send({"type": "http.response.start", "status": status, "headers": headers})
     await send({"type": "http.response.body", "body": json.dumps(payload, ensure_ascii=False).encode()})
 
@@ -702,9 +702,14 @@ class PublicBoundary:
         if scope.get("path", "").rstrip("/") != "/mcp":
             await _public_reply(send, 404, {"error": "Not found"})
             return
-        if scope.get("method") not in ("POST","GET","DELETE"):
+        # This public server is stateless and responds to POST with JSON. It
+        # has no server-initiated events to deliver on a standalone GET SSE
+        # stream. Such idle streams used to retain every query slot forever.
+        # MCP permits 405 for an endpoint without a standalone SSE stream.
+        # Reject before acquiring a slot, including when the query queue is full.
+        if scope.get("method") not in ("POST","DELETE"):
             await _public_reply(send, 405, {"authentication": "none", "public_readonly": True,
-                "message": "MCP Streamable HTTP는 POST/GET/DELETE를 지원합니다. 서버 상태 확인 주소는 /healthz입니다."})
+                "message": "이 무상태 MCP는 POST로 호출합니다. 별도 GET 이벤트 스트림은 제공하지 않습니다. 상태 확인 주소는 /healthz입니다."})
             return
         if scope.get("uijeong_control_request"):
             if self.control_waiting >= 16:

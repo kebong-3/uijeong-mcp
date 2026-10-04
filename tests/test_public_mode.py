@@ -64,7 +64,7 @@ def test_real_guard_no_auth_and_rejections(public_env):
     async def run():
         async with httpx.AsyncClient(transport=httpx.ASGITransport(app), base_url='https://mcp.example.test') as c:
             assert (await c.post('/mcp', json={})).status_code == 200
-            assert (await c.get('/mcp')).status_code == 200
+            assert (await c.get('/mcp')).status_code == 405
             assert (await c.get('/healthz')).status_code == 200
             assert (await c.post('/mcp', content=b'x' * 65537)).status_code == 413
             assert (await c.post('/mcp', json={}, headers={'origin':'https://bad.example'})).status_code == 403
