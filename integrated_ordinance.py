@@ -5,7 +5,8 @@ import copy
 import json
 from dataclasses import replace
 from datetime import date, datetime
-from typing import Literal
+from typing import Literal, Annotated
+from pydantic import Field
 from zoneinfo import ZoneInfo
 from mcp.types import ToolAnnotations
 from jachi.config import Settings
@@ -133,12 +134,22 @@ def register(mcp):
                     'selection_required':True,'law_view':'effective' if kind=='law' else None}
         return await _run(action)
 
-    @tool('ordinance_get_document','공식 원문·해시·시행상태 조회. section=articles/supplementary/annexes 별도 페이지. coverage.next_offset/next_start_char로 이어읽기. 법령 MST에는 effective_date 필수.')
-    async def ordinance_get_document(reference:DocumentRef, keyword:str='', offset:int=0, limit:int=8,
+    @tool('ordinance_get_document','공식 원문·해시·시행상태 조회. section=articles/supplementary/annexes 별도 페이지. offset/start_char 0 이상, limit 1~30, max_chars 200~5000. coverage.next_offset/next_start_char로 이어읽기. 법령 MST에는 effective_date 필수.')
+    async def ordinance_get_document(reference:DocumentRef, keyword:str='',
+                                     offset:Annotated[int, Field(ge=0)]=0,
+                                     limit:Annotated[int, Field(ge=1,le=30)]=8,
                                      section:Literal['articles','supplementary','annexes']='articles',
-                                     start_char:int=0, max_chars:int=2000) -> dict:
+                                     start_char:Annotated[int, Field(ge=0)]=0,
+                                     max_chars:Annotated[int, Field(ge=200,le=5000)]=2000) -> dict:
+        for field,value,minimum,maximum in (('offset',offset,0,None),('start_char',start_char,0,None),
+                ('limit',limit,1,30),('max_chars',max_chars,200,5000)):
+            if type(value) is not int or value<minimum or (maximum is not None and value>maximum):
+                return {'status':'unavailable','code':'invalid_input',
+                        'message':'조례 원문 입력 범위를 확인하세요.',
+                        'validation':{'field':field,'value':value,'allowed':{'minimum':minimum,'maximum':maximum}},
+                        'next_action':'허용 범위로 줄이고 coverage.next_offset/next_start_char로 이어읽으세요.',
+                        'warning':'입력 거절은 원문 장애·검색 0건·근거 없음이 아닙니다.'}
         async def action(c):
-            if offset<0 or start_char<0 or not 1<=limit<=30 or not 200<=max_chars<=5000: raise ValueError('range')
             d=await c.get_document(reference)
             if section=='articles':
                 items=[a for a in d.articles if not keyword or keyword in a.text or keyword in a.title]
@@ -253,3 +264,30 @@ def register(mcp):
             return await asyncio.to_thread(draft_amendment,docs[0],operations,expected_hash,evidence_index(docs))
         return await _run(action)
     return TOOL_NAMES
+
+
+async def mention_context(query: str, jurisdiction: str) -> dict:
+    """Internal integration uses the same search and parser as ordinance tools."""
+    async def action(client):
+        found = await client.search(query, kind='ordinance', jurisdiction=jurisdiction, max_pages=1)
+        items = []
+        for row in found.get('results', [])[:2]:
+            item = {**row, 'match_status':'OFFICIAL_MENTION_SEARCH_CANDIDATE',
+                    'applicability_verified':False, 'same_project_verified':False}
+            try:
+                doc = await client.get_document(DocumentRef(kind='ordinance', document_id=row['document_id'],
+                                                            mst=row.get('mst',''), title_hint=row.get('title','')))
+                item['document_summary'] = doc.summary()
+                item['articles'] = [a.model_dump() for a in doc.articles[:3]]
+                item['article_coverage'] = {'returned':min(3,len(doc.articles)), 'total':len(doc.articles),
+                    'note':'일부 조문만 표시. 적용 조항은 ordinance_get_document keyword/offset으로 별도 열람'}
+            except (UpstreamError, ValueError) as exc:
+                item['detail_error'] = {'code':getattr(exc,'code','invalid_document'),
+                                        'meaning':'후보 발견과 원문 검증을 구분하세요.'}
+            items.append(item)
+        return {'status':'PARTIAL' if items else 'ERROR' if found.get('failures') else 'EMPTY',
+                'items':items,'search_coverage':found.get('coverage'),
+                'jurisdiction_resolution':found.get('jurisdiction_resolution'),
+                'same_project_verified':False,'applicability_verified':False,
+                'failures':found.get('failures',[])}
+    return await _run(action)

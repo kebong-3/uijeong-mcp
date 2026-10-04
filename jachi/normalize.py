@@ -6,6 +6,7 @@ from collections import Counter
 from typing import Any
 from urllib.parse import urlencode
 from .models import Article, Document, UserText, digest
+from jurisdiction_identity import same_jurisdiction
 
 
 def clean(value: Any) -> str:
@@ -99,11 +100,31 @@ def jo_label(value: str, branch: str = "") -> str:
             number, br = int(value[:4]), int(value[4:])
         elif len(value) == 7: # 법령 조문키 includes trailing entry marker; prefer 조문번호.
             number, br = int(value[:4]), int(value[4:6])
-        else:
+        elif len(value) <= 4:
             number, br = int(value), int(branch or 0)
+        else:
+            return ""  # opaque source identifier, not a human article number
         if number:
             return f"제{number}조" + (f"의{br}" if br else "")
     return ""
+
+
+def article_identity(raw_number: str, content: str, branch: str = "", kind: str = "ordinance") -> dict[str, str]:
+    """One identity rule for standalone and legacy integrated document readers."""
+    # Ordinance API provides a string without the law JO encoding contract.
+    number_label = ("" if kind == "ordinance" and raw_number.isdigit() and len(raw_number)>4
+                    else jo_label(raw_number, branch))
+    match = re.match(r"(제\s*\d+\s*조(?:\s*의\s*\d+)?)", content)
+    heading = match[1] if match else ""
+    heading_label = jo_label(heading) if heading else ""
+    if number_label and heading_label and number_label != heading_label:
+        raise ValueError("조문번호와 원문 표제 불일치: 후속 비교·개정안 생성 중단")
+    label = heading_label or number_label
+    if not label:
+        raise ValueError("조문 식별 실패: 미확인 조문을 누락한 문서의 후속 비교·개정안 생성 중단")
+    return {"label":label, "raw_number":raw_number, "source_heading":heading,
+            "number_source":"source_heading" if heading_label else "number_field",
+            "number_field_recognized":bool(number_label)}
 
 
 def article_order(label: str) -> tuple[int, int]:
@@ -147,16 +168,16 @@ def parse_document(data: Any, kind: str, document_id: str = "", mst: str = "",
             continue
         content = pick(n, "조내용", "조문내용")
         if content:
-            label = jo_label(pick(n, "조문번호"), pick(n, "조문가지번호"))
-            if not label:
-                m = re.match(r"(제\s*\d+\s*조(?:\s*의\s*\d+)?)", content)
-                label = jo_label(m[1]) if m else ""
-            if not label:
-                warnings.append("조문번호 해석 실패: 번호 미확인 내용을 검토에서 누락시킬 수 있음")
-                continue
+            raw_number = pick(n, "조문번호")
+            identity = article_identity(raw_number, content, pick(n, "조문가지번호"), kind)
+            label = identity['label']
+            if raw_number and not identity['number_field_recognized']:
+                warnings.append("식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용")
             body = flatten_article(n)
             arts.append(Article(key=f"main:{label}", label=label,
                                 title=pick(n, "조제목", "조문제목"), text=body,
+                                raw_number=raw_number, source_heading=identity["source_heading"],
+                                number_source=identity["number_source"],
                                 deleted=bool(re.match(r"^(?:제\d+조(?:의\d+)?\s*(?:\([^)]*\))?\s*)?삭제(?:\s|<|$)", body)),
                                 effective_date=pick(n, "조문시행일자")))
         if pick(n, "부칙내용"):
@@ -221,8 +242,7 @@ def compact(text: str) -> str:
 
 def region_match(org: str, wanted: str) -> bool:
     """No assumed merger aliases and no substring match for ambiguous '서구'/'광주시'."""
-    a, b = compact(org), compact(wanted)
-    return bool(a and b and a == b)
+    return same_jurisdiction(org, wanted)
 
 
 def paragraphs(text: str) -> list[str]:

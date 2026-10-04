@@ -33,10 +33,12 @@ def search_candidates(topic, extras, normalize):
             break
     return result
 
-def fiscal_basis(stage, date):
+def fiscal_basis(stage, date, evidence_found=False):
     return {"requested_stage": stage, "requested_stage_label": STAGES[stage],
         "returned_stage": "current", "returned_stage_label": STAGES["current"],
-        "requested_stage_verified": stage == "current", "basis_date": date,
+        "requested_stage_supported": stage == "current",
+        "requested_stage_verified": stage == "current" and evidence_found,
+        "amount_verified": False, "same_project_verified": False, "basis_date": date,
         "amount_unit": "SOURCE_CONFIRMATION_REQUIRED",
         "field_meanings": {"budget_current_amount": "bdg_cash_amt: 조회일 예산현액",
                           "expenditure": "ep_amt: 조회일 기준 지출액",
@@ -149,7 +151,7 @@ async def context(topic, council, fiscal_year, limit, search_terms, snapshot_dat
             "fallback_used": bool(used_date and used_date != requested.strftime("%Y%m%d")), "date_attempts": date_attempts,
             "max_lookback_days": MAX_DATE_LOOKBACK, "mixed_dates": False},
         "search_strategy": {"exact_first": True, "progressive_widening": len(attempts) > 1, "attempts": attempts, "request_count": requests},
-        "budget_basis": fiscal_basis(budget_stage, used_date),
+        "budget_basis": fiscal_basis(budget_stage, used_date, bool(found)),
         "coverage": {"limited": bool(errors or incomplete or len(found) > limit or stage_incomplete), "is_exhaustive": False,
             "scanned_pages_per_query": 1, "has_unread_pages": incomplete, "date_data_available": bool(used_date),
             "requested_stage_complete": bool(found) and not stage_incomplete},

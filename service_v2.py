@@ -8,7 +8,8 @@ import inspect
 import json
 import os
 from pathlib import Path
-from typing import Optional, Any
+from typing import Optional, Any, Annotated
+from pydantic import Field
 from urllib.parse import urlparse, parse_qs
 
 import evidence_core as E
@@ -161,14 +162,11 @@ def install(U):
             await attach_source_links(records)
             events=[];followups=[]
             for record in records:
-                seen=set()
                 for term in terms:
-                    for event in E.record_events(record,term,mode,answerer):
-                        fingerprint=json.dumps(event,ensure_ascii=False,sort_keys=True)
-                        if fingerprint not in seen:events.append(event);seen.add(fingerprint)
-                for term in terms:
+                    events.extend(E.record_events(record,term,mode,answerer))
                     followups.extend(E.record_events(record,term,'약속',answerer))
-            followups=list({e['event_id']:e for e in followups}.values())
+            events=E.merge_events(events)
+            followups=E.merge_events(followups)
             partial=bool(errors) or any(not c.get('exhausted',False) for c in coverage)
             succeeded=sum(c.get('parsed',0) for c in coverage)
             # A successful empty listing is still a successful source operation.
@@ -547,14 +545,22 @@ def install(U):
         return 'clik',ref
 
     @register
-    async def council_read_source(ref:str,keyword:Optional[str]=None,start_turn:int=0,start_char:int=0,
-            max_turns:int=30,max_chars:int=12000,whole_agenda:bool=False)->dict[str, Any]:
+    async def council_read_source(ref:str,keyword:Optional[str]=None,
+            start_turn:Annotated[int, Field(ge=0)]=0,start_char:Annotated[int, Field(ge=0)]=0,
+            max_turns:Annotated[int, Field(ge=1,le=80)]=30,
+            max_chars:Annotated[int, Field(ge=100,le=24000)]=12000,whole_agenda:bool=False)->dict[str, Any]:
         """CLIK docid로 원문 발언을 끝까지 이어읽기.
         서구의회 홈페이지 URL/site:key 직접 조회는 안정성을 위해 제거했다.
+        start_turn/start_char는 0 이상, max_turns는 1~80, max_chars는 100~24000.
         next_start_turn/next_start_char를 그대로 전달한다. body_hash가 바뀌면 원문이 갱신된 것이다."""
         try: origin,key=parse_ref(ref.strip())
         except ValueError as exc:return invalid(str(exc))
-        if not (0<=start_turn and 0<=start_char and 1<=max_turns<=80 and 100<=max_chars<=24000):return invalid('이어읽기 범위가 잘못되었습니다.')
+        for field,value,minimum,maximum in (('start_turn',start_turn,0,None),('start_char',start_char,0,None),
+                ('max_turns',max_turns,1,80),('max_chars',max_chars,100,24000)):
+            if type(value) is not int or value<minimum or (maximum is not None and value>maximum):
+                return {**invalid('이어읽기 입력 범위를 확인하세요.'),'code':'invalid_input',
+                        'validation':{'field':field,'value':value,'allowed':{'minimum':minimum,'maximum':maximum}},
+                        'next_action':'허용 범위로 줄여 호출하고 next_start_turn/next_start_char로 이어읽으세요.'}
         try:
             meta=await U.minutes_detail(key);turns=await asyncio.to_thread(E.parse_turns,meta.get('MINTS_HTML',''));url=meta.get('ORGINL_FILE_URL')
         except Exception as exc:return {'status':'ERROR','message':R.safe_error(exc),'items':[]}

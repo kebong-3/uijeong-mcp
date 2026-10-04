@@ -18,6 +18,7 @@ from typing import Any
 from urllib.parse import urlencode
 
 import httpx
+from jachi.normalize import article_identity
 
 SEARCH_URL = "https://www.law.go.kr/DRF/lawSearch.do"
 SERVICE_URL = "https://www.law.go.kr/DRF/lawService.do"
@@ -214,21 +215,26 @@ def _query_tokens(query: str) -> list[str]:
     return out[:6]
 
 
-def _article_rows(data: Any, query: str, limit: int = 5) -> list[dict[str,str]]:
+def _article_rows(data: Any, query: str, limit: int = 5, kind: str = "ordinance") -> list[dict[str,str]]:
     tokens = _query_tokens(query)
     candidates=[]
     for node in _nodes(data):
         if not isinstance(node, dict):
             continue
+        if _pick(node, "조문여부") in {"N", "전문"}:
+            continue
         body = _pick(node, "조내용", "조문내용")
         if not body:
             continue
-        label = _pick(node, "조문번호")
+        identity = article_identity(_pick(node, "조문번호"), body, _pick(node,"조문가지번호"), kind)
+        label = identity["label"]
         title = _pick(node, "조제목", "조문제목")
         hay = re.sub(r"\s+","", title+" "+body)
         score = sum(1 for t in tokens if re.sub(r"\s+","",t) in hay)
         if score:
-            candidates.append((score, {"article":label, "title":title, "text":body[:1800]}))
+            candidates.append((score, {"article":label, "title":title, "text":body[:1800],
+                                       "raw_number":identity["raw_number"], "source_heading":identity["source_heading"],
+                                       "number_source":identity["number_source"]}))
     candidates.sort(key=lambda x:(-x[0], x[1]["article"]))
     return [item for _,item in candidates[:limit]]
 
@@ -292,7 +298,7 @@ async def detail(item: dict[str, Any], query: str, max_articles: int = 5) -> dic
     data = await _request("service", params)
     return {
         **item,
-        "matched_articles":_article_rows(data, query, max_articles),
+        "matched_articles":_article_rows(data, query, max_articles, kind),
         "detail_checked":True,
         "detail_note":"검색어와 직접 일치한 조문만 후보로 제시합니다. 최종 법적 판단은 전체 본문·부칙·시행일·별표를 공식 원문에서 확인하세요.",
     }

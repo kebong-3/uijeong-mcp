@@ -189,7 +189,8 @@ def law_jurisdiction(rows, wanted):
     target = canonical_jurisdiction(wanted)
     if not target:
         return rows, True
-    matched = [r for r in rows if canonical_jurisdiction(r.get("jurisdiction", "")) == target]
+    from jurisdiction_identity import same_jurisdiction
+    matched = [r for r in rows if same_jurisdiction(r.get("jurisdiction", ""), wanted)]
     return matched, bool(matched)
 
 
@@ -427,6 +428,8 @@ async def context_pack(U, topic: str, council: str = "광주 서구", date_from:
     scope = {"keyword":topic.strip(), "council":council, "date_from":date_from,"date_to":date_to,
              "max_docs":max_docs,"source":"auto","limit":8}
     tasks = {"council_evidence":U.council_evidence_bundle(**scope,mode="질의답변"),
+             "report_mentions":U.council_evidence_bundle(**{**scope,"max_docs":min(max_docs,2)},
+                        mode="발언",search_terms=expansions(topic,"minutes")),
              "related_bills":C._bill_context(U,topic.strip(),cid,2),
              "member_record_discovery":C._member_discovery(U,topic.strip(),cid,2),
              "policy_background":C._policy_context(U,topic.strip(),1)}
@@ -441,17 +444,60 @@ async def context_pack(U, topic: str, council: str = "광주 서구", date_from:
     for name in ("legal_and_ordinance_context","finance_context","public_data_discovery"):
         layers.setdefault(name,{"status":"SKIPPED"})
     evidence = layers["council_evidence"]
-    report = {"status":"SKIPPED"}
-    if not evidence.get("items") and evidence.get("status") != "ERROR":
-        report = await stage(U.council_evidence_bundle(**{**scope,"max_docs":min(max_docs,2)},
-                    mode="발언",search_terms=expansions(topic,"minutes")),16)
-    layers["report_mentions"] = report
-    return {"status":aggregate_status(layers), "topic":topic.strip(),"council":{"id":cid,"name":cname}, **layers,
-            "search_strategy":{"exact_first":True,"expanded":False,"report_pass_separate":report.get("status")!="SKIPPED"},
+    # Run the separate speech/report pass alongside initial queries so the
+    # bounded discovery pass stays within the public tool deadline.
+    report = layers["report_mentions"]
+    from evidence_discovery import discover_candidates
+    candidates = discover_candidates((evidence.get("items") or []) + (report.get("items") or []), topic)
+    followup_tasks, followup_keys = [], []
+    if include_legal and not layers["legal_and_ordinance_context"].get("ordinances"):
+        from integrated_ordinance import mention_context
+        for candidate in candidates["ordinance"][:2]:
+            followup_keys.append(("ordinance",candidate))
+            followup_tasks.append(mention_context(candidate["term"], C._jurisdiction_from_council(cname)))
+    if include_finance and not layers["finance_context"].get("items"):
+        # A located title can supply a shorter literal search phrase; this
+        # widens candidate discovery, never proves identity or parenthood.
+        terms = list(dict.fromkeys(re.sub(r"(?:지원|운영|조성)사업$", "", c["term"]).strip()
+                     for c in candidates["budget"] if c["term"] != topic.strip()))[:3]
+        if terms:
+            followup_keys.append(("budget", candidates["budget"]))
+            followup_tasks.append(F.context(topic.strip(),cname,fiscal_year,3,search_terms=terms))
+    followed = await asyncio.gather(*(stage(task,12) for task in followup_tasks))
+    discoveries = [{"domain":kind,"candidate":candidate,"result":result,
+                    "same_project_verified":False,"applicability_verified":False}
+                   for (kind,candidate), result in zip(followup_keys,followed)]
+    legal_candidates = [row for item in discoveries if item["domain"] == "ordinance"
+                        for row in item["result"].get("items",[])]
+    fiscal_candidates = [row for item in discoveries if item["domain"] == "budget"
+                         for row in item["result"].get("items",[])]
+    # Expose candidate evidence and exact continuation arguments, never certify
+    # an inferred hierarchy or use report amounts as confirmed appropriations.
+    unresolved = ["사업명과 정식 예산사업의 동일성·상하위 관계 미확인",
+                  "업무보고 금액과 의결 본예산·추경 금액의 동일성 미확인",
+                  "조례의 현행 버전·적용대상·지출근거 및 금액 단위 별도 대조 필요"]
+    review = {"council":{"status":evidence.get("status"),"snapshot_id":evidence.get("snapshot_id"),
+                "observed_events":evidence.get("total_items",len(evidence.get("items",[]))),
+                "is_exhaustive":False},
+              "budget":{"status":layers["finance_context"].get("status"),
+                "initial_candidates":len(layers["finance_context"].get("items",[])),
+                "discovered_candidates":len(fiscal_candidates),"amounts_verified":False},
+              "ordinance":{"status":layers["legal_and_ordinance_context"].get("status"),
+                "initial_candidates":len(layers["legal_and_ordinance_context"].get("ordinances",[])),
+                "discovered_candidates":len(legal_candidates),"applicability_verified":False},
+              "relationships":discoveries,"unresolved":unresolved,"ready_for_submission":False,
+              "legal_approval":False,"same_project_verified":False}
+    all_stages = {**layers, **{f"discovery_{i}":x["result"] for i,x in enumerate(discoveries)}}
+    return {"status":"PARTIAL" if aggregate_status(all_stages)=="COMPLETE" else aggregate_status(all_stages),
+            "topic":topic.strip(),"council":{"id":cid,"name":cname}, **layers,
+            "discovery_candidates":candidates,"linked_review":review,
+            "search_strategy":{"exact_first":True,"expanded":bool(discoveries),
+                "candidate_source":"LOCATED_OFFICIAL_MEETING_QUOTES", "same_project_verified":False,
+                "report_pass_separate":report.get("status")!="SKIPPED"},
             "coverage_card":{"date_from":date_from,"date_to":date_to,"search_terms":[topic.strip()],
                 "evidence_coverage":evidence.get("coverage",[]),"coverage_summary":evidence.get("coverage_summary",{}),"is_exhaustive":False},
-            "execution_trace":{"mcp_tool":"council_context_pack","stages":[{"stage":k,"status":v["status"],"elapsed_ms":v.get("elapsed_ms")} for k,v in layers.items()]},
-            "interpretation":["report_mentions의 집행부 업무보고는 의원 질의가 아닙니다.","법령·예산·의원정보·정책정보는 용도별 후보이며 발언 사실은 회의록 원문으로 확인합니다.","각 출처의 오류·미설정·검색범위를 그대로 표시해야 합니다."],
+            "execution_trace":{"mcp_tool":"council_context_pack","stages":[{"stage":k,"status":v["status"],"elapsed_ms":v.get("elapsed_ms")} for k,v in all_stages.items()]},
+            "interpretation":["report_mentions의 집행부 업무보고는 의원 질의가 아닙니다.","후속 검색의 예산사업·조례는 원문 명칭에서 찾은 후보이며 동일사업·적법성·확정 본예산을 증명하지 않습니다.","각 출처의 오류·미설정·검색범위를 그대로 표시해야 합니다."],
             "ready_for_submission":False}
 
 

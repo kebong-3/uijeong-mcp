@@ -27,6 +27,9 @@ class Article(Strict):
     label: str
     title: str = ""
     text: str
+    raw_number: str = ""
+    source_heading: str = ""
+    number_source: str = ""
     deleted: bool = False
     effective_date: str = ""
 

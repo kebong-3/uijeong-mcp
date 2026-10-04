@@ -1,4 +1,5 @@
 from __future__ import annotations
+from jurisdiction_identity import resolve_jurisdiction
 
 import asyncio
 import copy
@@ -242,7 +243,7 @@ class LawClient:
                             "query_exhausted":exhausted,"query_fully_scanned":exhausted and page==1 and not failures,
                             "first_scanned_page":page,"national_exhaustive":False,
                             "scope":"이 검색어·필터에 한정한 결과이며 전국 모든 관련 법규의 완전성을 보증하지 않음"},
-                "observed_jurisdictions":orgs,"failures":failures,
+                "observed_jurisdictions":orgs,"jurisdiction_resolution":resolve_jurisdiction(jurisdiction),"failures":failures,
                 "warning":"검색 0건을 미제정/법적 근거 없음으로 확정하지 마세요. 정식 제명·본문·동의어·기관코드로 재확인하세요."}
 
     async def get_document(self, ref: DocumentRef, allow_stale: bool = False):

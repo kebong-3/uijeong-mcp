@@ -52,6 +52,7 @@ _CACHE_MAX_ENTRIES = 128
 _SEARCH_TIMEOUT_SECONDS = 55
 _FETCH_TIMEOUT_SECONDS = 55
 _RESULT_LIMIT = 10
+CLIK_PORTAL_URL = "https://clik.nanet.go.kr/"
 
 _FILLER = {
     "관련", "최근", "회의록", "회의", "질의", "답변", "질의답변", "발언", "의원", "집행부",
@@ -81,9 +82,19 @@ def _best_council(query: str) -> tuple[str, set[str]]:
     ranked: list[tuple[int, str, dict[str, Any], str]] = []
     for row in _source_rows():
         names = [row.get("name", ""), row.get("directory_name", ""), *(row.get("aliases") or [])]
+        # Registry full names plus unique local-unit aliases support ordinary queries.
+        for name in list(names):
+            parts = str(name).split()
+            if len(parts) > 1:
+                names.append(parts[-1])
+                province = parts[0]
+                shortened = re.sub(r"(특별자치시|특별자치도|특별시|광역시|도)$", "", province)
+                if shortened != province:
+                    names.append(" ".join([shortened, *parts[1:]]))
         for name in names:
             n = _norm(name)
-            if len(n) < 3 or n not in normalized:
+            if (len(n) < 2 or n not in normalized
+                    or (len(n) == 2 and str(name) not in query)):
                 continue
             # Prefer longer aliases, then aliases that include a province/city marker.
             specificity = int(any(mark in n for mark in (
@@ -103,12 +114,23 @@ def _best_council(query: str) -> tuple[str, set[str]]:
 
     default = os.environ.get("UIJEONG_DEFAULT_COUNCIL", "광주 서구").strip() or "광주 서구"
     if chosen is None:
+        if ranked:
+            raise ValueError("의회명이 모호합니다. 시·도와 시·군·구를 함께 지정하세요.")
+        from jurisdiction_identity import resolve_jurisdiction
+        for token in re.findall(r"[가-힣]+", query):
+            if resolve_jurisdiction(token)['state'] == 'ambiguous':
+                raise ValueError("지역명이 모호합니다. 시·도와 시·군·구를 함께 지정하세요.")
         return default, set()
 
     row, matched_name = chosen[2], chosen[3]
+    from jurisdiction_identity import resolve_jurisdiction
+    if resolve_jurisdiction(matched_name)['state'] == 'ambiguous':
+        raise ValueError("의회명이 모호합니다. 시·도와 시·군·구를 함께 지정하세요.")
     drop_tokens: set[str] = set()
     for name in [matched_name, row.get("name", ""), *(row.get("aliases") or [])]:
         for token in re.findall(r"[0-9A-Za-z가-힣]+", str(name)):
+            drop_tokens.add(token)
+            drop_tokens.add(token.removesuffix("의회"))
             token = re.sub(r"(시|도|군|구)?의회$", "", token)
             if len(token) >= 2:
                 drop_tokens.add(token)
@@ -250,7 +272,9 @@ def build_tools(backend: Any) -> dict[str, Any]:
 
         Include a council name when searching outside the default Gwangju Seo-gu
         council. Results are matching public meeting passages with canonical,
-        user-openable source URLs.
+        user-openable source URLs. If CLIK omits a document link, the URL is
+        the official service portal, explicitly marked in the title; fetch
+        preserves the official document ID and parsed-turn locator.
         """
         if not isinstance(query, str) or not query.strip() or len(query) > 300:
             raise ValueError("query는 1~300자 문자열이어야 합니다.")
@@ -286,15 +310,17 @@ def build_tools(backend: Any) -> dict[str, Any]:
             ref = _ref_from_event(event)
             url = _event_url(event, anchor)
             turn = (anchor or {}).get("turn_index")
-            if not ref or not url or not isinstance(turn, int):
+            if not ref or not isinstance(turn, int):
                 continue
+            direct_url = url is not None
+            url = url or CLIK_PORTAL_URL
             key = (ref, turn)
             if key in seen:
                 continue
             seen.add(key)
             results.append(SearchResult(
                 id=_encode_id(ref, turn, url),
-                title=_title(event.get("metadata") or {}, str(event.get("kind") or "")),
+                title=_title(event.get("metadata") or {}, str(event.get("kind") or "")) + ("" if direct_url else " [CLIK 원문링크 미제공]"),
                 url=url,
             ))
             if len(results) >= _RESULT_LIMIT:
@@ -363,6 +389,9 @@ def build_tools(backend: Any) -> dict[str, Any]:
             "meeting_name": meta.get("meeting_name"),
             "council_name": meta.get("council_name"),
             "citation_status": (page.get("source_link") or {}).get("status"),
+            "url_kind": "OFFICIAL_SERVICE_PORTAL" if url == CLIK_PORTAL_URL else "DOCUMENT_REFERENCE",
+            "direct_document_url": url != CLIK_PORTAL_URL,
+            "citation_note": "CLIK 제공 원문 주소가 없습니다. URL은 공식 서비스 안내이며 문서 ID·발언번호로 대조하세요." if url == CLIK_PORTAL_URL else None,
             "scope": "matching_passage_with_context",
             "start_turn": start_turn,
             "matched_turn": turn,

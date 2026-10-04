@@ -74,7 +74,8 @@ def classify_act(role: str, label: str, text: str) -> str:
             return "other"
         return "question"
     if role in ("executive", "staff"):
-        return "report" if _REPORT_OPEN.search(text) else "answer_candidate"
+        formal_report = re.search(r"소관.{0,100}업무(?:추진실적|추진계획|현황)?\s*보고(?:를)?\s*(?:드리|하)", text[:500])
+        return "report" if _REPORT_OPEN.search(text) or formal_report else "answer_candidate"
     return "other"
 
 
@@ -715,3 +716,22 @@ def evidence_status(*, items: int, attempted: int, succeeded: int, errors: Optio
                          "is_exhaustive_council_archive": False},
             "errors": copy.deepcopy(errors),
             "interpretation": "COMPLETE는 지정한 검색조건·확인범위의 완료를 뜻하며 의미상 모든 표현이나 의회 전체 전수를 뜻하지 않습니다. 미발견은 확인한 범위에 한정되며 조회 실패·본문 미제공은 미발견으로 간주하지 않습니다."}
+
+
+def merge_events(events: list[dict]) -> list[dict]:
+    """Coalesce only canonical event IDs; retain all matching query provenance."""
+    merged, by_id = [], {}
+    for original in events:
+        event = copy.deepcopy(original)
+        queries = list(dict.fromkeys([q for q in [event.get("matched_query"),
+                    *(event.get("matched_queries") or [])] if q]))
+        key = event.get("event_id")
+        if key and key in by_id:
+            target = by_id[key]
+            target["matched_queries"] = list(dict.fromkeys(target["matched_queries"] + queries))
+        else:
+            event["matched_queries"] = queries
+            merged.append(event)
+            if key:
+                by_id[key] = event
+    return merged
