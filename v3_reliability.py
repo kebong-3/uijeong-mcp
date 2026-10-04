@@ -229,7 +229,8 @@ def finance_jurisdiction(value):
 def finance_belongs(row, council):
     if not council:
         return True
-    return finance_jurisdiction(row.get("laf_hg_nm", "")) == finance_jurisdiction(council)
+    from jurisdiction_identity import same_jurisdiction
+    return same_jurisdiction(finance_jurisdiction(row.get("laf_hg_nm", "")), finance_jurisdiction(council))
 
 
 def result_code(payload):
@@ -421,7 +422,7 @@ def compact_discovery(kind, candidate, result):
             hints[-1]['quote']=quote[:250]
             hints[-1]['quote_display']={'kept_chars':250,'original_chars':len(quote),'excerpt_only':True}
     rows=[]
-    for row in result.get('items',[])[:3]:
+    for row in result.get('items',[])[:6]:
         # Keep every scalar identity/amount/unit/state field. Large article text
         # is retrieved by document reference instead of copied repeatedly.
         small={k:copy.deepcopy(v) for k,v in row.items() if not isinstance(v,(dict,list))}
@@ -486,22 +487,27 @@ async def context_pack(U, topic: str, council: str = "광주 서구", date_from:
     # Run the separate speech/report pass alongside initial queries so the
     # bounded discovery pass stays within the public tool deadline.
     report = layers["report_mentions"]
-    from evidence_discovery import discover_candidates
-    candidates = discover_candidates((evidence.get("items") or []) + (report.get("items") or []), topic)
+    from evidence_discovery import discover_candidates, discover_subjects
+    located = (evidence.get("items") or []) + (report.get("items") or [])
+    candidates = discover_candidates(located, topic)
+    subjects = discover_subjects(located, topic, limit=1)
+    candidates['target_subjects'] = subjects
     followup_tasks, followup_keys = [], []
     if include_legal and not layers["legal_and_ordinance_context"].get("ordinances"):
         from integrated_ordinance import mention_context
-        for candidate in candidates["ordinance"][:2]:
+        seeds = subjects + candidates["ordinance"]
+        for candidate in seeds[:2]:
             followup_keys.append(("ordinance",candidate))
             followup_tasks.append(mention_context(candidate["term"], C._jurisdiction_from_council(cname)))
     if include_finance and not layers["finance_context"].get("items"):
         # A located title can supply a shorter literal search phrase; this
         # widens candidate discovery, never proves identity or parenthood.
-        terms = list(dict.fromkeys(re.sub(r"(?:지원|운영|조성)사업$", "", c["term"]).strip()
-                     for c in candidates["budget"] if c["term"] != topic.strip()))[:3]
+        terms = list(dict.fromkeys([c['term'] for c in subjects] +
+                     [re.sub(r"(?:지원|운영|조성)사업$", "", c["term"]).strip()
+                      for c in candidates["budget"] if c["term"] != topic.strip()]))[:3]
         if terms:
             followup_keys.append(("budget", candidates["budget"]))
-            followup_tasks.append(F.context(topic.strip(),cname,fiscal_year,3,search_terms=terms))
+            followup_tasks.append(F.context(topic.strip(),cname,fiscal_year,6,search_terms=terms))
     followed = await asyncio.gather(*(stage(task,12) for task in followup_tasks))
     discoveries = [compact_discovery(kind,candidate,result)
                    for (kind,candidate), result in zip(followup_keys,followed)]

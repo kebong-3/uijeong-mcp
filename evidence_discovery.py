@@ -45,7 +45,7 @@ def discover_candidates(items: list[dict], topic: str = '', limit: int = 3) -> d
                 continue
             if (event_kind or source_kind) not in _OFFICIAL:
                 continue
-            if not (citation.get('record_id') or citation.get('docid')) or citation.get('turn_index') is None:
+            if not (citation.get('record_id') or citation.get('docid')) or type(citation.get('turn_index')) is not int or citation['turn_index'] < 0:
                 continue
             text = turn.get('text')
             if not isinstance(text, str) or not text.strip() or len(text) > 100000:
@@ -88,3 +88,54 @@ def discover_candidates(items: list[dict], topic: str = '', limit: int = 3) -> d
         result[domain] = result[domain][:limit]
     result['ranking'] = 'EXACT_TOPIC_SENTENCE_THEN_SAME_TURN_DISTANCE_THEN_SOURCE_ORDER'
     return result
+
+
+def discover_subjects(items: list[dict], topic: str = '', limit: int = 2) -> list[dict]:
+    """Find literal target groups for bounded follow-up searches, not equivalence.
+
+    For example a located official quote may say a policy targets elderly people
+    or small apartment buildings. Those noun phrases are search hints only.
+    """
+    if not isinstance(items, list) or type(limit) is not int or not 1 <= limit <= 2:
+        raise ValueError('items는 근거 목록이며 limit은 1~2입니다.')
+    candidates, seen = [], set()
+    pattern = re.compile(r'([가-힣A-Za-z0-9·()「」]+(?:\s+[가-힣A-Za-z0-9·()「」]+){0,7}?)\s*[을를]\s*대상으로')
+    for event in items[:200]:
+        if not isinstance(event, dict):
+            continue
+        event_kind = str(event.get('source_kind', '')).upper()
+        for turn in _turns(event):
+            citation = turn.get('citation')
+            if not isinstance(citation, dict):
+                continue
+            kind = str(citation.get('source_kind', '')).upper()
+            if event_kind in _UNVERIFIED or kind in _UNVERIFIED or (event_kind or kind) not in _OFFICIAL:
+                continue
+            if not (citation.get('record_id') or citation.get('docid')) or type(citation.get('turn_index')) is not int or citation['turn_index'] < 0:
+                continue
+            text = turn.get('text')
+            if not isinstance(text, str) or len(text) > 100000:
+                continue
+            for sentence in _SENTENCE.finditer(text):
+                quote = sentence.group().strip()
+                for match in pattern.finditer(quote):
+                    term = match.group(1).strip(' ()「」')
+                    term = _PREFIX.sub('', term)
+                    # A preceding relative/narrative clause is not the target
+                    # noun phrase; retain the source quote for checking this cut.
+                    term = re.split(r'\s+\S*(?:겪는|하는|되는|있는|없는|된|한|인)\s+', term)[-1].strip()
+                    term = re.sub(r'^\d+(?:명|가구|개소|개|곳)\s+', '', term).strip(' ()「」')
+                    key = re.sub(r'\s+', '', term)
+                    if not 2 <= len(term) <= 60 or key in seen:
+                        continue
+                    seen.add(key)
+                    candidates.append({'term': term, 'kind': 'OFFICIAL_TARGET_SUBJECT_CANDIDATE',
+                        'quote': quote, 'citation': copy.deepcopy(citation),
+                        'locator': {'turn_index': citation['turn_index'], 'char_start': sentence.start(),
+                                    'char_end': sentence.end(), 'offset_basis': 'TURN_TEXT'},
+                        'source_event_id': event.get('event_id'), 'same_project_verified': False,
+                        'applicability_verified': False, 'amount_attribution_verified': False,
+                        'discovery_rank': [0 if topic and topic in quote else 1,
+                                           abs(sentence.start()-text.find(topic)) if topic and topic in text else 1000000]})
+    candidates.sort(key=lambda row: row['discovery_rank'])
+    return candidates[:limit]

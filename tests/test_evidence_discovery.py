@@ -78,3 +78,27 @@ def test_report_narration_prefix_is_not_a_search_title():
     assert result['ordinance'][0]['term'] == '수원시 건축 기본 조례'
     result = discover_candidates([event('다음은 주민공동체 개선을 위한 소규모 공동주택 지원사업입니다.')])
     assert result['budget'][0]['term'] == '소규모 공동주택 지원사업'
+
+
+def test_subject_bridge_is_literal_and_not_policy_equivalence():
+    from evidence_discovery import discover_subjects
+    text = '노후 및 관리주체의 부재로 불편을 겪는 소규모 공동주택을 대상으로 청소, 안전 등 주거환경 개선을 위한 관리소를 운영합니다.'
+    result = discover_subjects([event(text)], topic='관리소')
+    assert result[0]['term'] == '소규모 공동주택'
+    assert result[0]['quote'] == text[:-1]
+    assert result[0]['same_project_verified'] is False
+
+
+def test_subject_other_region_elderly_and_youth_and_parentheses():
+    from evidence_discovery import discover_subjects
+    for target in ('홀로 사는 어르신', '청년 주거 취약계층', '(저소득 한부모 가족)'):
+        result = discover_subjects([event(target+'을 대상으로 돌봄 서비스를 지원합니다.')])
+        assert result[0]['term'] == target.strip('()')
+    assert not discover_subjects([event('어르신을 대상으로 지원합니다.', source='SYNTHETIC')])
+
+
+def test_subject_bridge_prioritizes_topic_sentence():
+    from evidence_discovery import discover_subjects
+    text = '전체 시민을 대상으로 문화행사를 운영합니다. 청년을 대상으로 주거비 보조 사업을 운영합니다.'
+    result = discover_subjects([event(text)], topic='주거비', limit=1)
+    assert result[0]['term'] == '청년'

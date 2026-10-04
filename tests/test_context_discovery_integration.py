@@ -76,3 +76,34 @@ def test_unambiguous_city_shortform_does_not_use_default():
     council,drop=O._best_council('수원 공동주택 회의록')
     assert council == '경기도 수원시의회'
     assert O._keyword('수원 공동주택 회의록',drop) == '공동주택'
+
+
+def test_fiscal_short_jurisdiction_uses_shared_identity():
+    assert V.finance_belongs({'laf_hg_nm':'경기수원시'},'수원시')
+    assert V.finance_belongs({'laf_hg_nm':'경기수원시'},'경기도 수원시의회')
+    assert not V.finance_belongs({'laf_hg_nm':'서울중구'},'중구')
+    assert not V.finance_belongs({'laf_hg_nm':'부산중구'},'서울특별시 중구')
+
+def test_located_target_subject_is_first_shared_search_seed(monkeypatch):
+    calls=[]
+    async def empty(*a,**k):return {'status':'EMPTY','items':[],'ordinances':[]}
+    for name in ('_bill_context','_member_discovery','_policy_context'):
+        monkeypatch.setattr(C,name,empty)
+    monkeypatch.setattr(L,'context',empty)
+    async def finance(topic,council,year,limit,search_terms=None):
+        if search_terms:calls.append(('budget',search_terms))
+        return {'status':'EMPTY','items':[]}
+    monkeypatch.setattr(F,'context',finance)
+    async def legal(query,jurisdiction):
+        calls.append(('ordinance',query));return {'status':'EMPTY','items':[]}
+    monkeypatch.setattr(IO,'mention_context',legal)
+    async def evidence(**kwargs):
+        return {'status':'COMPLETE','items':[{'source_kind':'OFFICIAL_FETCHED','speech':{
+            'text':'홀몸 어르신을 대상으로 행복돌봄을 운영합니다.',
+            'citation':{'source_kind':'OFFICIAL_FETCHED','docid':'S1','turn_index':8}}}]}
+    backend=SimpleNamespace(pick_council=lambda q:('X','서울특별시 종로구의회',None),council_evidence_bundle=evidence)
+    r=asyncio.run(V.context_pack(backend,'행복돌봄',fiscal_year=2026))
+    assert ('ordinance','홀몸 어르신') in calls
+    assert next(v for kind,v in calls if kind=='budget')[0]=='홀몸 어르신'
+    assert r['discovery_candidates']['target_subjects'][0]['same_project_verified'] is False
+    assert r['linked_review']['legal_approval'] is False
