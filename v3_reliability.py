@@ -523,6 +523,12 @@ async def context_pack(U, topic: str, council: str = "광주 서구", date_from:
               "ordinance":{"status":layers["legal_and_ordinance_context"].get("status"),
                 "initial_candidates":len(layers["legal_and_ordinance_context"].get("ordinances",[])),
                 "discovered_candidates":len(legal_candidates),"applicability_verified":False},
+              "candidate_index":{domain:[{k:row[k] for k in
+                   ('document_id','mst','title','jurisdiction','source_url','project_name','project_code',
+                    'local_government','fiscal_year','amount_unit','budget_stage','same_project_verified',
+                    'applicability_verified') if k in row} for row in rows]
+                   for domain,rows in (('ordinance',legal_candidates),('budget',fiscal_candidates))},
+              "index_scope":"모든 반환 후보 식별자. 상세 items는 응답 크기 때문에 줄어들 수 있으며 recovery로 재조회합니다.",
               "relationships":discoveries,"unresolved":unresolved,"ready_for_submission":False,
               "legal_approval":False,"same_project_verified":False}
     all_stages = {**layers, **{f"discovery_{i}":x["result"] for i,x in enumerate(discoveries)}}

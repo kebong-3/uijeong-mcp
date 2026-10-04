@@ -1,4 +1,4 @@
-# 공개 호출 계약 — 4.1.4-public.2
+# 공개 호출 계약 — 4.1.4-public.3
 
 운영 endpoint: `https://uijeong-mcp.onrender.com/mcp`. 인증 없음, 공개자료 읽기 전용. MCP SDK 1.30.0, stateless Streamable HTTP JSON. initialize → tools/list → tools/call을 POST로 전송한다. 독립 GET은 405이며 장애가 아니다. 원문 제한 초과는 정상 입력 거절이다.
 
@@ -25,3 +25,5 @@
 조문 원시 번호의 긴 숫자는 공개 명세에 없는 인코딩을 추측해 해독하지 않는다. 본문 시작 조문 표제를 사용해 label/key를 맞추고 raw_number/source_heading/number_source를 보존한다. 식별 불가·불일치이면 후속 비교·입안을 차단한다. 본문 조회 명세: https://open.law.go.kr/LSO/openApi/guideResult.do?htmlName=ordinInfoGuide
 
 지역 정규화는 배포에 포함된 날짜 명시 등록표의 고유 식별자 기준이다. 법제처·지방재정 기관코드와 같은 코드라고 가정하지 않는다. 행정구역의 법적 유효기간·전국 코드 교차표 검증을 완료한 것은 아니다.
+
+후속 후보의 전체 식별자는 linked_review.candidate_index에 보존한다. 상세 result.items는 축약될 수 있으므로 반환 개수와 조회된 개수를 구분한다. candidate_index의 후보도 동일사업·적법성 확인이 아니다.

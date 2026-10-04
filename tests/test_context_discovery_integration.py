@@ -32,6 +32,8 @@ def test_integration_requeries_located_titles_without_certifying(monkeypatch):
     assert any(kind=='budget' and terms for kind,terms in calls)
     assert r['search_strategy']['expanded']
     assert r['linked_review']['budget']['discovered_candidates'] == 1
+    assert len(r['linked_review']['candidate_index']['budget']) == 1
+    assert len(r['linked_review']['candidate_index']['ordinance']) == 1
     assert r['ready_for_submission'] is False
     assert r['linked_review']['same_project_verified'] is False
     assert r['linked_review']['legal_approval'] is False

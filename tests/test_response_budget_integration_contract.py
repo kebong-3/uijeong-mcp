@@ -61,3 +61,14 @@ def test_compact_ordinance_does_not_hide_document_failure():
     assert item['detail_error']['code']=='upstream_unavailable'
     assert item['applicability_verified'] is False
     assert item['recovery']['arguments']['reference']['document_id']=='123'
+
+
+def test_compact_candidate_identity_index_survives_item_caps():
+    from response_budget import apply_budget
+    index = {'ordinance':[{'document_id':str(n),'title':f'가상{n}지원조례'} for n in range(2)],
+             'budget':[{'project_code':str(n),'project_name':f'가상{n}지원사업','same_project_verified':False} for n in range(3)]}
+    payload = {'status':'PARTIAL','linked_review':{'candidate_index':index,
+               'relationships':[{'result':{'items':[{'text':'가나다 '*5000} for _ in range(3)]}}]},
+               'unbounded':[{'oversized':'x'*50000} for _ in range(10)]}
+    result=apply_budget(payload,30000)
+    assert result['linked_review']['candidate_index']==index
