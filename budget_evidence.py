@@ -95,7 +95,12 @@ async def context(topic, council, fiscal_year, limit, search_terms, snapshot_dat
     errors, attempts, date_attempts, found = [], [], [], []
     incomplete, used_date = False, None
     seen = set()
-    terms = search_candidates(topic, search_terms if search_terms is not None else V.expansions(topic, "finance"), V.norm)
+    extras = search_terms if search_terms is not None else V.expansions(topic, "finance")
+    terms = search_candidates(topic, extras, V.norm)
+    planned_queries = [term for term, _ in terms]
+    requested_search_terms = list(dict.fromkeys(term.strip() for term in extras
+                                                if isinstance(term, str) and term.strip()))
+    omitted_search_terms = [term for term in requested_search_terms if term not in planned_queries]
     async def request(params):
         nonlocal requests
         remaining = MAX_SECONDS - (time.monotonic() - started)
@@ -141,7 +146,7 @@ async def context(topic, council, fiscal_year, limit, search_terms, snapshot_dat
                 break
     stage_incomplete = bool(found and budget_stage != "current")
     status = ("ERROR" if errors and not found and not attempts else "PARTIAL"
-              if errors or incomplete or len(found) > limit or stage_incomplete else "COMPLETE" if found else "EMPTY")
+              if errors or incomplete or omitted_search_terms or len(found) > limit or stage_incomplete else "COMPLETE" if found else "EMPTY")
     result = {"status": status, "source": "행정안전부 지방재정365 세부사업별 세출현황",
         "service_code": F.SERVICE_CODE, "dataset_url": DATASET_URL, "source_url": CATALOG_URL,
         "query": {"topic": topic.strip(), "council": council, "fiscal_year": year,
@@ -150,9 +155,17 @@ async def context(topic, council, fiscal_year, limit, search_terms, snapshot_dat
         "date_resolution": {"strategy": "LATEST_AVAILABLE_ON_OR_BEFORE_REQUESTED",
             "fallback_used": bool(used_date and used_date != requested.strftime("%Y%m%d")), "date_attempts": date_attempts,
             "max_lookback_days": MAX_DATE_LOOKBACK, "mixed_dates": False},
-        "search_strategy": {"exact_first": True, "progressive_widening": len(attempts) > 1, "attempts": attempts, "request_count": requests},
+        "search_strategy": {"exact_first": True, "progressive_widening": len(attempts) > 1,
+            "requested_search_terms": requested_search_terms, "planned_queries": planned_queries,
+            "omitted_search_terms": omitted_search_terms, "max_search_expressions": MAX_TERMS,
+            "omission_reason": "SEARCH_EXPRESSION_LIMIT" if omitted_search_terms else None,
+            "unattempted_queries": [term for term in planned_queries if term not in {a["term"] for a in attempts}],
+            "stop_reason": "FIRST_CANDIDATE_FOUND" if found else "UPSTREAM_OR_LOOKUP_LIMIT" if errors else
+                           "NO_AVAILABLE_SNAPSHOT" if not used_date else "PLANNED_SEARCH_COMPLETE",
+            "attempts": attempts, "request_count": requests},
         "budget_basis": fiscal_basis(budget_stage, used_date, bool(found)),
-        "coverage": {"limited": bool(errors or incomplete or len(found) > limit or stage_incomplete), "is_exhaustive": False,
+        "coverage": {"limited": bool(errors or incomplete or omitted_search_terms or len(found) > limit or stage_incomplete), "is_exhaustive": False,
+            "search_terms_omitted": bool(omitted_search_terms),
             "scanned_pages_per_query": 1, "has_unread_pages": incomplete, "date_data_available": bool(used_date),
             "requested_stage_complete": bool(found) and not stage_incomplete},
         "errors": errors, "configured": True,

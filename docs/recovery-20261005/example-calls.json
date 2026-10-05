@@ -1,0 +1,65 @@
+{
+  "prepared_on": "2026-10-05",
+  "timezone": "Asia/Seoul",
+  "schema_basis": "4.1.4-public.4 live tools/list",
+  "execution_status": "PENDING",
+  "examples": [
+    {
+      "id": "department",
+      "tool": "council_department_brief",
+      "arguments": {
+        "department": "건축과",
+        "council": "수원시의회",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "max_docs": 2,
+        "source": "clik",
+        "limit": 3
+      }
+    },
+    {
+      "id": "budget",
+      "tool": "council_finance_context",
+      "arguments": {
+        "topic": "소규모 공동주택 활성화",
+        "council": "수원시",
+        "fiscal_year": 2026,
+        "snapshot_date": "2026-10-05",
+        "budget_stage": "current",
+        "limit": 3
+      }
+    },
+    {
+      "id": "ordinance",
+      "tool": "ordinance_get_document",
+      "arguments": {
+        "reference": {
+          "kind": "ordinance",
+          "document_id": "2209592",
+          "mst": "2102111",
+          "title_hint": "수원시 소규모 공동주택관리 지원 조례"
+        },
+        "keyword": "공동 관리소",
+        "section": "articles",
+        "offset": 0,
+        "limit": 3,
+        "max_chars": 2000
+      }
+    },
+    {
+      "id": "integration",
+      "tool": "council_context_pack",
+      "arguments": {
+        "topic": "빌라가꿈관리소",
+        "council": "수원시의회",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "fiscal_year": 2026,
+        "max_docs": 2,
+        "include_legal": true,
+        "include_finance": true,
+        "include_public_data": false
+      }
+    }
+  ]
+}

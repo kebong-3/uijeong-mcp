@@ -58,6 +58,13 @@ _PROCEDURAL = re.compile(r"(성원|개의|개회|산회|정회|속개|상정|선
 _QMARK = re.compile(r"(\?|습니까|십니까|나요|는지요|궁금|설명해\s*주시|답변해\s*주시|말씀해\s*주시|어떻게\s*(되|생각|하실)|왜\s)")
 _REVIEW_LABEL = ("전문위원", "입법조사")
 _REPORT_OPEN = re.compile(r"^[^.?!]{0,40}(업무보고|제안설명|보고를?\s*드리|설명을?\s*드리|보고드리도록|보고드리겠습니다|설명드리겠습니다)")
+_FORMAL_REPORT_OPEN = re.compile(
+    r"업무\s*(?:추진\s*(?:실적|계획)|현황)?\s*보고(?:를)?\s*(?:드리(?:겠|도록)|하(?:겠|도록))"
+)
+_EXPLICIT_RESPONSE_OPEN = re.compile(
+    r"(?:질문|질의|물으신|지적하신)[^.?!\n]{0,80}?(?:답변|대답|설명|말씀)(?:을)?\s*(?:드리|하겠)"
+    r"|(?:답변|대답)(?:을)?\s*(?:드리|하겠)"
+)
 
 
 def classify_act(role: str, label: str, text: str) -> str:
@@ -74,7 +81,13 @@ def classify_act(role: str, label: str, text: str) -> str:
             return "other"
         return "question"
     if role in ("executive", "staff"):
-        formal_report = re.search(r"소관.{0,100}업무(?:추진실적|추진계획|현황)?\s*보고(?:를)?\s*(?:드리|하)", text[:500])
+        opening = text[:500]
+        formal_report = _FORMAL_REPORT_OPEN.search(opening)
+        response = _EXPLICIT_RESPONSE_OPEN.search(opening)
+        # An answer may refer to a later report. A report that promises to take
+        # questions afterwards is still a report, so preserve the opening order.
+        if response and (not formal_report or response.start() < formal_report.start()):
+            return "answer_candidate"
         return "report" if _REPORT_OPEN.search(text) or formal_report else "answer_candidate"
     return "other"
 
@@ -366,8 +379,11 @@ def build_qa_pairs(turns: list[dict], kw: Optional[str] = None) -> list[dict]:
                 # A standalone report/review is never promoted to a response.
                 if turn.get("act") == "review":
                     continue
-                if turn.get("act") == "report" and not _ANSWER_CUE.search(turn["text"]):
-                    break
+                if turn.get("act") == "report":
+                    # Generic words such as '설명' also occur in formal reports;
+                    # they cannot connect a new report to the preceding question.
+                    if _FORMAL_REPORT_OPEN.search(turn["text"][:500]) or not _ANSWER_CUE.search(turn["text"]):
+                        break
                 answers.append(turn)
         if match_text(question["text"] + " ".join(a["text"] for a in answers), kw):
             pairs.append({"q": question, "answers": answers, "kind": speech_context(turns, i),

@@ -1,0 +1,74 @@
+{
+  "record_date": "2026-10-05",
+  "timezone": "Asia/Seoul",
+  "repository": "kebong-3/uijeong-mcp",
+  "branch": "main",
+  "endpoint": "https://uijeong-mcp.onrender.com/mcp",
+  "previous_verified_release": {
+    "version": "4.1.4-public.4",
+    "commit": "305c0468374b44377966870b5cb6b34132de648f",
+    "render_deploy_id": "dep-db160vgjo6nc73a7on8g",
+    "live_confirmed_at_utc": "2026-10-04T14:20:29.809168Z",
+    "public_tool_count": 40,
+    "tool_schema_sha256": "6701f2b8728d0fa16bce430abe338b83da7c689010e1625fc8deac2dff5adfe3",
+    "runtime_file_count": 80,
+    "manifest_status": "MATCH",
+    "fixture_tests_passed": 756,
+    "live_acceptance_checks_passed": 24,
+    "sdk_new_connections": 2,
+    "scope_note": "Prior release evidence. Not evidence that the new release has passed tests or been deployed."
+  },
+  "today_before_patch": {
+    "observed_version": "4.1.4-public.4",
+    "source_directory": "/workspace/scratch/0f8070660f49/verification-before",
+    "finance": {
+      "source_file": "council_finance_context.json",
+      "returned_at": "2026-10-05T22:43:07.119662+09:00",
+      "request_id": "6e815c1e9b904c39a877",
+      "status": "EMPTY",
+      "supplied_search_terms": ["소규모 공동주택"],
+      "observed_attempt_terms": ["빌라가꿈관리소"],
+      "progressive_widening": false
+    },
+    "integration": {
+      "source_file": "council_context_pack.json",
+      "status": "PARTIAL",
+      "budget_summary_status": "EMPTY",
+      "budget_discovered_candidates": 3,
+      "ordinance_summary_status": "EMPTY",
+      "ordinance_discovered_candidates": 3,
+      "member_record_discovery_executed": true,
+      "policy_background_executed": true
+    },
+    "scope_note": "Selected observations from today's pre-patch production calls. Not post-deployment verification."
+  },
+  "new_release": {
+    "planned_version": "4.1.5-public.1",
+    "actual_version": "PENDING",
+    "commit": "PENDING",
+    "render_service_id": "PENDING",
+    "render_deploy_id": "PENDING",
+    "live_confirmed_at_utc": "PENDING",
+    "public_tool_count": "PENDING",
+    "tool_schema_sha256": "PENDING",
+    "runtime_fingerprint": "PENDING",
+    "manifest_status": "PENDING",
+    "tracked_defect_ids": ["REC-01", "REC-02", "REC-03", "REC-04", "REC-05", "REC-06", "REC-07", "REC-08"],
+    "fixture_test_result": "PENDING",
+    "minimum_call_verifier": "scripts/verify_recovery.py",
+    "minimum_call_inventory": "PENDING",
+    "live_acceptance_result": "PENDING",
+    "sdk_connection_result": "PENDING",
+    "four_domain_examples": "PENDING",
+    "environment_changes": "PENDING",
+    "sites_changes": "PENDING",
+    "final_status": "PENDING"
+  },
+  "not_claimed_complete": [
+    "General automatic collection and validated extraction of official budget PDF/HWP/HWPX documents",
+    "Nationwide official organization-code crosswalk with effective dates",
+    "Full semantic grouping of discussions and verified project-amount attribution",
+    "All-account and all-client installation and end-to-end execution",
+    "Nationwide positive-source coverage and long-running operational validation"
+  ]
+}

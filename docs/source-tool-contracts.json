@@ -1,6 +1,6 @@
 {
   "generation_method": "AST_SOURCE_NOT_RUNTIME_SDK",
-  "version": "4.1.4-public.4",
+  "version": "4.1.5-public.1",
   "note": "SDK가 반환하는 JSON Schema의 실제 형식은 export_runtime_schemas.py 및 CI로 별도 확인.",
   "profiles": {
     "core": [
@@ -436,6 +436,58 @@
       "description": "비교 기준이 같은 예산·성과 수치만 계산(1~30행). 금액 단위 환산·%p·0분모 처리.\ndata=[{name,mode:year_over_year|same_period,previous:{value,unit,fiscal_year,metric,entity,population,\nperiod_basis,accounting_basis,document_ref},current:{동일 필드}}].\n단위=원/천원/만원/백만원/억원/명/건/개/개소/%/회. value는 정수 또는 숫자 문자열.\nperiod_basis 예 연간/1~8월누적, accounting_basis 예 최종예산/본예산/실인원.\n필수 비교기준 누락·불일치 시 계산값을 비워 잘못된 비교를 차단. 제공자료 진위 검증 없음."
     },
     {
+      "name": "council_context_pack",
+      "parameters": {
+        "topic": {
+          "annotation": "str"
+        },
+        "council": {
+          "annotation": "str",
+          "default": "광주 서구"
+        },
+        "date_from": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "date_to": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "include_legal": {
+          "annotation": "bool",
+          "default": true
+        },
+        "include_finance": {
+          "annotation": "bool",
+          "default": true
+        },
+        "include_public_data": {
+          "annotation": "bool",
+          "default": false
+        },
+        "fiscal_year": {
+          "annotation": "Optional[int]",
+          "default": null
+        },
+        "max_docs": {
+          "annotation": "int",
+          "default": 4
+        },
+        "include_member_records": {
+          "annotation": "bool",
+          "default": false
+        },
+        "include_policy_background": {
+          "annotation": "bool",
+          "default": false
+        }
+      },
+      "required": [
+        "topic"
+      ],
+      "description": "출처별 실패·후속 후보를 보존하는 근거팩. 업무보고와 의원 질의를 구분합니다.\n의원정보·정책배경은 요청한 경우에만 include_member_records/include_policy_background로 추가합니다."
+    },
+    {
       "name": "council_data_sources",
       "parameters": {
         "query": {
@@ -517,6 +569,38 @@
         "department"
       ],
       "description": "【부서 기준 진입】 검색어 없이 소관 부서만으로 그 부서가 의회에서 받은 질의·답변·후속조치를 모은다.\n실무 단위는 주제어가 아니라 소관 부서이므로, 사업명을 모를 때 여기서 시작한다.\n부서명(예: '기획실', '노인복지과')을 검색어로 회의록을 찾은 뒤 답변자 직함으로 우리 부서 건을 가려내며,\n같은 부서의 팀장 표기도 후보로 포함한다. 과거 명칭은 department_aliases=[{name,valid_from,valid_to,basis}].\n별칭은 검색과 최종분류 모두에 사용하며 사용자 제공 이력으로 표시한다(최대2개).\nextra_terms는 적용기간 없는 과거 명칭의 호환 인자다. source_offset/site_start_page로 이어검색한다.\nanswered=우리 부서가 답한 질의, unanswered=부서가 거론됐으나 이번 범위에서 답변 미연결,\nother_mention=다른 발언자가 답한 거론 건. 의원 개인 단위 집계는 하지 않는다."
+    },
+    {
+      "name": "council_department_session_brief",
+      "parameters": {
+        "department": {
+          "annotation": "str"
+        },
+        "council": {
+          "annotation": "str",
+          "default": "광주 서구"
+        },
+        "purpose": {
+          "annotation": "str",
+          "default": "행정사무감사"
+        },
+        "years": {
+          "annotation": "int",
+          "default": 3
+        },
+        "committee": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "max_docs_per_year": {
+          "annotation": "int",
+          "default": 4
+        }
+      },
+      "required": [
+        "department"
+      ],
+      "description": "주제어를 아직 정하지 못한 부서가 회기 전에 최근 질의와 반복쟁점 후보부터 점검하는 부서 기준 진입점입니다."
     },
     {
       "name": "council_discover_minutes_links",
@@ -649,6 +733,42 @@
         "keyword"
       ],
       "description": "통합 검색 호환 도구. 구조화 결과·안정된 근거 이어보기는 council_evidence_bundle 사용."
+    },
+    {
+      "name": "council_finance_context",
+      "parameters": {
+        "topic": {
+          "annotation": "str"
+        },
+        "council": {
+          "annotation": "str",
+          "default": "광주 서구"
+        },
+        "fiscal_year": {
+          "annotation": "Optional[int]",
+          "default": null
+        },
+        "limit": {
+          "annotation": "int",
+          "default": 20
+        },
+        "snapshot_date": {
+          "annotation": "str",
+          "default": ""
+        },
+        "budget_stage": {
+          "annotation": "Literal['current', 'original', 'supplementary', 'draft', 'settlement']",
+          "default": "current"
+        },
+        "search_terms": {
+          "annotation": "Annotated[Optional[list[Annotated[str, Field(min_length=1, max_length=100)]]], Field(max_length=3)]",
+          "default": null
+        }
+      },
+      "required": [
+        "topic"
+      ],
+      "description": "지방재정365 사업 예산·집행 조회. 최근 자료 제공일과 사업명 띄어쓰기·약칭을 보정합니다.\n지역과 fiscal_year를 지정하세요. snapshot_date는 선택 기준일 YYYYMMDD/ YYYY-MM-DD.\nbudget_stage: current=예산현액, original=본예산, supplementary=추경, draft=예산안, settlement=결산.\nsearch_terms: 원문에서 확인한 관련 검색어 최대 3개(각 1~100자). 원래 사업명부터 조회하고 미발견 시 순서대로 재검색합니다.\n원래명·표기변형을 합쳐 최대 4개 표현을 조회하며 첫 후보 발견 시 중단합니다. 생략·미시도 검색어는 search_strategy에 남습니다.\n관련 검색어로 찾은 사업은 동일사업으로 확정하지 않습니다.\nAPI는 예산현액을 반환하므로 다른 단계는 공식 예산서 대조 전 미확인입니다.\n실제 기준일·단위·사업코드를 확인하고 수치 뒤에 source_links의 확인 링크를 붙이세요."
     },
     {
       "name": "council_find_commitments",
@@ -850,6 +970,30 @@
       "description": "위원회별로 최근 의원 제안·질의에서 반복해서 등장한 주제어를 모아 '관심 현안 레이더'를 만듭니다.\n집계 단위는 위원회(회의명)이며 의원 개인별 집계·순위는 하지 않습니다.\nArgs:\n  council: 의회(기본 '광주 서구' — 홈페이지 최근 회의록 사용, 그 외는 CLIK 최근 회의록)\n  committee: 위원회명 일부(선택, 예: '사회도시')\n  date_from: 이 날짜 이후(선택)\n  max_meetings: 분석할 회의록 수(3~30)\n  top: 위원회별 표시 주제어 수\n※ 자동 추출 키워드이므로 해석 전에 council_evidence_search로 실제 발언을 확인하세요."
     },
     {
+      "name": "council_legislation_context",
+      "parameters": {
+        "topic": {
+          "annotation": "str"
+        },
+        "council": {
+          "annotation": "str",
+          "default": "광주 서구"
+        },
+        "jurisdiction": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "include_articles": {
+          "annotation": "bool",
+          "default": true
+        }
+      },
+      "required": [
+        "topic"
+      ],
+      "description": "복합 자연어를 법령명·조문·정책기능 검색어로 분해해 의회 대응용 법령·자치법규 후보를 조회합니다.\n\njurisdiction이 지정되면 해당 지역 자치법규 후보와 전국 기능 유사 후보를 분리합니다.\n검색후보는 법적 적용·적법성 결론이 아니며 최종 제·개정 검토는 전문 입법검토가 필요합니다."
+    },
+    {
       "name": "council_open_record",
       "parameters": {
         "ref": {
@@ -880,6 +1024,34 @@
         "ref"
       ],
       "description": "원문 열기 호환 도구. 정확한 이어읽기 위치는 결과의 next 값을 사용한다."
+    },
+    {
+      "name": "council_peer_cases",
+      "parameters": {
+        "topic": {
+          "annotation": "str"
+        },
+        "years": {
+          "annotation": "int",
+          "default": 5
+        },
+        "case_count": {
+          "annotation": "int",
+          "default": 3
+        },
+        "search_terms": {
+          "annotation": "Optional[list[str]]",
+          "default": null
+        },
+        "max_details": {
+          "annotation": "int",
+          "default": 12
+        }
+      },
+      "required": [
+        "topic"
+      ],
+      "description": "전국 CLIK에서 동일·유사 주제의 실제 의원 질의가 확인된 서로 다른 지방의회 사례를 제한적으로 찾습니다.\n반환 순서는 순위가 아니며 전국 전수조사도 아닙니다."
     },
     {
       "name": "council_period_review",
@@ -1461,6 +1633,46 @@
       "description": "타 지자체·공공기관 정책자료(지방정책정보: 연구용역·출장보고·감사자료 등)를 검색합니다.\n검토결과 작성 시 벤치마킹 근거로 활용하세요. docid를 주면 해당 자료 본문을 엽니다.\nArgs:\n  keyword: 검색어\n  region: 광역 지역명(예: '서울','경기','광주') — 선택\n  limit: 1~50\n  docid: 상세 조회할 자료 ID(선택)"
     },
     {
+      "name": "council_session_ready_pack",
+      "parameters": {
+        "topic": {
+          "annotation": "str"
+        },
+        "council": {
+          "annotation": "str",
+          "default": "광주 서구"
+        },
+        "purpose": {
+          "annotation": "str",
+          "default": "일반"
+        },
+        "date_from": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "date_to": {
+          "annotation": "Optional[str]",
+          "default": null
+        },
+        "fiscal_year": {
+          "annotation": "Optional[int]",
+          "default": null
+        },
+        "need_public_data": {
+          "annotation": "bool",
+          "default": false
+        },
+        "max_docs": {
+          "annotation": "int",
+          "default": 4
+        }
+      },
+      "required": [
+        "topic"
+      ],
+      "description": "회기 전 실무 준비용 시그니처 도구입니다.\n\n회의록·의안·법령/조례·재정 근거를 목적에 맞게 묶고, 동일 스냅샷으로 답변준비자료를 생성합니다.\npurpose: 일반 | 업무보고 | 행정사무감사 | 본예산 | 추경 | 조례·의안 | 5분발언 | 구정질문\nneed_public_data=True일 때만 공공데이터포털에서 추가 데이터 후보를 탐색합니다."
+    },
+    {
       "name": "council_status",
       "parameters": {
         "test_council": {
@@ -1473,7 +1685,7 @@
         }
       },
       "required": [],
-      "description": "버전·코드·도구명세 해시·저장방식·API 설정 점검. live=True일 때만 실제 CLIK 1회·홈페이지 목록 조회.\n키 자체를 출력하지 않는다. 배포 커밋과 해시를 배포 패키지 manifest와 대조한다."
+      "description": ""
     },
     {
       "name": "council_topic_history",
@@ -1502,6 +1714,18 @@
         "keyword"
       ],
       "description": "현안(주제어)이 의회에서 언제·어떤 회의에서 다뤄졌는지 연도별 흐름을 보여줍니다.\n집계 단위는 의회·연도·회의유형뿐이며 의원 개인 단위 집계는 하지 않습니다.\nArgs:\n  keyword: 현안 주제어(예: '복합쇼핑몰', '생활인구')\n  councils: 의회명 목록(비우면 전국). 의회당 API 약 1~3회\n  date_from: 시작일(선택, 기본 최근 4년)\n  include_bills: 관련 의안(조례안·건의안 등)도 함께 볼지\n  date_to: 종료일(선택)"
+    },
+    {
+      "name": "fetch",
+      "parameters": {
+        "id": {
+          "annotation": "str"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "description": "Fetch one search-result passage with nearby official meeting context."
     },
     {
       "name": "local_evidence_review",
@@ -1765,6 +1989,18 @@
         "parents"
       ],
       "description": ""
+    },
+    {
+      "name": "search",
+      "parameters": {
+        "query": {
+          "annotation": "str"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "description": "Search public local-council minutes for a natural-language query.\n\nInclude a council name when searching outside the default Gwangju Seo-gu\ncouncil. Results are matching public meeting passages with canonical,\nuser-openable source URLs. If CLIK omits a document link, the URL is\nthe official service portal, explicitly marked in the title; fetch\npreserves the official document ID and parsed-turn locator."
     },
     {
       "name": "seogu_council_read",

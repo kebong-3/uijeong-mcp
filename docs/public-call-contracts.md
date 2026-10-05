@@ -1,4 +1,4 @@
-# 공개 호출 계약 — 4.1.4-public.4
+# 공개 호출 계약 — 4.1.5-public.1
 
 운영 endpoint: `https://uijeong-mcp.onrender.com/mcp`. 인증 없음, 공개자료 읽기 전용. MCP SDK 1.30.0, stateless Streamable HTTP JSON. initialize → tools/list → tools/call을 POST로 전송한다. 독립 GET은 405이며 장애가 아니다. 원문 제한 초과는 정상 입력 거절이다.
 
@@ -11,6 +11,9 @@
 | ordinance_get_document.offset / start_char | 정수 0 이상 | 선택 section 별도 열람 |
 | council_evidence_bundle.max_docs | 공개 서버 1~6 | source_offset 또는 snapshot 이어보기 |
 | council_evidence_bundle.limit | 정수 1~30 | next_item_offset |
+| council_finance_context.search_terms | 선택 목록, 최대 3개, 각 1~100자 | 원래명·표기변형 포함 최대 4개 표현. 생략·미시도는 search_strategy 표시 |
+| council_context_pack.include_member_records | bool, 기본 false | 명시 요청 시 의원 공식기록 후보 추가 |
+| council_context_pack.include_policy_background | bool, 기본 false | 명시 요청 시 정책배경 후보 추가 |
 
 실제 도구 명세는 운영 tools/list가 기준이다. 스키마 경계에서의 거절은 실패 필드와 허용값을 SDK가 표시하고, 직접 함수 호출의 입력 거절도 validation.field/value/allowed를 제공한다. max_turns=140 및 조례 max_chars=8000은 금지된다. 상한을 올리기 위해 제한을 우회하지 말고 커서를 사용한다.
 
@@ -29,3 +32,12 @@
 후속 후보의 전체 식별자는 linked_review.candidate_index에 보존한다. 상세 result.items는 축약될 수 있으므로 반환 개수와 조회된 개수를 구분한다. candidate_index의 후보도 동일사업·적법성 확인이 아니다.
 
 정식 명칭이 없으면 위치 있는 공식 문장의 대상 표현(예: ○○을 대상으로)을 한 개의 후속 검색어로 사용한다. 대상 표현도 동일사업·상위사업·예산 귀속·적법성을 입증하지 않는다. 재정 지역 비교도 같은 고유 지역 식별 규칙을 사용한다.
+
+## 4.1.5의 출력 상태
+
+- `linked_review.budget/ordinance.status`는 최초 검색과 후속 후보를 함께 반영한다. 최초 `EMPTY` 뒤 후보를 찾으면 `PARTIAL` 및 `candidate_status=CANDIDATES_FOUND`를 반환한다. 최초 상태는 `initial_status`, 후속 상태는 `discovery_statuses`에 보존한다. 금액·동일사업·법적 적용 검증은 각각 별도 false 상태를 유지한다.
+- 생략한 의원정보·정책배경은 `SKIPPED`, `reason=NOT_REQUESTED`로 기록한다. 응답 축약으로 개별 layer가 생략되면 `execution_trace.stages`의 동일 단계 상태를 확인한다.
+- 법규 검색에 미열람 페이지가 남으면 해당 지역 후보가 아직 0건이어도 `PARTIAL`이다. `coverage.has_unread_pages`와 출처별 coverage를 확인한다. 공개 검색으로 옮기는 복구 경로는 `RESTART_WITH_PUBLIC_SEARCH`이며 페이지 크기·조회구분이 다를 수 있어 1페이지부터 재검색한다. 원 조회의 연속 커서가 아니다.
+- 예산 후보 색인은 `account`, `execution_date`, `local_government_code`를 보존한다. 같은 사업코드라도 회계가 다르면 별도 행으로 검토한다.
+- 조례의 지역 일치는 응답 전체의 성공 표시가 아니라 행별 지자체로 판단한다. 타 지역 후보는 비교용으로 분리하며 대상 지자체의 직접 근거로 사용하지 않는다.
+- 정식 업무보고 개시를 앞선 질문의 답변으로 연결하지 않는다. 실제 질의·답변 개시는 답변 후보로 보존한다.

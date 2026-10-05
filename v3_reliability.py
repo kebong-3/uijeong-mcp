@@ -350,7 +350,10 @@ async def legal_context(query: str, jurisdiction: str = "", include_articles: bo
             if total is None and not rows:
                 return {"status": "ERROR", "code": "LAW_SCHEMA_UNCONFIRMED", "items": []}
             local, _ = law_jurisdiction(rows, jurisdiction) if kind == "ordinance" else (rows, True)
-            attempts.append({"query": term, "api_total": total, "returned": len(rows), "local_candidates": len(local)})
+            attempts.append({"query": term, "api_total": total, "returned": len(rows),
+                             "local_candidates": len(local),
+                             "has_unread_pages": bool(total and total > len(rows)),
+                             "page": 1})
             if local:
                 selected = local[:limit]
                 break
@@ -367,9 +370,23 @@ async def legal_context(query: str, jurisdiction: str = "", include_articles: bo
                     selected[i]["applicability_verified"] = False
                 else:
                     detail_errors.append({"title":selected[i].get("title"), "status":checked.get("status","ERROR")})
-        limited = bool(total and total > len(rows)) or len(rows) > limit or bool(detail_errors)
-        return {"status": ("PARTIAL" if limited else "COMPLETE") if selected else "EMPTY",
+        has_unread_pages = any(attempt["has_unread_pages"] for attempt in attempts)
+        omitted_candidates = max(0, (attempts[-1]["local_candidates"] if attempts else 0) - len(selected))
+        limited = has_unread_pages or bool(omitted_candidates) or bool(detail_errors)
+        coverage = {"has_unread_pages": has_unread_pages,
+                    "candidate_output_omitted": omitted_candidates,
+                    "detail_incomplete": bool(detail_errors),
+                    "is_exhaustive": False,
+                    "recovery": [{"tool": "ordinance_search", "arguments": {
+                        "kind": kind, "query": attempt["query"],
+                        "jurisdiction": jurisdiction if kind == "ordinance" else "",
+                        "page": 1, "max_pages": 1, "limit": limit},
+                        "strategy": "RESTART_WITH_PUBLIC_SEARCH",
+                        "note": "공개 검색은 원천 조회구분·페이지 크기가 다를 수 있어 1페이지부터 재검색합니다. 현재 조회의 이어읽기 커서가 아닙니다. 이후 공개 검색이 반환하는 커서를 사용하세요."}
+                        for attempt in attempts if attempt["has_unread_pages"]]}
+        return {"status": "PARTIAL" if limited else "COMPLETE" if selected else "EMPTY",
                 "items": selected, "attempts": attempts, "detail_errors":detail_errors,
+                "coverage": coverage,
                 "jurisdiction_match": bool(selected) if kind == "ordinance" and jurisdiction else None}
 
     law, ordin = await asyncio.gather(stage(lookup("law", law_limit), 22), stage(lookup("ordinance", ordinance_limit), 22))
@@ -378,7 +395,11 @@ async def legal_context(query: str, jurisdiction: str = "", include_articles: bo
               "laws": law.get("items", []), "ordinances": ordin.get("items", []),
               "coverage": {"law_search": law["status"], "ordinance_search": ordin["status"],
                            "ordinance_jurisdiction_match": ordin.get("jurisdiction_match"),
-                           "law_attempts": law.get("attempts", []), "ordinance_attempts": ordin.get("attempts", [])},
+                           "law_attempts": law.get("attempts", []), "ordinance_attempts": ordin.get("attempts", []),
+                           "law_coverage": law.get("coverage", {}),
+                           "ordinance_coverage": ordin.get("coverage", {}),
+                           "has_unread_pages": any(layer.get("coverage", {}).get("has_unread_pages", False)
+                                                   for layer in (law, ordin))},
               "errors": [x for x in (law, ordin) if x["status"] == "ERROR"],
               "checked_at": dt.datetime.now(KST).isoformat(), "version_scope": "CURRENT_LOOKUP_NOT_HISTORICAL_OPINION",
               "legal_conclusion_verified": False,
@@ -449,9 +470,30 @@ def compact_discovery(kind, candidate, result):
     return {'domain':kind,'candidate':hints,'result':slim,'same_project_verified':False,'applicability_verified':False}
 
 
+def discovery_summary(initial, initial_key, discoveries, domain):
+    """Summarize retrieval without promoting related candidates to verified facts."""
+    followed = [item["result"] for item in discoveries if item["domain"] == domain]
+    initial_count = len(initial.get(initial_key, []))
+    discovered_count = sum(len(result.get("items", [])) for result in followed)
+    status = aggregate_status({"initial": initial, **{str(i): result for i, result in enumerate(followed)}})
+    # A related candidate is useful evidence, while its legal applicability and
+    # fiscal identity remain unresolved. The initial EMPTY is still visible.
+    if discovered_count and status in {"COMPLETE", "EMPTY", "ERROR"}:
+        status = "PARTIAL"
+    candidate_status = ("CANDIDATES_FOUND" if initial_count or discovered_count else
+                        "NOT_REQUESTED" if initial.get("status") == "SKIPPED" else
+                        "NO_MATCH_IN_SEARCHED_SCOPE" if status == "EMPTY" else "SEARCH_INCOMPLETE")
+    return {"status": "SKIPPED" if initial.get("status") == "SKIPPED" and not followed else status,
+            "initial_status": initial.get("status"),
+            "discovery_statuses": [result.get("status") for result in followed],
+            "candidate_status": candidate_status,
+            "initial_candidates": initial_count, "discovered_candidates": discovered_count}
+
+
 async def context_pack(U, topic: str, council: str = "광주 서구", date_from: Optional[str] = None,
                        date_to: Optional[str] = None, include_legal: bool = True, include_finance: bool = True,
-                       include_public_data: bool = False, fiscal_year: Optional[int] = None, max_docs: int = 4) -> dict[str, Any]:
+                       include_public_data: bool = False, fiscal_year: Optional[int] = None, max_docs: int = 4,
+                       include_member_records: bool = False, include_policy_background: bool = False) -> dict[str, Any]:
     import council_extensions as C
     import legal_context as L
     import finance_context as F
@@ -470,9 +512,11 @@ async def context_pack(U, topic: str, council: str = "광주 서구", date_from:
     tasks = {"council_evidence":U.council_evidence_bundle(**scope,mode="질의답변"),
              "report_mentions":U.council_evidence_bundle(**{**scope,"max_docs":min(max_docs,2)},
                         mode="발언",search_terms=expansions(topic,"minutes")),
-             "related_bills":C._bill_context(U,topic.strip(),cid,2),
-             "member_record_discovery":C._member_discovery(U,topic.strip(),cid,2),
-             "policy_background":C._policy_context(U,topic.strip(),1)}
+             "related_bills":C._bill_context(U,topic.strip(),cid,2)}
+    if include_member_records:
+        tasks["member_record_discovery"] = C._member_discovery(U,topic.strip(),cid,2)
+    if include_policy_background:
+        tasks["policy_background"] = C._policy_context(U,topic.strip(),1)
     if include_legal:
         tasks["legal_and_ordinance_context"] = L.context(topic.strip(),C._jurisdiction_from_council(cname),include_articles=True)
     if include_finance:
@@ -481,8 +525,9 @@ async def context_pack(U, topic: str, council: str = "광주 서구", date_from:
         tasks["public_data_discovery"] = D.search(topic.strip(),6)
     results = await asyncio.gather(*(stage(task,30) for task in tasks.values()))
     layers = dict(zip(tasks,results))
-    for name in ("legal_and_ordinance_context","finance_context","public_data_discovery"):
-        layers.setdefault(name,{"status":"SKIPPED"})
+    for name in ("legal_and_ordinance_context","finance_context","public_data_discovery",
+                 "member_record_discovery","policy_background"):
+        layers.setdefault(name,{"status":"SKIPPED", "reason":"NOT_REQUESTED"})
     evidence = layers["council_evidence"]
     # Run the separate speech/report pass alongside initial queries so the
     # bounded discovery pass stays within the public tool deadline.
@@ -523,18 +568,17 @@ async def context_pack(U, topic: str, council: str = "광주 서구", date_from:
     review = {"council":{"status":evidence.get("status"),"snapshot_id":evidence.get("snapshot_id"),
                 "observed_events":evidence.get("total_items",len(evidence.get("items",[]))),
                 "is_exhaustive":False},
-              "budget":{"status":layers["finance_context"].get("status"),
-                "initial_candidates":len(layers["finance_context"].get("items",[])),
-                "discovered_candidates":len(fiscal_candidates),"amounts_verified":False},
-              "ordinance":{"status":layers["legal_and_ordinance_context"].get("status"),
-                "initial_candidates":len(layers["legal_and_ordinance_context"].get("ordinances",[])),
-                "discovered_candidates":len(legal_candidates),"applicability_verified":False},
+              "budget":{**discovery_summary(layers["finance_context"],"items",discoveries,"budget"),
+                        "amounts_verified":False},
+              "ordinance":{**discovery_summary(layers["legal_and_ordinance_context"],"ordinances",discoveries,"ordinance"),
+                           "applicability_verified":False},
               "candidate_index":{domain:[{k:row[k] for k in
                    ('document_id','mst','title','jurisdiction','source_url','project_name','project_code',
-                    'local_government','fiscal_year','amount_unit','budget_stage','same_project_verified',
+                    'local_government','local_government_code','account','account_code','fiscal_year',
+                    'execution_date','amount_unit','budget_stage','same_project_verified',
                     'applicability_verified') if k in row} for row in rows]
                    for domain,rows in (('ordinance',legal_candidates),('budget',fiscal_candidates))},
-              "index_scope":"모든 반환 후보 식별자. 상세 items는 응답 크기 때문에 줄어들 수 있으며 recovery로 재조회합니다.",
+              "index_scope":"후속 검색에서 반환된 후보 식별자·회계·기준일. 최초 결과는 각 원천 layer에 있습니다. 상세 items는 축약될 수 있으며 recovery로 재조회합니다.",
               "relationships":discoveries,"unresolved":unresolved,"ready_for_submission":False,
               "legal_approval":False,"same_project_verified":False}
     all_stages = {**layers, **{f"discovery_{i}":x["result"] for i,x in enumerate(discoveries)}}
@@ -575,9 +619,13 @@ def install(U):
 
     async def council_context_pack(topic: str, council: str = "광주 서구", date_from: Optional[str] = None,
             date_to: Optional[str] = None, include_legal: bool = True, include_finance: bool = True,
-            include_public_data: bool = False, fiscal_year: Optional[int] = None, max_docs: int = 4) -> dict[str, Any]:
-        """출처별 실패를 보존하는 근거팩. 업무보고와 의원 질의를 구분합니다."""
-        return await context_pack(U,topic,council,date_from,date_to,include_legal,include_finance,include_public_data,fiscal_year,max_docs)
+            include_public_data: bool = False, fiscal_year: Optional[int] = None, max_docs: int = 4,
+            include_member_records: bool = False, include_policy_background: bool = False) -> dict[str, Any]:
+        """출처별 실패·후속 후보를 보존하는 근거팩. 업무보고와 의원 질의를 구분합니다.
+        의원정보·정책배경은 요청한 경우에만 include_member_records/include_policy_background로 추가합니다.
+        """
+        return await context_pack(U,topic,council,date_from,date_to,include_legal,include_finance,include_public_data,
+                                  fiscal_year,max_docs,include_member_records,include_policy_background)
 
     old_status = U.council_status
     async def council_status(test_council: str = "광주 서구", live: bool = False) -> dict[str, Any]:

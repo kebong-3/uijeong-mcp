@@ -1,0 +1,1251 @@
+{
+  "schema_version": 1,
+  "requirement": "R02_ALL_PUBLIC_TOOLS_VALID_MINIMUM_INPUT",
+  "generated_at_utc": "2026-10-05T13:45:11.205673+00:00",
+  "schema_source": "ACTUAL_LOCAL_BUILD_SERVER_TOOLS_LIST_AFTER_RECOVERY_CHANGES",
+  "expected_unique_tool_count": 40,
+  "planned_call_count": 41,
+  "live_execution_performed_by_inventory_author": false,
+  "scope": {
+    "council": "수원시",
+    "jurisdiction": "경기도 수원시",
+    "topic": "빌라가꿈관리소",
+    "related_term": "소규모 공동주택",
+    "date_from": "2025-01-01",
+    "date_to": "2026-10-05",
+    "fiscal_year": 2026
+  },
+  "execution_rules": [
+    "Only name and fully resolved arguments are sent to tools/call. Never send placeholders or this metadata to a tool.",
+    "Read calls in the written dependency order. extract paths start at the actual normalized structured tool response, not the JSON-RPC envelope; numeric path segments index lists.",
+    "A string that begins with @ is an exact placeholder reference. Resolve only from a preceding actual response in this verification run. Never infer IDs, hashes, snapshots, dates, codes or source URLs.",
+    "If an extraction is missing or its documented precondition fails, mark dependent calls BLOCKED_DEPENDENCY and report the cause. Do not replace it with a fabricated or historical cached ID.",
+    "DocumentRef objects are assembled from explicitly extracted fields. Do not pass an entire ordinance result row because its extra fields violate DocumentRef.extra=forbid.",
+    "For ordinance_draft_amendment, the retrieved article must be the full 제5조의2 text and the hash must come from the same fetched document/version. Recover official continuation first if excerpt_only is true.",
+    "Keep API errors, unavailable data, partial coverage and empty results distinct. A valid request does not certify completeness, amounts, project identity or legal approval.",
+    "search/fetch return typed data without a status field; council_evidence_search/council_search_minutes return text with an explicit status prefix. Do not treat missing dictionary status as transport failure.",
+    "budget_calculate, budget_review_project and legislative drafting/review test inputs marked example_only are synthetic demonstrations. Their amounts/text are not actual government decisions.",
+    "The expected block describes assertions or interpretation safeguards. Where an approval flag is not emitted by that tool, never invent a true approval; retain its actual review-only warning.",
+    "No deployment, database mutation, external publication, message sending or additional external LLM calls are authorized by this inventory."
+  ],
+  "dependency_notes": [
+    {
+      "tool": "ordinance_compare",
+      "extra_call": "dependency_peer_ordinance_search",
+      "reason": "A distinct official comparison ordinance must be obtained through a prior actual search. This is the one additional call beyond the 40 unique tool tests."
+    },
+    {
+      "tool": "ordinance_diff_versions",
+      "scope": "IDENTICAL_VERSION_NEGATIVE_CONTROL",
+      "remaining_scope": "Different historical versions cannot be discovered through the currently exposed ordinance_search schema. The identical-version test is valid minimum input and must not be reported as actual old/new law-change validation."
+    },
+    {
+      "tool": "council_prepare_pack",
+      "guard": "Reuse exactly the bundle keyword/council/date range/max_docs and default source=auto, mode=질의답변. Extra search terms are not attached to the original bundle."
+    }
+  ],
+  "static_validation": {
+    "input_models": "actual FastMCP fn_metadata.arg_model.model_validate",
+    "calls_checked": 41,
+    "unique_tools_checked": 40,
+    "budgets_checked_against_internal_operation_schemas": true,
+    "placeholder_values": "Synthetic type probes were used only in local validation and are deliberately not stored here. No tool functions were executed."
+  },
+  "tool_inventory": [
+    {
+      "name": "search",
+      "call_ids": [
+        "search"
+      ],
+      "required_arguments": [
+        "query"
+      ],
+      "input_schema_sha256": "70d56fc588123a91facb406e0c895496c3d41ae2a27e23a87348a1e8984614e4"
+    },
+    {
+      "name": "fetch",
+      "call_ids": [
+        "fetch"
+      ],
+      "required_arguments": [
+        "id"
+      ],
+      "input_schema_sha256": "48483243f185fc7678c52b9b090f11be75c0a9ab5b9c6b549e74437454c82d88"
+    },
+    {
+      "name": "council_find_council",
+      "call_ids": [
+        "council_find_council"
+      ],
+      "required_arguments": [
+        "query"
+      ],
+      "input_schema_sha256": "5c4e473d7b9b105b6ad2a5e138cd80c8b2aac1400cbe0d516bd9b847b21549a0"
+    },
+    {
+      "name": "council_evidence_bundle",
+      "call_ids": [
+        "council_evidence_bundle"
+      ],
+      "required_arguments": [
+        "keyword"
+      ],
+      "input_schema_sha256": "e653443828e9694438cca3d786e1bd2ba0c0dae57138900d8f76e68b5ac5bbe5"
+    },
+    {
+      "name": "council_evidence_search",
+      "call_ids": [
+        "council_evidence_search"
+      ],
+      "required_arguments": [
+        "keyword"
+      ],
+      "input_schema_sha256": "bb8b3e452dd50b0926ae51410df9693baddab12f225f3bcb20df0d88e2a92554"
+    },
+    {
+      "name": "council_period_review",
+      "call_ids": [
+        "council_period_review"
+      ],
+      "required_arguments": [
+        "keyword"
+      ],
+      "input_schema_sha256": "d92fef8bc10531825c5fdc8c502473b666f3285e9147b769d26fb5f083ccb861"
+    },
+    {
+      "name": "council_department_brief",
+      "call_ids": [
+        "council_department_brief"
+      ],
+      "required_arguments": [
+        "department"
+      ],
+      "input_schema_sha256": "5062520db8c8d71a61cb35f11747cc95f7d819d79f9f7ebdfe31f2dc0be2c787"
+    },
+    {
+      "name": "council_recurring_issues",
+      "call_ids": [
+        "council_recurring_issues"
+      ],
+      "required_arguments": [],
+      "input_schema_sha256": "01eca140a04d2e01a204e8af6bb80fce734cecf7e79f384b6ed1bd0b0ce3130c"
+    },
+    {
+      "name": "council_read_source",
+      "call_ids": [
+        "council_read_source"
+      ],
+      "required_arguments": [
+        "ref"
+      ],
+      "input_schema_sha256": "3e709248a20332d177d0ed32dac50a1a1c6e6048e36c06ba18e267d47c97c655"
+    },
+    {
+      "name": "council_open_record",
+      "call_ids": [
+        "council_open_record"
+      ],
+      "required_arguments": [
+        "ref"
+      ],
+      "input_schema_sha256": "2f02edc5ab165c33edbc50c7ea9f3d3e843a20b3adcc3aa879b295be4078f7a4"
+    },
+    {
+      "name": "council_get_evidence",
+      "call_ids": [
+        "council_get_evidence"
+      ],
+      "required_arguments": [
+        "snapshot_id"
+      ],
+      "input_schema_sha256": "52a1d9c7dded9f652ec613190fe0db10f8ec1d5fa78829e719b336f89988dc27"
+    },
+    {
+      "name": "council_data_sources",
+      "call_ids": [
+        "council_data_sources"
+      ],
+      "required_arguments": [],
+      "input_schema_sha256": "e676a587c482ce94634f8da3d47ee02774bf8cb2439d5f61528b522aef8219a4"
+    },
+    {
+      "name": "council_search_minutes",
+      "call_ids": [
+        "council_search_minutes"
+      ],
+      "required_arguments": [
+        "keyword"
+      ],
+      "input_schema_sha256": "791659ac3cd11ef002fcad5669e8363088acd05335be9002407fe093bdfbd4b4"
+    },
+    {
+      "name": "council_prepare_pack",
+      "call_ids": [
+        "council_prepare_pack"
+      ],
+      "required_arguments": [
+        "keyword"
+      ],
+      "input_schema_sha256": "f3d8c0632a8e3729ff3f33713629fc83e95d5e295ea9b90db33434245132fafb"
+    },
+    {
+      "name": "council_status",
+      "call_ids": [
+        "council_status"
+      ],
+      "required_arguments": [],
+      "input_schema_sha256": "9615ead815b4074f4d790bcd3aa5820dea6ae16a75cdc3012e75baa017949886"
+    },
+    {
+      "name": "council_legislation_context",
+      "call_ids": [
+        "council_legislation_context"
+      ],
+      "required_arguments": [
+        "topic"
+      ],
+      "input_schema_sha256": "b33dd9c9e32da894b22f780bf8b1b55968f2c737ea275d2d7faba0e369533a35"
+    },
+    {
+      "name": "council_finance_context",
+      "call_ids": [
+        "council_finance_context"
+      ],
+      "required_arguments": [
+        "topic"
+      ],
+      "input_schema_sha256": "f9d5b3e0fb4560ddafabee6012e03838922298f8b2c7d26592a3fa030ef9e818"
+    },
+    {
+      "name": "council_context_pack",
+      "call_ids": [
+        "council_context_pack"
+      ],
+      "required_arguments": [
+        "topic"
+      ],
+      "input_schema_sha256": "f2787be99fa3b62c8ab465eca142c0dcfad8c2a0ad639ec81d8070cf4bc74733"
+    },
+    {
+      "name": "council_session_ready_pack",
+      "call_ids": [
+        "council_session_ready_pack"
+      ],
+      "required_arguments": [
+        "topic"
+      ],
+      "input_schema_sha256": "fd5e5a5af1317538b406b2247490b8ad9a3b891ee6722af6cc1628dacdf2e73e"
+    },
+    {
+      "name": "council_peer_cases",
+      "call_ids": [
+        "council_peer_cases"
+      ],
+      "required_arguments": [
+        "topic"
+      ],
+      "input_schema_sha256": "99b456469b8e40a916875e8fdc79a38fb9bcf4e1adb66a41676755be22cd6154"
+    },
+    {
+      "name": "council_department_session_brief",
+      "call_ids": [
+        "council_department_session_brief"
+      ],
+      "required_arguments": [
+        "department"
+      ],
+      "input_schema_sha256": "fa4c40c61f695b3d216cc880d484af144d0d29e42b698ceb1be387f56705272e"
+    },
+    {
+      "name": "budget_api_catalog",
+      "call_ids": [
+        "budget_api_catalog"
+      ],
+      "required_arguments": [],
+      "input_schema_sha256": "dbce95ebb9f7b5966e2e8ab50d3650b54d56a320224752525ded9fb040631ad3"
+    },
+    {
+      "name": "budget_api_status",
+      "call_ids": [
+        "budget_api_status"
+      ],
+      "required_arguments": [],
+      "input_schema_sha256": "8ede45e1d1d2326c6aaba234fb7fa6b85034f56a9ceb35e1f21fe80ec7b24183"
+    },
+    {
+      "name": "budget_fetch_api",
+      "call_ids": [
+        "budget_fetch_api"
+      ],
+      "required_arguments": [
+        "api_id",
+        "params"
+      ],
+      "input_schema_sha256": "0bd78a0483da376d31f7e5206c708313dda4f3b5fe4716757939f4c7b24d33e2"
+    },
+    {
+      "name": "budget_search_similar_projects",
+      "call_ids": [
+        "budget_search_similar_projects"
+      ],
+      "required_arguments": [
+        "query",
+        "fiscal_year",
+        "execution_date"
+      ],
+      "input_schema_sha256": "18291dfbd0cee9245a191a12944edf75ae50a5cbfb7c133c9253ecb0ef1599f1"
+    },
+    {
+      "name": "budget_calculation_schema",
+      "call_ids": [
+        "budget_calculation_schema"
+      ],
+      "required_arguments": [
+        "operation"
+      ],
+      "input_schema_sha256": "6af3cd1c95f7320a888b7a1a662b5a5677c9ab603511dc1bcd7f990c6ab78794"
+    },
+    {
+      "name": "budget_calculate",
+      "call_ids": [
+        "budget_calculate"
+      ],
+      "required_arguments": [
+        "operation",
+        "arguments"
+      ],
+      "input_schema_sha256": "e24c6be9b1878f43f8393b3f95637bc6f30ea7e08792c75f3d0a0a03839e608a"
+    },
+    {
+      "name": "budget_review_project",
+      "call_ids": [
+        "budget_review_project"
+      ],
+      "required_arguments": [
+        "title",
+        "year",
+        "components"
+      ],
+      "input_schema_sha256": "9d9031af56316f7cdc55da39cff121bbed934b36824413b72bd934d71e9d74b3"
+    },
+    {
+      "name": "budget_checklist",
+      "call_ids": [
+        "budget_checklist"
+      ],
+      "required_arguments": [
+        "topic",
+        "year"
+      ],
+      "input_schema_sha256": "aa6dae8be924c88fa3414461f4a93860cd9f0cf3e0135ba08441af44e69b81da"
+    },
+    {
+      "name": "ordinance_guide",
+      "call_ids": [
+        "ordinance_guide"
+      ],
+      "required_arguments": [],
+      "input_schema_sha256": "14ba07dcd4916f587f2bae460996f5f95c3c6c07b95f23836ed5390848de1068"
+    },
+    {
+      "name": "ordinance_search",
+      "call_ids": [
+        "ordinance_search",
+        "dependency_peer_ordinance_search"
+      ],
+      "required_arguments": [
+        "query"
+      ],
+      "input_schema_sha256": "032ef4caa3730c68a83c5cd85f35aa1e95138b33e1576c04e52d4fd8ddb4bd8c"
+    },
+    {
+      "name": "ordinance_get_document",
+      "call_ids": [
+        "ordinance_get_document"
+      ],
+      "required_arguments": [
+        "reference"
+      ],
+      "input_schema_sha256": "e818786bdaef6b6499a7c6e809eae0786dbf233fe7df136e43cf15b8b568b5c9"
+    },
+    {
+      "name": "ordinance_linked",
+      "call_ids": [
+        "ordinance_linked"
+      ],
+      "required_arguments": [
+        "law_id"
+      ],
+      "input_schema_sha256": "1c8238b5da854b6743853a5b160662735561cf3b214d862f016916da1b3bc8c9"
+    },
+    {
+      "name": "ordinance_compare",
+      "call_ids": [
+        "ordinance_compare"
+      ],
+      "required_arguments": [
+        "baseline",
+        "comparisons"
+      ],
+      "input_schema_sha256": "aab184025f67d2f01334ef9f0d9ffe5400b2b5f6560820c8457daa1d3e83bb4f"
+    },
+    {
+      "name": "ordinance_diff_versions",
+      "call_ids": [
+        "ordinance_diff_versions"
+      ],
+      "required_arguments": [
+        "old",
+        "new"
+      ],
+      "input_schema_sha256": "9bc19425dda03ecf0f823ad69edc3a67a9eb28dd797f7ce2d7165d0b9416cea1"
+    },
+    {
+      "name": "ordinance_review_project",
+      "call_ids": [
+        "ordinance_review_project"
+      ],
+      "required_arguments": [
+        "params"
+      ],
+      "input_schema_sha256": "afd0552d547ea3bb09f2586f0744a58800a3f5fdea0c6614ee8bb0867ad8ec5b"
+    },
+    {
+      "name": "ordinance_verify_references",
+      "call_ids": [
+        "ordinance_verify_references"
+      ],
+      "required_arguments": [
+        "text",
+        "parents"
+      ],
+      "input_schema_sha256": "756cca5c95d6dd23b0af48703c20aff78c090cb3afa527f365c5e6bc803a10b2"
+    },
+    {
+      "name": "ordinance_draft_amendment",
+      "call_ids": [
+        "ordinance_draft_amendment"
+      ],
+      "required_arguments": [
+        "baseline",
+        "operations",
+        "expected_hash"
+      ],
+      "input_schema_sha256": "0abeac2e570dce34339db8afc920aaedbf32cf77374f98d807d39bd5412fd1b9"
+    },
+    {
+      "name": "local_workflow_plan",
+      "call_ids": [
+        "local_workflow_plan"
+      ],
+      "required_arguments": [
+        "question"
+      ],
+      "input_schema_sha256": "3a51147290c5a864f975e529cd1236b34d88826a6eb4c7c1743e683d292e8342"
+    },
+    {
+      "name": "local_evidence_review",
+      "call_ids": [
+        "local_evidence_review"
+      ],
+      "required_arguments": [
+        "evidence"
+      ],
+      "input_schema_sha256": "e781b74144dc79982c899b61711b081ca77da8070c074d1559085a4ceb8f6e4a"
+    }
+  ],
+  "calls": [
+    {
+      "id": "council_status",
+      "name": "council_status",
+      "arguments": {
+        "test_council": "수원시",
+        "live": false
+      },
+      "extract": {},
+      "purpose": "배포 상태·실제 노출 도구·실행 버전을 읽기 전용으로 확인"
+    },
+    {
+      "id": "council_find_council",
+      "name": "council_find_council",
+      "arguments": {
+        "query": "수원시"
+      },
+      "extract": {},
+      "purpose": "수원시의 공식 의회 식별자 확인"
+    },
+    {
+      "id": "council_data_sources",
+      "name": "council_data_sources",
+      "arguments": {
+        "query": "수원",
+        "limit": 1
+      },
+      "extract": {},
+      "purpose": "공식 의회 자료 진입점 1건 확인"
+    },
+    {
+      "id": "budget_api_catalog",
+      "name": "budget_api_catalog",
+      "arguments": {
+        "query": "lofin_projects"
+      },
+      "extract": {},
+      "purpose": "지방재정365 API ID·필수 조건·공식 명세 확인"
+    },
+    {
+      "id": "budget_api_status",
+      "name": "budget_api_status",
+      "arguments": {},
+      "extract": {},
+      "purpose": "키 설정과 실제 출처 확인 상태를 구분"
+    },
+    {
+      "id": "budget_calculation_schema",
+      "name": "budget_calculation_schema",
+      "arguments": {
+        "operation": "cost"
+      },
+      "extract": {
+        "budget_cost_arguments_schema": "arguments_schema"
+      },
+      "purpose": "산출 계산에 필요한 실제 내부 스키마 확인"
+    },
+    {
+      "id": "budget_calculate",
+      "name": "budget_calculate",
+      "arguments": {
+        "operation": "cost",
+        "arguments": {
+          "components": [
+            {
+              "name": "[기능검증용 예시] 공동 관리소 운영비",
+              "basis": "기능검증을 위한 가상단가 1,000원과 물량 1회. 실제 사업비 또는 공인 단가가 아님.",
+              "unit_price": "1000",
+              "quantity": "1"
+            }
+          ],
+          "unit": "원"
+        }
+      },
+      "extract": {},
+      "purpose": "실제 사업과 분리된 예시 1,000원 × 1회 산출",
+      "depends_on": [
+        "budget_calculation_schema"
+      ],
+      "example_only": true,
+      "expected": {
+        "summary.total_won": 1000
+      }
+    },
+    {
+      "id": "budget_review_project",
+      "name": "budget_review_project",
+      "arguments": {
+        "title": "[기능검증용 예시] 소규모 공동주택 공동 관리소 산출안",
+        "year": 2026,
+        "components": [
+          {
+            "name": "[기능검증용 예시] 공동 관리소 운영비",
+            "basis": "기능검증을 위한 가상단가 1,000원과 물량 1회. 실제 사업비 또는 공인 단가가 아님.",
+            "unit_price": "1000",
+            "quantity": "1"
+          }
+        ],
+        "topic": "시설",
+        "unit": "원"
+      },
+      "extract": {},
+      "purpose": "최소 산출안 검산과 승인 보류 상태 확인",
+      "example_only": true,
+      "expected": {
+        "status": "REVIEW_REQUIRED",
+        "amount_won": 1000
+      }
+    },
+    {
+      "id": "budget_checklist",
+      "name": "budget_checklist",
+      "arguments": {
+        "topic": "시설",
+        "year": 2026
+      },
+      "extract": {},
+      "purpose": "시설사업 사전절차 확인질문 반환. 임의 사업명을 topic enum으로 전달하지 않음"
+    },
+    {
+      "id": "ordinance_guide",
+      "name": "ordinance_guide",
+      "arguments": {
+        "procedure": {
+          "jurisdiction": "경기도 수원시",
+          "instrument": "ordinance",
+          "action": "prepare",
+          "basis_kind": "unknown",
+          "ordinance_stage": "unknown"
+        },
+        "as_of": "2026-10-05"
+      },
+      "extract": {},
+      "purpose": "검증용 절차 입력의 미확인·보류 조건 확인",
+      "example_only": true,
+      "expected": {
+        "procedure_screening.legal_approval": false,
+        "procedure_screening.publication_ready": false,
+        "procedure_screening.implementation_ready": false
+      }
+    },
+    {
+      "id": "local_workflow_plan",
+      "name": "local_workflow_plan",
+      "arguments": {
+        "question": "수원시 빌라가꿈관리소의 의회 질의, 2026년 예산현액과 관련 조례를 검토해줘",
+        "jurisdiction": "경기도 수원시",
+        "fiscal_year": 2026,
+        "as_of": "2026-10-05",
+        "domains": [
+          "council",
+          "budget",
+          "ordinance"
+        ]
+      },
+      "extract": {},
+      "purpose": "실제 실행과 구분되는 통합 검색 계획·호출 인자 확인",
+      "expected": {
+        "status": "PLAN_ONLY"
+      }
+    },
+    {
+      "id": "search",
+      "name": "search",
+      "arguments": {
+        "query": "수원시 빌라가꿈관리소"
+      },
+      "extract": {
+        "search_first_id": "results.0.id"
+      },
+      "purpose": "표준 지식검색의 실제 반환 ID 확보",
+      "scope_note": "이 도구에는 날짜 입력항목이 없으므로 고정 명시기간을 적용한 조회라고 표현하지 않는다."
+    },
+    {
+      "id": "fetch",
+      "name": "fetch",
+      "arguments": {
+        "id": "@search_first_id"
+      },
+      "extract": {},
+      "purpose": "직전 search가 반환한 실제 ID로 공식 회의 문맥 조회",
+      "depends_on": [
+        "search"
+      ]
+    },
+    {
+      "id": "council_evidence_bundle",
+      "name": "council_evidence_bundle",
+      "arguments": {
+        "keyword": "빌라가꿈관리소",
+        "council": "수원시",
+        "mode": "질의답변",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "max_docs": 1,
+        "source": "auto",
+        "limit": 1
+      },
+      "extract": {
+        "evidence_snapshot_id": "snapshot_id",
+        "meeting_document_ref": "records.0.docid"
+      },
+      "purpose": "명시 기간의 의원 질의·답변과 재사용 스냅샷 확보"
+    },
+    {
+      "id": "council_get_evidence",
+      "name": "council_get_evidence",
+      "arguments": {
+        "snapshot_id": "@evidence_snapshot_id",
+        "collection": "items",
+        "limit": 1
+      },
+      "extract": {},
+      "purpose": "실제 bundle 스냅샷에서 근거 1건 재조회",
+      "depends_on": [
+        "council_evidence_bundle"
+      ]
+    },
+    {
+      "id": "council_read_source",
+      "name": "council_read_source",
+      "arguments": {
+        "ref": "@meeting_document_ref",
+        "keyword": "빌라가꿈관리소",
+        "max_turns": 2,
+        "max_chars": 2000
+      },
+      "extract": {},
+      "purpose": "bundle이 반환한 공식 문서 ID의 실제 발언·출처 확인",
+      "depends_on": [
+        "council_evidence_bundle"
+      ]
+    },
+    {
+      "id": "council_open_record",
+      "name": "council_open_record",
+      "arguments": {
+        "ref": "@meeting_document_ref",
+        "keyword": "빌라가꿈관리소",
+        "max_chars": 2000
+      },
+      "extract": {},
+      "purpose": "같은 공식 문서 ID의 열람용 반환 경로 확인",
+      "depends_on": [
+        "council_evidence_bundle"
+      ]
+    },
+    {
+      "id": "council_prepare_pack",
+      "name": "council_prepare_pack",
+      "arguments": {
+        "keyword": "빌라가꿈관리소",
+        "council": "수원시",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "max_docs": 1,
+        "snapshot_id": "@evidence_snapshot_id",
+        "max_evidence": 1
+      },
+      "extract": {},
+      "purpose": "동일 질의답변 검색조건·source=auto 스냅샷을 재사용해 답변준비 초안 생성",
+      "depends_on": [
+        "council_evidence_bundle"
+      ],
+      "expected": {
+        "briefing.human_review_required": true
+      }
+    },
+    {
+      "id": "council_evidence_search",
+      "name": "council_evidence_search",
+      "arguments": {
+        "keyword": "빌라가꿈관리소",
+        "council": "수원시",
+        "mode": "질의답변",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "depth": "빠르게"
+      },
+      "extract": {},
+      "purpose": "통합검색 호환 도구의 최소 유효 depth 확인",
+      "scope_note": "현재 빠르게 옵션은 내부 상세 최대 3건이며 max_docs 인자를 직접 받지 않는다.",
+      "result_contract": "text_with_status_prefix"
+    },
+    {
+      "id": "council_search_minutes",
+      "name": "council_search_minutes",
+      "arguments": {
+        "keyword": "빌라가꿈관리소",
+        "council": "수원시",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "limit": 1
+      },
+      "extract": {},
+      "purpose": "원문 목록의 실제 공식 문서번호와 기간 설명 확인",
+      "result_contract": "text_with_status_prefix"
+    },
+    {
+      "id": "council_period_review",
+      "name": "council_period_review",
+      "arguments": {
+        "keyword": "빌라가꿈관리소",
+        "council": "수원시",
+        "years": 2,
+        "include_current_year": true,
+        "as_of": "2026-10-05",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "mode": "질의답변",
+        "max_docs_per_year": 1
+      },
+      "extract": {},
+      "purpose": "명시 기간을 회의연도별로 나누어 각 연도 1건 한도 확인"
+    },
+    {
+      "id": "council_department_brief",
+      "name": "council_department_brief",
+      "arguments": {
+        "department": "건축과",
+        "council": "수원시",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "max_docs": 1,
+        "limit": 1,
+        "source": "auto"
+      },
+      "extract": {},
+      "purpose": "수원 건축과의 의원 질의·집행부 답변 역할 구분 확인"
+    },
+    {
+      "id": "council_recurring_issues",
+      "name": "council_recurring_issues",
+      "arguments": {
+        "keyword": "소규모 공동주택",
+        "council": "수원시",
+        "years": 2,
+        "include_current_year": true,
+        "as_of": "2026-10-05",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "min_years": 2,
+        "top": 1,
+        "max_docs_per_year": 1,
+        "source": "auto"
+      },
+      "extract": {},
+      "purpose": "두 회의연도의 반복 쟁점 후보를 작은 범위로 조회하고 동일 요구 확정과 구분"
+    },
+    {
+      "id": "council_peer_cases",
+      "name": "council_peer_cases",
+      "arguments": {
+        "topic": "소규모 공동주택",
+        "years": 1,
+        "case_count": 1,
+        "max_details": 3
+      },
+      "extract": {},
+      "purpose": "서로 다른 지방의회 실제 질문 사례 중 최소 1건을 제한적으로 조회",
+      "scope_note": "전국 조회 도구이며 council/date_from/date_to를 받지 않는다. years=1은 실행일 기준 최근 1년, max_details의 실제 최소값은 3이다. 지정 기간 전수조사 아님."
+    },
+    {
+      "id": "council_department_session_brief",
+      "name": "council_department_session_brief",
+      "arguments": {
+        "department": "건축과",
+        "council": "수원시",
+        "purpose": "업무보고",
+        "years": 1,
+        "max_docs_per_year": 1
+      },
+      "extract": {},
+      "purpose": "부서 기준 회기 준비의 최소 1년 입력 확인",
+      "scope_note": "date_from/date_to/as_of를 받지 않는다. 현재 구현은 최근 1년과 내부 brief 상세 최대 3건을 조회한다. 명시된 2025-01-01 시작범위와 같다고 표현하지 않는다."
+    },
+    {
+      "id": "council_finance_context",
+      "name": "council_finance_context",
+      "arguments": {
+        "topic": "빌라가꿈관리소",
+        "council": "수원시",
+        "fiscal_year": 2026,
+        "snapshot_date": "20261005",
+        "budget_stage": "current",
+        "search_terms": [
+          "소규모 공동주택"
+        ],
+        "limit": 3
+      },
+      "extract": {
+        "finance_snapshot_date": "query.snapshot_date",
+        "finance_local_government_code": "items.0.local_government_code"
+      },
+      "purpose": "공개 인자의 관련 검색어가 실제 재검색에 전달되는지와 최근 제공 기준일 확인",
+      "expected": {
+        "budget_basis.same_project_verified": false,
+        "budget_basis.amount_verified": false,
+        "budget_basis.requested_stage": "current"
+      }
+    },
+    {
+      "id": "budget_fetch_api",
+      "name": "budget_fetch_api",
+      "arguments": {
+        "api_id": "lofin_projects",
+        "params": {
+          "fyr": "2026",
+          "exe_ymd": "@finance_snapshot_date",
+          "laf_cd": "@finance_local_government_code",
+          "dbiz_nm": "소규모 공동주택"
+        },
+        "page_size": 1
+      },
+      "extract": {},
+      "purpose": "카탈로그에서 확인한 필드와 직전 실제 제공일·지자체코드로 공식 API 1행 조회",
+      "depends_on": [
+        "budget_api_catalog",
+        "council_finance_context"
+      ]
+    },
+    {
+      "id": "budget_search_similar_projects",
+      "name": "budget_search_similar_projects",
+      "arguments": {
+        "query": "소규모 공동주택",
+        "fiscal_year": 2026,
+        "execution_date": "@finance_snapshot_date",
+        "local_gov_code": "@finance_local_government_code",
+        "page_size": 1
+      },
+      "extract": {},
+      "purpose": "같은 제공일·지자체에서 이름이 유사한 사업 후보 1행 조회",
+      "depends_on": [
+        "council_finance_context"
+      ]
+    },
+    {
+      "id": "council_legislation_context",
+      "name": "council_legislation_context",
+      "arguments": {
+        "topic": "공동주택관리법",
+        "council": "수원시",
+        "jurisdiction": "경기도 수원시",
+        "include_articles": false
+      },
+      "extract": {
+        "law_document_id": "laws.0.document_id",
+        "law_title": "laws.0.title"
+      },
+      "purpose": "명시된 상위법의 공식 ID를 정확 제명으로 먼저 확인",
+      "preconditions_for_extraction": [
+        {
+          "path": "laws.0.title",
+          "equals": "공동주택관리법"
+        }
+      ],
+      "scope_note": "법령 단일 제목의 최소 검색이다. 해당 호출의 현지 조례가 비어 PARTIAL이어도 근거 없음으로 해석하지 않는다. 현지 조례는 별도 ordinance_search로 확인한다."
+    },
+    {
+      "id": "ordinance_search",
+      "name": "ordinance_search",
+      "arguments": {
+        "query": "소규모 공동주택",
+        "kind": "ordinance",
+        "jurisdiction": "경기도 수원시",
+        "limit": 1,
+        "max_pages": 1
+      },
+      "extract": {
+        "ordinance_document_id": "results.0.document_id",
+        "ordinance_mst": "results.0.mst",
+        "ordinance_title": "results.0.title"
+      },
+      "purpose": "수원시 소규모 공동주택 조례의 공식 식별자 확보",
+      "preconditions_for_extraction": [
+        {
+          "path": "results.0.jurisdiction",
+          "equals": "경기도 수원시"
+        },
+        {
+          "path": "results.0.title",
+          "equals": "수원시 소규모 공동주택관리 지원 조례"
+        }
+      ]
+    },
+    {
+      "id": "ordinance_get_document",
+      "name": "ordinance_get_document",
+      "arguments": {
+        "reference": {
+          "kind": "ordinance",
+          "document_id": "@ordinance_document_id",
+          "mst": "@ordinance_mst",
+          "title_hint": "@ordinance_title"
+        },
+        "keyword": "공동 관리소",
+        "section": "articles",
+        "limit": 1,
+        "max_chars": 2000
+      },
+      "extract": {
+        "document_content_hash": "summary.content_hash",
+        "document_article_label": "articles.0.label",
+        "document_article_text": "articles.0.text",
+        "ordinance_source_url": "summary.source_url"
+      },
+      "purpose": "실제 검색 식별자로 공동 관리소 조문·버전 해시·원문 링크 확인",
+      "depends_on": [
+        "ordinance_search"
+      ],
+      "preconditions_for_extraction": [
+        {
+          "path": "articles.0.label",
+          "equals": "제5조의2"
+        },
+        {
+          "path": "articles.0.excerpt_location.excerpt_only",
+          "must_not_equal": true
+        }
+      ],
+      "scope_note": "draft의 expected_text는 해당 조문 전체여야 한다. excerpt_only=true이면 공식 continuation으로 동일 조문을 완전히 회수하기 전 draft를 호출하지 않는다."
+    },
+    {
+      "id": "ordinance_linked",
+      "name": "ordinance_linked",
+      "arguments": {
+        "law_id": "@law_document_id",
+        "article": "제1조",
+        "max_pages": 1
+      },
+      "extract": {},
+      "purpose": "실제 상위법 ID·조번호로 공식 연결 조례 조회 경로 확인",
+      "depends_on": [
+        "council_legislation_context"
+      ],
+      "scope_note": "제1조는 존재·연결 도구의 최소 입력이며 연결 0건을 위임근거 또는 모든 관련 조례 부재로 해석하지 않는다."
+    },
+    {
+      "id": "dependency_peer_ordinance_search",
+      "name": "ordinance_search",
+      "arguments": {
+        "query": "소규모 공동주택",
+        "kind": "ordinance",
+        "jurisdiction": "경기도 성남시",
+        "limit": 1,
+        "max_pages": 1
+      },
+      "extract": {
+        "peer_ordinance_document_id": "results.0.document_id",
+        "peer_ordinance_mst": "results.0.mst",
+        "peer_ordinance_title": "results.0.title"
+      },
+      "purpose": "타 지자체 비교 도구에 전달할 실제 비교 조례 1건 확보",
+      "classification": "DEPENDENCY_ONLY",
+      "preconditions_for_extraction": [
+        {
+          "path": "results.0.jurisdiction",
+          "equals": "경기도 성남시"
+        }
+      ]
+    },
+    {
+      "id": "ordinance_compare",
+      "name": "ordinance_compare",
+      "arguments": {
+        "baseline": {
+          "kind": "ordinance",
+          "document_id": "@ordinance_document_id",
+          "mst": "@ordinance_mst",
+          "title_hint": "@ordinance_title"
+        },
+        "comparisons": [
+          {
+            "kind": "ordinance",
+            "document_id": "@peer_ordinance_document_id",
+            "mst": "@peer_ordinance_mst",
+            "title_hint": "@peer_ordinance_title"
+          }
+        ],
+        "as_of": "2026-10-05"
+      },
+      "extract": {},
+      "purpose": "실제 검색에서 확보한 수원·성남 조례 각 1개의 기능 차이 비교",
+      "depends_on": [
+        "ordinance_search",
+        "dependency_peer_ordinance_search"
+      ]
+    },
+    {
+      "id": "ordinance_diff_versions",
+      "name": "ordinance_diff_versions",
+      "arguments": {
+        "old": {
+          "kind": "ordinance",
+          "document_id": "@ordinance_document_id",
+          "mst": "@ordinance_mst",
+          "title_hint": "@ordinance_title"
+        },
+        "new": {
+          "kind": "ordinance",
+          "document_id": "@ordinance_document_id",
+          "mst": "@ordinance_mst",
+          "title_hint": "@ordinance_title"
+        }
+      },
+      "extract": {},
+      "purpose": "같은 공식 버전을 양쪽에 넣은 무변경 대조 시험",
+      "depends_on": [
+        "ordinance_search"
+      ],
+      "test_scope": "IDENTICAL_VERSION_NEGATIVE_CONTROL",
+      "expected": {
+        "changes": [],
+        "supplementary_changed": false,
+        "annexes_changed": false,
+        "metadata_changed": {}
+      },
+      "limitation": "공개 ordinance_search에는 history 입력이 없다. 이것은 유효 최소입력과 무변경 대조 검증이며 서로 다른 구·신 버전의 실데이터 비교 검증을 대체하지 않는다."
+    },
+    {
+      "id": "ordinance_review_project",
+      "name": "ordinance_review_project",
+      "arguments": {
+        "params": {
+          "project": "[기능검증용 예시] 수원시 소규모 공동주택 공동 관리소의 설치·운영 근거를 검토한다. 실제 신규사업·개정안·지출 승인 요청이 아니다.",
+          "jurisdiction": "경기도 수원시",
+          "as_of": "2026-10-05",
+          "topic": "소규모 공동주택",
+          "baseline": {
+            "kind": "ordinance",
+            "document_id": "@ordinance_document_id",
+            "mst": "@ordinance_mst",
+            "title_hint": "@ordinance_title"
+          },
+          "auto_search": false,
+          "reasoning": "rules",
+          "allow_external_llm": false,
+          "budget_calls": 1
+        },
+        "detail_level": "summary",
+        "max_evidence": 1
+      },
+      "extract": {},
+      "purpose": "실제 기준조례를 선택한 검토 초안의 미확인 항목과 승인 불가 상태 확인",
+      "depends_on": [
+        "ordinance_search"
+      ],
+      "example_only": true,
+      "expected": {
+        "quality_gate.legal_approval": false,
+        "quality_gate.submission_ready": false,
+        "draft.submission_ready": false,
+        "usage.llm_calls": 0
+      }
+    },
+    {
+      "id": "ordinance_verify_references",
+      "name": "ordinance_verify_references",
+      "arguments": {
+        "text": "[기능검증용 예시] 「공동주택관리법」 제1조를 인용한다.",
+        "parents": [
+          {
+            "kind": "law",
+            "document_id": "@law_document_id",
+            "title_hint": "@law_title"
+          }
+        ],
+        "as_of": "2026-10-05"
+      },
+      "extract": {},
+      "purpose": "실제 법령 ID에서 예시 인용의 조문 존재만 대조",
+      "depends_on": [
+        "council_legislation_context"
+      ],
+      "example_only": true,
+      "scope_note": "법령 ID만 전달하므로 현재 시행 본문을 조회한다. 미래에 특정 MST를 전달하려면 해당 검색결과의 effective_date도 함께 필요하다."
+    },
+    {
+      "id": "ordinance_draft_amendment",
+      "name": "ordinance_draft_amendment",
+      "arguments": {
+        "baseline": {
+          "kind": "ordinance",
+          "document_id": "@ordinance_document_id",
+          "mst": "@ordinance_mst",
+          "title_hint": "@ordinance_title"
+        },
+        "operations": [
+          {
+            "operation": "replace_article",
+            "article": "@document_article_label",
+            "expected_text": "@document_article_text",
+            "new_text": "제5조의2(검증용 예시) 이 문안은 기능 검증을 위한 예시이며 실제 개정·공포·집행에 사용하지 않는다.",
+            "reason": "기능검증용 가상 문안의 기계적 대체 시험. 실제 개정 제안·제출·공포 또는 법적 승인 아님."
+          }
+        ],
+        "expected_hash": "@document_content_hash"
+      },
+      "extract": {},
+      "purpose": "실제 원문 해시와 정확한 조문 전체 일치 후 공개 검증용 일부개정 초안만 생성",
+      "depends_on": [
+        "ordinance_get_document"
+      ],
+      "example_only": true,
+      "expected": {
+        "status": "mechanical_working_draft",
+        "submission_ready": false
+      },
+      "preconditions": [
+        {
+          "placeholder": "document_article_label",
+          "equals": "제5조의2"
+        },
+        {
+          "source": "ordinance_get_document",
+          "path": "articles.0.excerpt_location.excerpt_only",
+          "must_not_equal": true
+        }
+      ]
+    },
+    {
+      "id": "local_evidence_review",
+      "name": "local_evidence_review",
+      "arguments": {
+        "evidence": [
+          {
+            "domain": "ordinance",
+            "source_ref": "@ordinance_source_url",
+            "jurisdiction": "경기도 수원시",
+            "as_of": "2026-10-05",
+            "state": "partial",
+            "claim": "공식 조례의 공동 관리소 설치 조문 1개를 조회함. 전체 조문·적법성·동일사업은 확정하지 않음."
+          }
+        ],
+        "jurisdiction": "경기도 수원시",
+        "required_domains": [
+          "ordinance"
+        ]
+      },
+      "extract": {},
+      "purpose": "실제 조회한 조례 원문의 제한된 열람범위를 메타데이터로 점검",
+      "depends_on": [
+        "ordinance_get_document"
+      ],
+      "expected": {
+        "status": "METADATA_REVIEW_ONLY",
+        "verified_facts": false
+      }
+    },
+    {
+      "id": "council_context_pack",
+      "name": "council_context_pack",
+      "arguments": {
+        "topic": "빌라가꿈관리소",
+        "council": "수원시",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "fiscal_year": 2026,
+        "max_docs": 1,
+        "include_legal": true,
+        "include_finance": true,
+        "include_public_data": false,
+        "include_member_records": false,
+        "include_policy_background": false
+      },
+      "extract": {},
+      "purpose": "사업명→공식 회의록의 대상 구절→조례·재정 후보 연결과 통합 상태 확인",
+      "expected": {
+        "ready_for_submission": false,
+        "linked_review.legal_approval": false,
+        "linked_review.same_project_verified": false
+      }
+    },
+    {
+      "id": "council_session_ready_pack",
+      "name": "council_session_ready_pack",
+      "arguments": {
+        "topic": "빌라가꿈관리소",
+        "council": "수원시",
+        "purpose": "행정사무감사",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "fiscal_year": 2026,
+        "max_docs": 1,
+        "need_public_data": false
+      },
+      "extract": {},
+      "purpose": "실제 회기 목적에서 의회·예산·조례 근거와 담당자 확인사항 연결",
+      "expected": {
+        "ready_for_submission": false
+      }
+    }
+  ]
+}

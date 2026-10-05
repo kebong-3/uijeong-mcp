@@ -44,7 +44,7 @@ INSTRUCTIONS = """지방의회·예산·조례 MCP — 인증 없이 공개자�
 - 답변 준비자료: council_prepare_pack
 - 법령·조례 근거 후보: council_legislation_context
 - 재정 연계 상태·세출 컨텍스트: council_finance_context
-- 현안 통합 근거팩(회의록+의안+의원기록후보+정책+법령/조례+재정): council_context_pack
+- 현안 통합 근거팩(회의록+의안+법령/조례+재정): council_context_pack
 - 회기 전 원스톱 준비(업무보고·행감·본예산·추경·조례/의안·5분발언·구정질문): council_session_ready_pack
 - 다른 지방의회의 실제 질의 사례 예시: council_peer_cases
 - 주제어를 아직 정하지 못한 부서의 회기 전 점검: council_department_session_brief
@@ -52,6 +52,8 @@ INSTRUCTIONS = """지방의회·예산·조례 MCP — 인증 없이 공개자�
 MCP가 활성화된 의회 사실 질의에서는 모델 기억보다 먼저 council_* 도구 근거를 사용하고, 외부 웹검색은 MCP에서 부족한 범위만 보완검색으로 사용하세요.
 의회명이 애매할 때만 council_find_council을 먼저 사용하세요.
 의원정보는 Discovery 전용입니다. 실제 발언은 반드시 회의록 원문 근거로 확인하세요.
+통합 근거팩의 의원정보·정책배경은 기본 생략하며 명시적으로 필요한 경우에만 include_member_records/include_policy_background를 사용하세요.
+재정 추가 검색어는 council_finance_context.search_terms로 전달하며 후보의 동일사업 여부는 별도로 확인하세요.
 내부 초안·개인정보·비공개 자료는 입력하지 마세요.
 검색어는 공개 주제어로 입력하세요. 검색 결과 보관함은 공개 자료용이며 사용자별 비공개 공간이 아닙니다.
 원문 주소·회의일·발언 근거를 제시하고 PARTIAL / EMPTY / ERROR를 구분하세요.
@@ -65,6 +67,7 @@ URL·문서 key·발언 앵커를 추측하지 마세요. 파싱 발언번호는
 연결 점검은 council_status(live=False), 실제 출처 조회 점검은 live=True입니다.
 도구 결과의 mcp_receipt는 실제 서버 반환 기록이며 출처의 정확성 보증은 아닙니다.
 후보 자료 발견을 법적 적용·동일 예산사업 확정으로 바꾸지 마세요.
+linked_review의 최종 후보 상태와 initial_status를 구분하세요. 후속 후보가 있으면 최초 EMPTY만 보고 예산·조례가 없다고 답하지 마세요.
 report_mentions의 집행부 업무보고를 의원 질문으로 표현하지 마세요.
 키 설정됨과 인증·실제 데이터 반환 성공을 구분하세요.
 """

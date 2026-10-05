@@ -13,13 +13,16 @@ from __future__ import annotations
 import asyncio
 import json
 from pathlib import Path
-from typing import Any, Optional, Literal
+from typing import Annotated, Any, Optional, Literal
+
+from pydantic import Field
 
 import finance_context as F
 import legal_context as L
 import public_data_discovery as D
 import runtime_security as R
 import query_decomposition as Q
+from jurisdiction_identity import resolve_jurisdiction, same_jurisdiction
 from result_contract import wire_result
 
 _TERMS_PATH = Path(__file__).parent / "data" / "administrative_terms.json"
@@ -196,6 +199,11 @@ def install(U: Any) -> None:
         if error:
             return {"status":"INVALID_INPUT","message":error}
         wanted=jurisdiction or _jurisdiction_from_council(cname)
+        jurisdiction_resolution=resolve_jurisdiction(wanted)
+        if jurisdiction_resolution["state"] == "ambiguous":
+            return {"status":"INVALID_INPUT",
+                    "message":"대상 지자체명이 모호합니다. 시·도를 포함한 정식 명칭으로 지정하세요.",
+                    "jurisdiction_resolution":jurisdiction_resolution}
         plan=Q.legal_search_plan(topic.strip(),wanted,6)
 
         queries=[]
@@ -235,7 +243,9 @@ def install(U: Any) -> None:
                         item["match_status"]="RELATED_LAW_CANDIDATE"
                         related_laws.append(item)
                 else:
-                    if value.get("jurisdiction_match"):
+                    # Title and body fallback searches can return a mixed set.
+                    # A response-wide match flag cannot identify every row.
+                    if same_jurisdiction(item.get("jurisdiction", ""), wanted):
                         item["match_status"]="LOCAL_ORDINANCE_CANDIDATE"
                         local_ordinances.append(item)
                     else:
@@ -288,6 +298,7 @@ def install(U: Any) -> None:
             "status":status,
             "query":topic.strip(),
             "jurisdiction":wanted,
+            "jurisdiction_resolution":jurisdiction_resolution,
             "query_plan":plan,
             "laws":laws,
             "local_ordinances":local_ordinances,
@@ -324,16 +335,28 @@ def install(U: Any) -> None:
         limit: int = 20,
         snapshot_date: str = "",
         budget_stage: Literal["current", "original", "supplementary", "draft", "settlement"] = "current",
+        search_terms: Annotated[Optional[list[Annotated[str, Field(min_length=1, max_length=100)]]],
+                                Field(max_length=3)] = None,
     ) -> dict[str, Any]:
         """지방재정365 사업 예산·집행 조회. 최근 자료 제공일과 사업명 띄어쓰기·약칭을 보정합니다.
         지역과 fiscal_year를 지정하세요. snapshot_date는 선택 기준일 YYYYMMDD/ YYYY-MM-DD.
         budget_stage: current=예산현액, original=본예산, supplementary=추경, draft=예산안, settlement=결산.
+        search_terms: 원문에서 확인한 관련 검색어 최대 3개(각 1~100자). 원래 사업명부터 조회하고 미발견 시 순서대로 재검색합니다.
+        원래명·표기변형을 합쳐 최대 4개 표현을 조회하며 첫 후보 발견 시 중단합니다. 생략·미시도 검색어는 search_strategy에 남습니다.
+        관련 검색어로 찾은 사업은 동일사업으로 확정하지 않습니다.
         API는 예산현액을 반환하므로 다른 단계는 공식 예산서 대조 전 미확인입니다.
         실제 기준일·단위·사업코드를 확인하고 수치 뒤에 source_links의 확인 링크를 붙이세요."""
+        if search_terms is not None and (not isinstance(search_terms, list) or len(search_terms) > 3
+                or any(not isinstance(term, str) or not term.strip() or len(term) > 100
+                       for term in search_terms)):
+            return {"status":"INVALID_INPUT", "message":"search_terms는 각 1~100자의 공개 검색어 최대 3개입니다.",
+                    "validation":{"field":"search_terms","allowed":{"max_items":3,"min_length":1,"max_length":100}},
+                    "items":[]}
         cid,cname,error=U.pick_council(council)
         if error:
             return {"status":"INVALID_INPUT","message":error}
-        result=await F.context(topic,cname,fiscal_year,limit,snapshot_date=snapshot_date,budget_stage=budget_stage)
+        result=await F.context(topic,cname,fiscal_year,limit,search_terms=search_terms,
+                               snapshot_date=snapshot_date,budget_stage=budget_stage)
         result["council"]={"id":cid,"name":cname}
         result["execution_trace"]={"mcp_tool":"council_finance_context","source":"FINANCE365","used":True}
         return result
