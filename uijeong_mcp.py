@@ -38,6 +38,7 @@ R.configure_logging()
 import contextvars
 import datetime as dt
 import html as htmllib
+import json
 import os
 import re
 import sys
@@ -235,8 +236,24 @@ def pick_council(query: Optional[str]) -> tuple[Optional[str], Optional[str], Op
 # 3. CLIK API 클라이언트 (캐시 + 일일 호출 예산)
 # ════════════════════════════════════════════════════════════
 class ClikError(Exception):
+    def __init__(self, message: str, *, code: Optional[str] = None):
+        super().__init__(message)
+        # Only locally defined codes may enter diagnostics; never echo a raw error payload.
+        allowed = {*CLIK_ERRORS, "MISSING_API_KEY", "TRANSPORT_ERROR", "NON_JSON_RESPONSE",
+                   "MALFORMED_RESPONSE", "UNKNOWN_RESPONSE"}
+        self.code = code if code in allowed else None
+        self.query_recovery: Optional[dict] = None
+
+    def diagnostics(self) -> dict:
+        fields = {"code": self.code} if self.code else {}
+        if self.query_recovery:
+            fields["query_recovery"] = self.query_recovery
+        return fields
+
     def __str__(self):
         message=super().__str__()
+        if self.query_recovery:
+            message += "\n검색 복구 이력: " + json.dumps(self.query_recovery, ensure_ascii=False)
         return message if message.startswith("상태:") else "상태: ERROR\n"+message
 
 
@@ -275,13 +292,60 @@ class ClikClient:
         try:
             return r.json()
         except ValueError:
-            raise ClikError("CLIK 응답이 JSON이 아닙니다. 점검 상태와 인증키를 확인하세요.")
+            raise ClikError("CLIK 응답이 JSON이 아닙니다. 점검 상태와 인증키를 확인하세요.",
+                            code="NON_JSON_RESPONSE")
 
     async def get(self, path: str, **params: Any) -> dict:
+        """Try the requested query first; recover one proven CLIK content-query failure.
+
+        In the public profile, CLIK can return ERROR11 for a spaced MINTS_HTML
+        query while its compact form succeeds. This is a different query, not a successful
+        execution of the original. Authentication, quota and transport failures are
+        never retried here. Both attempts use the ordinary cache and quota controls.
+        """
+        try:
+            return await self._get_once(path, params)
+        except ClikError as original:
+            keyword = params.get("searchKeyword")
+            # The public consumers propagate recovery coverage. Legacy profiles
+            # keep their prior error behavior until their formatters do so too.
+            if not (PROFILE == "public" and original.code == "ERROR11" and path == "minutes.do"
+                    and params.get("displayType") == "list"
+                    and params.get("searchType") == "MINTS_HTML"
+                    and isinstance(keyword, str) and re.search(r"\S\s+\S", keyword)):
+                raise
+            compact = re.sub(r"\s+", "", keyword)
+            recovery = {
+                "reason": "CLIK_MINTS_HTML_WHITESPACE_ERROR11",
+                "original_keyword": keyword,
+                "fallback_keyword": compact,
+                "transformation": "REMOVE_WHITESPACE",
+                "same_result_set_verified": False,
+                "scope": {
+                    "endpoint": "minutes.do", "display_type": "list", "search_type": "MINTS_HTML",
+                    "council_id": params.get("rasmblyId"), "offset": params.get("startCount", 0),
+                    "list_count": params.get("listCount"), "sort": params.get("sort"),
+                },
+                "attempts": [{"query": keyword, "code": "ERROR11"}],
+                "recovered": False,
+                "limitation": "원문구 조회는 실패했습니다. 공백 제거 검색의 결과가 원문구 검색과 같은 범위인지는 확인하지 않았습니다.",
+            }
+            try:
+                obj = await self._get_once(path, {**params, "searchKeyword": compact})
+            except ClikError as fallback:
+                recovery["attempts"].append({"query": compact, "code": fallback.code or "UNCLASSIFIED_ERROR"})
+                fallback.query_recovery = recovery
+                raise
+            recovery["attempts"].append({"query": compact, "code": "SUCCESS"})
+            recovery["recovered"] = True
+            # Do not mutate the compact query's cached object or cache it as an exact hit.
+            return {**obj, "query_recovery": recovery}
+
+    async def _get_once(self, path: str, params: dict[str, Any]) -> dict:
         if not API_KEY:
             raise ClikError(
                 "CLIK_API_KEY가 설정되지 않았습니다. 국회도서관 지방의정포털(clik.nanet.go.kr) 로그인 → "
-                "Open API → 인증키 신청 후, 서버 환경변수 CLIK_API_KEY에 넣어주세요."
+                "Open API → 인증키 신청 후, 서버 환경변수 CLIK_API_KEY에 넣어주세요.", code="MISSING_API_KEY"
             )
         clean = {k: v for k, v in params.items() if v not in (None, "")}
         ck = path + "?" + "&".join(f"{k}={clean[k]}" for k in sorted(clean))
@@ -291,16 +355,19 @@ class ClikClient:
         self._roll_day()
         async with self._lock:
             if not self._budget.reserve():
-                raise ClikError(CLIK_ERRORS["ERROR09"])
+                raise ClikError(CLIK_ERRORS["ERROR09"], code="ERROR09")
             self.calls_today += 1
         try:
             data = await self._raw_get(path, {"key": API_KEY, "type": "json", **clean})
         except (httpx.HTTPError, ValueError, R.SecurityError) as e:
-            raise ClikError(f"CLIK 서버 연결 실패: {type(e).__name__}. 잠시 후 다시 시도하세요.")
+            raise ClikError(f"CLIK 서버 연결 실패: {type(e).__name__}. 잠시 후 다시 시도하세요.",
+                            code="TRANSPORT_ERROR")
         obj = _unwrap(data)
         code = str(obj.get("RESULT_CODE", "MALFORMED_RESPONSE"))
         if code != "SUCCESS":
-            raise ClikError(CLIK_ERRORS.get(code, f"CLIK 오류: {code}"))
+            safe_code = code if code in CLIK_ERRORS or code == "MALFORMED_RESPONSE" else "UNKNOWN_RESPONSE"
+            raise ClikError(CLIK_ERRORS.get(code, "CLIK 응답 형식을 확인할 수 없습니다. 잠시 후 다시 시도하세요."),
+                            code=safe_code)
         _trim_cache(self._cache, CACHE_MAX)
         self._cache[ck] = (time.time(), obj)
         return obj
@@ -735,11 +802,25 @@ async def list_minutes(
                 searchType=search_type, searchKeyword=keyword, rasmblyId=council_id, sort=sort,
             )
         except ClikError as exc:
+            if exc.query_recovery:
+                exc.query_recovery = {**exc.query_recovery, "local_filters": {
+                    "date_from": df, "date_to": dt_, "meeting_type": kind_filter, "committee": committee,
+                }}
             if not st["scanned"]:
                 raise
             st.update(next_pos=start, exhausted=False)
-            st["errors"].append({"source":"CLIK", "stage":"list", "offset":start, "message":str(exc)})
+            st["errors"].append({"source":"CLIK", "stage":"list", "offset":start,
+                                 "message": R.safe_error(exc), **exc.diagnostics()})
             break
+        if obj.get("query_recovery"):
+            recovery = {**obj["query_recovery"], "local_filters": {
+                "date_from": df, "date_to": dt_, "meeting_type": kind_filter, "committee": committee,
+            }}
+            st["errors"].append({
+                "source": "CLIK", "stage": "list_query_recovery", "offset": start, "code": "ERROR11",
+                "message": "원문구 내용검색 실패 후 공백 제거 검색을 확인했습니다. 원문구 조회 실패 범위는 미확인입니다.",
+                "query_recovery": recovery,
+            })
         rows = _rows(obj)
         total = int(obj.get("TOTAL_COUNT") or 0)
         stop = False

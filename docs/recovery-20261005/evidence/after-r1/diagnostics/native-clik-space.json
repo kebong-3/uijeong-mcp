@@ -1,0 +1,74 @@
+{
+  "purpose": "실제 CLIK 내용검색의 공백 포함 ERROR11 조합을 구분한 제한된 진단. 원천의 보편적 공백 규칙을 증명하지 않음.",
+  "captured_date": "2026-10-05",
+  "server_version": "4.1.5-public.1",
+  "calls": [
+    {
+      "arguments": {
+        "keyword": "소규모 공동주택",
+        "council": "수원시",
+        "search_in": "전체",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "limit": 1
+      },
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "상태: PARTIAL\n경기도 수원시의회 회의록 '소규모 공동주택' 검색 · 기간 2025.01.01.~2026.10.05.\n상류(CLIK) 검색건수 855건 — 검색어·의회 기준 건수이며 기간·회의유형 조건 충족 건수나 질의 건수가 아닙니다.\n이번 조회: 상류 위치 0부터 1건 검토 → 조건 충족 1건 표시\n- 경기도 수원시의회 제13대 제404회 본회의 제1차 (2026.09.01.) [본회의] docid=CLIKC3092799235444263\n\n다음 결과: cursor=e2.eyJwIjoxLCJxIjoiMzRkNmRlZDM5MGU4N2ExZmU2ODMyMzNlMjFmYmQxODhlZWI0NWNhODRjNDliMzlmZWU5NzBlNmI1MjE5MTQ4ZiIsInMiOm51bGwsInYiOjJ9 (방금 표시한 결과 바로 다음부터 이어집니다)\n\n—\n출처: 국회도서관 지방의정포털(CLIK) Open API · 같은 저장소 기준 KST 잔여 추정 985회(공식 잔여량 아님)"
+          }
+        ],
+        "structuredContent": {
+          "result": "상태: PARTIAL\n경기도 수원시의회 회의록 '소규모 공동주택' 검색 · 기간 2025.01.01.~2026.10.05.\n상류(CLIK) 검색건수 855건 — 검색어·의회 기준 건수이며 기간·회의유형 조건 충족 건수나 질의 건수가 아닙니다.\n이번 조회: 상류 위치 0부터 1건 검토 → 조건 충족 1건 표시\n- 경기도 수원시의회 제13대 제404회 본회의 제1차 (2026.09.01.) [본회의] docid=CLIKC3092799235444263\n\n다음 결과: cursor=e2.eyJwIjoxLCJxIjoiMzRkNmRlZDM5MGU4N2ExZmU2ODMyMzNlMjFmYmQxODhlZWI0NWNhODRjNDliMzlmZWU5NzBlNmI1MjE5MTQ4ZiIsInMiOm51bGwsInYiOjJ9 (방금 표시한 결과 바로 다음부터 이어집니다)\n\n—\n출처: 국회도서관 지방의정포털(CLIK) Open API · 같은 저장소 기준 KST 잔여 추정 985회(공식 잔여량 아님)"
+        },
+        "isError": false
+      }
+    },
+    {
+      "arguments": {
+        "keyword": "소규모 공동주택",
+        "council": "수원시",
+        "search_in": "내용",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "limit": 1
+      },
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "상태: ERROR\n상태: ERROR\nCLIK 서버 호출 중 오류가 발생했습니다. 잠시 후 다시 시도하세요."
+          }
+        ],
+        "structuredContent": {
+          "result": "상태: ERROR\n상태: ERROR\nCLIK 서버 호출 중 오류가 발생했습니다. 잠시 후 다시 시도하세요.",
+          "error_code": "INVALID_ARGUMENT"
+        },
+        "isError": true
+      }
+    },
+    {
+      "arguments": {
+        "keyword": "소규모공동주택",
+        "council": "수원시",
+        "search_in": "내용",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "limit": 1
+      },
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "상태: PARTIAL\n경기도 수원시의회 회의록 '소규모공동주택' 검색 · 기간 2025.01.01.~2026.10.05.\n상류(CLIK) 검색건수 842건 — 검색어·의회 기준 건수이며 기간·회의유형 조건 충족 건수나 질의 건수가 아닙니다.\n이번 조회: 상류 위치 0부터 1건 검토 → 조건 충족 1건 표시\n- 경기도 수원시의회 제13대 제404회 본회의 제1차 (2026.09.01.) [본회의] docid=CLIKC3092799235444263\n\n다음 결과: cursor=e2.eyJwIjoxLCJxIjoiYmFjZjQxMWNlMWRjMmFkMGIxYzQzMjI5ZGM0ZDc3YTRhY2JhMmU1MzM0NjM4YTE5NGI5NTE2Mjk4MWJlNzllMyIsInMiOm51bGwsInYiOjJ9 (방금 표시한 결과 바로 다음부터 이어집니다)\n\n—\n출처: 국회도서관 지방의정포털(CLIK) Open API · 같은 저장소 기준 KST 잔여 추정 983회(공식 잔여량 아님)"
+          }
+        ],
+        "structuredContent": {
+          "result": "상태: PARTIAL\n경기도 수원시의회 회의록 '소규모공동주택' 검색 · 기간 2025.01.01.~2026.10.05.\n상류(CLIK) 검색건수 842건 — 검색어·의회 기준 건수이며 기간·회의유형 조건 충족 건수나 질의 건수가 아닙니다.\n이번 조회: 상류 위치 0부터 1건 검토 → 조건 충족 1건 표시\n- 경기도 수원시의회 제13대 제404회 본회의 제1차 (2026.09.01.) [본회의] docid=CLIKC3092799235444263\n\n다음 결과: cursor=e2.eyJwIjoxLCJxIjoiYmFjZjQxMWNlMWRjMmFkMGIxYzQzMjI5ZGM0ZDc3YTRhY2JhMmU1MzM0NjM4YTE5NGI5NTE2Mjk4MWJlNzllMyIsInMiOm51bGwsInYiOjJ9 (방금 표시한 결과 바로 다음부터 이어집니다)\n\n—\n출처: 국회도서관 지방의정포털(CLIK) Open API · 같은 저장소 기준 KST 잔여 추정 983회(공식 잔여량 아님)"
+        },
+        "isError": false
+      }
+    }
+  ]
+}

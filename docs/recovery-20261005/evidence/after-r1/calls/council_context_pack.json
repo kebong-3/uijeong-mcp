@@ -1,0 +1,913 @@
+{
+  "call": {
+    "id": "council_context_pack",
+    "tool": "council_context_pack",
+    "purpose": "사업명→공식 회의록의 대상 구절→조례·재정 후보 연결과 통합 상태 확인",
+    "seconds": 5.13,
+    "isError": false,
+    "status": "PARTIAL",
+    "code": null,
+    "classification": "RETURNED_WITH_SCOPE",
+    "receipt": null,
+    "arguments": {
+      "topic": "빌라가꿈관리소",
+      "council": "수원시",
+      "date_from": "2025-01-01",
+      "date_to": "2026-10-05",
+      "fiscal_year": 2026,
+      "max_docs": 1,
+      "include_legal": true,
+      "include_finance": true,
+      "include_public_data": false,
+      "include_member_records": false,
+      "include_policy_background": false
+    },
+    "response_file": "calls/council_context_pack.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "상태: PARTIAL\n일부 확인 — 이어보기 위치와 생략분을 함께 확인\n주제: 빌라가꿈관리소\n내용: items 0건\n축약: 24곳 — 생략분은 각 retrieval 경로로 확인\n전체 구조화 결과는 structuredContent에 있습니다.",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "PARTIAL",
+      "council": {
+        "id": "031014",
+        "name": "경기도 수원시의회"
+      },
+      "topic": "빌라가꿈관리소",
+      "source_links": [
+        {
+          "url": "https://clik.nanet.go.kr/",
+          "label": "CLIK 공식 검색(개별 원문 링크 미확인)",
+          "markdown": "[CLIK 공식 검색(개별 원문 링크 미확인)](https://clik.nanet.go.kr/)",
+          "kind": "OFFICIAL_SEARCH",
+          "status": "SEARCH_REFERENCE",
+          "direct_document": false
+        }
+      ],
+      "link_guidance": {
+        "display": "각 핵심 사실·수치 뒤에 해당 source_links.markdown을 붙이고 자료별로 연결하세요.",
+        "scope": "DOCUMENT_REFERENCE=원문 주소, OFFICIAL_DATASET=데이터셋 안내, CATALOG_METADATA=자료 설명, OFFICIAL_SEARCH=검색 화면.",
+        "verification": "링크 제공과 페이지 본문 조회·대조는 다릅니다. status와 열람 범위를 유지하세요.",
+        "links_omitted": true
+      },
+      "ready_for_submission": false,
+      "linked_review": {
+        "council": {
+          "status": "PARTIAL",
+          "snapshot_id": "bfa8c3018f6bb691c304eca503de08c4dc0b2b8ffa5523efdec70558b5b5506d",
+          "observed_events": 6,
+          "is_exhaustive": false
+        },
+        "budget": {
+          "status": "PARTIAL",
+          "initial_status": "EMPTY",
+          "discovery_statuses": [
+            "COMPLETE"
+          ],
+          "candidate_status": "CANDIDATES_FOUND",
+          "initial_candidates": 0,
+          "discovered_candidates": 3,
+          "amounts_verified": false
+        },
+        "ordinance": {
+          "status": "PARTIAL",
+          "initial_status": "EMPTY",
+          "discovery_statuses": [
+            "PARTIAL",
+            "PARTIAL"
+          ],
+          "candidate_status": "CANDIDATES_FOUND",
+          "initial_candidates": 0,
+          "discovered_candidates": 3,
+          "applicability_verified": false
+        },
+        "candidate_index": {
+          "ordinance": [
+            {
+              "document_id": "2209592",
+              "mst": "2102111",
+              "title": "수원시 소규모 공동주택관리 지원 조례",
+              "jurisdiction": "경기도 수원시",
+              "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+              "same_project_verified": false,
+              "applicability_verified": false
+            },
+            {
+              "document_id": "2254750",
+              "mst": "2054117",
+              "title": "수원시 건축기본 조례",
+              "jurisdiction": "경기도 수원시",
+              "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2054117",
+              "same_project_verified": false,
+              "applicability_verified": false
+            },
+            {
+              "document_id": "2083129",
+              "mst": "2102141",
+              "title": "수원시 도시계획 조례",
+              "jurisdiction": "경기도 수원시",
+              "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102141",
+              "same_project_verified": false,
+              "applicability_verified": false
+            }
+          ],
+          "budget": [
+            {
+              "project_name": "소규모 공동주택 안전점검 지원(도비)",
+              "project_code": "37400002016300FF",
+              "local_government": "경기수원시",
+              "local_government_code": "4111000",
+              "account": "일반회계",
+              "fiscal_year": "2026",
+              "execution_date": "20261004",
+              "amount_unit": "SOURCE_CONFIRMATION_REQUIRED",
+              "budget_stage": "current",
+              "same_project_verified": false
+            },
+            {
+              "project_name": "노후 소규모 공동주택 유지관리(도비)",
+              "project_code": "3740000202230134",
+              "local_government": "경기수원시",
+              "local_government_code": "4111000",
+              "account": "일반회계",
+              "fiscal_year": "2026",
+              "execution_date": "20261004",
+              "amount_unit": "SOURCE_CONFIRMATION_REQUIRED",
+              "budget_stage": "current",
+              "same_project_verified": false
+            },
+            {
+              "project_name": "소규모 공동주택 활성화",
+              "project_code": "37400002025302B6",
+              "local_government": "경기수원시",
+              "local_government_code": "4111000",
+              "account": "일반회계",
+              "fiscal_year": "2026",
+              "execution_date": "20261004",
+              "amount_unit": "SOURCE_CONFIRMATION_REQUIRED",
+              "budget_stage": "current",
+              "same_project_verified": false
+            }
+          ]
+        },
+        "index_scope": "후속 검색에서 반환된 후보 식별자·회계·기준일. 최초 결과는 각 원천 layer에 있습니다. 상세 items는 축약될 수 있으며 recovery로 재조회합니다.",
+        "relationships": [
+          {
+            "domain": "ordinance",
+            "candidate": [
+              {
+                "term": "소규모 공동주택",
+                "kind": "OFFICIAL_TARGET_SUBJECT_CANDIDATE",
+                "quote": "노후 및 관리주체의 부재로 불편을 겪는 소규모 공동주택을 대상으로 청소, 안전 등 주거환경 개선을 위한 빌라가꿈관리소를 설치·운영하는 사업입니다",
+                "citation": {
+                  "record_id": "rec_a48f481202216889d548df72",
+                  "docid": "CLIKC2479358086714915",
+                  "turn_index": 219,
+                  "source_url": null,
+                  "body_url": "https://clik.nanet.go.kr/openapi/minutes.do",
+                  "source_kind": "OFFICIAL_FETCHED",
+                  "body_sha256": "60a82b710497e196baa2c54ff7da894e9f5b04fdcc4ab00f6cbd63924f88d3fa",
+                  "turn_sha256": "ef57d3cfc63bc2aa7a5c1ad2bf01c0bdc649e4c4e1206fcb6bcc99d6db991d24",
+                  "locator": "parsed_turn",
+                  "char_start": 0,
+                  "char_end": 1754,
+                  "fiscal_year": null,
+                  "source_url_status": "NOT_AVAILABLE",
+                  "body_url_status": "FETCHED",
+                  "citation_url": null,
+                  "citation_markdown": null,
+                  "citation_status": "NOT_AVAILABLE",
+                  "citation_kind": null
+                },
+                "locator": {
+                  "turn_index": 219,
+                  "char_start": 473,
+                  "char_end": 555,
+                  "offset_basis": "TURN_TEXT"
+                },
+                "source_event_id": "evt_c9df122c20e639d8c87a2af2",
+                "same_project_verified": false,
+                "applicability_verified": false,
+                "amount_attribution_verified": false
+              }
+            ],
+            "result": {
+              "status": "PARTIAL",
+              "elapsed_ms": 302,
+              "items": [
+                {
+                  "kind": "ordinance",
+                  "document_id": "2209592",
+                  "mst": "2102111",
+                  "title": "수원시 소규모 공동주택관리 지원 조례",
+                  "jurisdiction": "경기도 수원시",
+                  "effective_date": "20251231",
+                  "promulgation_date": "20251231",
+                  "amendment_type": "일부개정",
+                  "status_code": "",
+                  "ordinance_type": "조례",
+                  "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+                  "parent_article": "",
+                  "ordinance_article": "",
+                  "match_status": "OFFICIAL_MENTION_SEARCH_CANDIDATE",
+                  "applicability_verified": false,
+                  "same_project_verified": false,
+                  "document_summary": {
+                    "kind": "ordinance",
+                    "document_id": "2209592",
+                    "title": "수원시 소규모 공동주택관리 지원 조례",
+                    "jurisdiction": "경기도 수원시",
+                    "version": "2102111",
+                    "effective_date": "20251231",
+                    "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+                    "content_hash": "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210"
+                  },
+                  "recovery": {
+                    "tool": "ordinance_get_document",
+                    "arguments": {
+                      "reference": {
+                        "kind": "ordinance",
+                        "document_id": "2209592",
+                        "mst": "2102111",
+                        "title_hint": "수원시 소규모 공동주택관리 지원 조례"
+                      },
+                      "limit": 3,
+                      "max_chars": 2000
+                    }
+                  }
+                }
+              ],
+              "errors": [],
+              "coverage": {
+                "source_items": 1,
+                "shown_items": 1,
+                "is_exhaustive": false,
+                "summary_only": true,
+                "original_status": "PARTIAL"
+              }
+            },
+            "same_project_verified": false,
+            "applicability_verified": false
+          },
+          {
+            "domain": "ordinance",
+            "candidate": [
+              {
+                "term": "수원시 건축 기본 조례",
+                "kind": "OFFICIAL_MENTION_CANDIDATE",
+                "quote": "그간 추진사항을 보고드리면 법적 근거 마련을 위해 수원시 건축 기본 조례를 2025년 7월 10일 자로 제정 공포한 바 있으며, 현재 기본계획 용역을 발주하여 업체 선정 과정 중에…",
+                "citation": {
+                  "record_id": "rec_a48f481202216889d548df72",
+                  "docid": "CLIKC2479358086714915",
+                  "turn_index": 219,
+                  "source_url": null,
+                  "body_url": "https://clik.nanet.go.kr/openapi/minutes.do",
+                  "source_kind": "OFFICIAL_FETCHED",
+                  "body_sha256": "60a82b710497e196baa2c54ff7da894e9f5b04fdcc4ab00f6cbd63924f88d3fa",
+                  "turn_sha256": "ef57d3cfc63bc2aa7a5c1ad2bf01c0bdc649e4c4e1206fcb6bcc99d6db991d24",
+                  "locator": "parsed_turn",
+                  "char_start": 0,
+                  "char_end": 1754,
+                  "fiscal_year": null,
+                  "source_url_status": "NOT_AVAILABLE",
+                  "body_url_status": "FETCHED",
+                  "citation_url": null,
+                  "citation_markdown": null,
+                  "citation_status": "NOT_AVAILABLE",
+                  "citation_kind": null
+                },
+                "locator": {
+                  "turn_index": 219,
+                  "char_start": 204,
+                  "char_end": 311,
+                  "offset_basis": "TURN_TEXT"
+                },
+                "source_event_id": "evt_c9df122c20e639d8c87a2af2",
+                "same_project_verified": false,
+                "applicability_verified": false,
+                "amount_attribution_verified": false,
+                "quote_display": {
+                  "char_start": 0,
+                  "char_end": 100,
+                  "original_chars": 105,
+                  "sha256": "9aca669f5d1be2efcfa64fde2f02d0081fcb685ddc956688daf3d4e2d6c38e76",
+                  "source_locator_unchanged": true
+                }
+              }
+            ],
+            "result": {
+              "status": "PARTIAL",
+              "elapsed_ms": 3532,
+              "items": [
+                {
+                  "kind": "ordinance",
+                  "document_id": "2254750",
+                  "mst": "2054117",
+                  "title": "수원시 건축기본 조례",
+                  "jurisdiction": "경기도 수원시",
+                  "effective_date": "20250710",
+                  "promulgation_date": "20250710",
+                  "amendment_type": "제정",
+                  "status_code": "",
+                  "ordinance_type": "조례",
+                  "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2054117",
+                  "parent_article": "",
+                  "ordinance_article": "",
+                  "match_status": "OFFICIAL_MENTION_SEARCH_CANDIDATE",
+                  "applicability_verified": false,
+                  "same_project_verified": false,
+                  "document_summary": {
+                    "kind": "ordinance",
+                    "document_id": "2254750",
+                    "title": "수원시 건축기본 조례",
+                    "jurisdiction": "경기도 수원시",
+                    "version": "2054117",
+                    "effective_date": "20250710",
+                    "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2054117",
+                    "content_hash": "f53a7cd91dfed7fe78ae54eec66089ea428a84df4f45bf2fc14af1dc0267db08"
+                  },
+                  "recovery": {
+                    "tool": "ordinance_get_document",
+                    "arguments": {
+                      "reference": {
+                        "kind": "ordinance",
+                        "document_id": "2254750",
+                        "mst": "2054117",
+                        "title_hint": "수원시 건축기본 조례"
+                      },
+                      "limit": 3,
+                      "max_chars": 2000
+                    }
+                  }
+                }
+              ],
+              "items_omitted": {
+                "count": 1,
+                "total": 2,
+                "retrieval": "같은 snapshot_id로 item_offset을 늘려 이어봅니다."
+              },
+              "errors": [],
+              "coverage": {
+                "source_items": 2,
+                "shown_items": 2,
+                "is_exhaustive": false,
+                "summary_only": true,
+                "original_status": "PARTIAL"
+              }
+            },
+            "same_project_verified": false,
+            "applicability_verified": false
+          },
+          {
+            "domain": "budget",
+            "candidate": [
+              {
+                "term": "공동주택 지원사업",
+                "kind": "OFFICIAL_MENTION_CANDIDATE",
+                "quote": "그런데 아시다시피 의회도 예산심의 의결권을 가지고 있고 저희 의원들도 일선에서 주민들께 실질적으로 혜택이 되는, 공동주택 지원사업이라든가 아니면 여기에서 계속 말씀해 주신 빌라가꿈…",
+                "quote_truncated": {
+                  "kept_chars": 140,
+                  "original_chars": 154,
+                  "retrieval": "council_read_source로 원문 전체를 확인합니다.",
+                  "note": "원문 표현을 자른 것이며 문구를 고치지 않았습니다."
+                },
+                "citation": {
+                  "record_id": "rec_a48f481202216889d548df72",
+                  "docid": "CLIKC2479358086714915",
+                  "turn_index": 441,
+                  "source_url": null,
+                  "body_url": "https://clik.nanet.go.kr/openapi/minutes.do",
+                  "source_kind": "OFFICIAL_FETCHED",
+                  "body_sha256": "60a82b710497e196baa2c54ff7da894e9f5b04fdcc4ab00f6cbd63924f88d3fa",
+                  "turn_sha256": "7d1d0bc2f048b9db6d13323b97df57320443f1c09f05e5549c92c5cfc0b2dc9f",
+                  "locator": "parsed_turn",
+                  "char_start": 0,
+                  "char_end": 1406,
+                  "fiscal_year": null,
+                  "source_url_status": "NOT_AVAILABLE",
+                  "body_url_status": "FETCHED",
+                  "citation_url": null,
+                  "citation_markdown": null,
+                  "citation_status": "NOT_AVAILABLE",
+                  "citation_kind": null
+                },
+                "locator": {
+                  "turn_index": 441,
+                  "char_start": 903,
+                  "char_end": 1058,
+                  "offset_basis": "TURN_TEXT"
+                },
+                "source_event_id": "evt_5bcfff828a518db9a7c7b8eb",
+                "same_project_verified": false,
+                "applicability_verified": false,
+                "amount_attribution_verified": false,
+                "quote_display": {
+                  "char_start": 0,
+                  "char_end": 100,
+                  "original_chars": 154,
+                  "sha256": "cc093206da35aa259ede51f6a03c4bca6841d1e5678dda41739352c4d4161909",
+                  "source_locator_unchanged": true
+                }
+              },
+              {
+                "term": "노후주택 주거환경개선 지원사업",
+                "kind": "OFFICIAL_MENTION_CANDIDATE",
+                "quote": "책자 31쪽, 노후주택 주거환경개선 지원사업입니다",
+                "citation": {
+                  "record_id": "rec_a48f481202216889d548df72",
+                  "docid": "CLIKC2479358086714915",
+                  "turn_index": 219,
+                  "source_url": null,
+                  "body_url": "https://clik.nanet.go.kr/openapi/minutes.do",
+                  "source_kind": "OFFICIAL_FETCHED",
+                  "body_sha256": "60a82b710497e196baa2c54ff7da894e9f5b04fdcc4ab00f6cbd63924f88d3fa",
+                  "turn_sha256": "ef57d3cfc63bc2aa7a5c1ad2bf01c0bdc649e4c4e1206fcb6bcc99d6db991d24",
+                  "locator": "parsed_turn",
+                  "char_start": 0,
+                  "char_end": 1754,
+                  "fiscal_year": null,
+                  "source_url_status": "NOT_AVAILABLE",
+                  "body_url_status": "FETCHED",
+                  "citation_url": null,
+                  "citation_markdown": null,
+                  "citation_status": "NOT_AVAILABLE",
+                  "citation_kind": null
+                },
+                "locator": {
+                  "turn_index": 219,
+                  "char_start": 731,
+                  "char_end": 760,
+                  "offset_basis": "TURN_TEXT"
+                },
+                "source_event_id": "evt_c9df122c20e639d8c87a2af2",
+                "same_project_verified": false,
+                "applicability_verified": false,
+                "amount_attribution_verified": false
+              },
+              {
+                "term": "녹색건축물 조성 지원사업",
+                "kind": "OFFICIAL_MENTION_CANDIDATE",
+                "quote": "우선 에너지성능 개선을 위한 녹색건축물 조성 지원사업입니다",
+                "citation": {
+                  "record_id": "rec_a48f481202216889d548df72",
+                  "docid": "CLIKC2479358086714915",
+                  "turn_index": 219,
+                  "source_url": null,
+                  "body_url": "https://clik.nanet.go.kr/openapi/minutes.do",
+                  "source_kind": "OFFICIAL_FETCHED",
+                  "body_sha256": "60a82b710497e196baa2c54ff7da894e9f5b04fdcc4ab00f6cbd63924f88d3fa",
+                  "turn_sha256": "ef57d3cfc63bc2aa7a5c1ad2bf01c0bdc649e4c4e1206fcb6bcc99d6db991d24",
+                  "locator": "parsed_turn",
+                  "char_start": 0,
+                  "char_end": 1754,
+                  "fiscal_year": null,
+                  "source_url_status": "NOT_AVAILABLE",
+                  "body_url_status": "FETCHED",
+                  "citation_url": null,
+                  "citation_markdown": null,
+                  "citation_status": "NOT_AVAILABLE",
+                  "citation_kind": null
+                },
+                "locator": {
+                  "turn_index": 219,
+                  "char_start": 761,
+                  "char_end": 795,
+                  "offset_basis": "TURN_TEXT"
+                },
+                "source_event_id": "evt_c9df122c20e639d8c87a2af2",
+                "same_project_verified": false,
+                "applicability_verified": false,
+                "amount_attribution_verified": false
+              }
+            ],
+            "result": {
+              "status": "COMPLETE",
+              "elapsed_ms": 489,
+              "budget_basis": {
+                "requested_stage": "current",
+                "requested_stage_label": "조회일 예산현액",
+                "returned_stage": "current",
+                "returned_stage_label": "조회일 예산현액",
+                "requested_stage_supported": true,
+                "requested_stage_verified": true,
+                "amount_verified": false,
+                "same_project_verified": false,
+                "basis_date": "20261004",
+                "amount_unit": "SOURCE_CONFIRMATION_REQUIRED",
+                "field_meanings": {
+                  "budget_current_amount": "bdg_cash_amt: 조회일 예산현액",
+                  "expenditure": "ep_amt: 조회일 기준 지출액",
+                  "cpl_amt": "필드 의미 미검증. 본예산·확정예산으로 사용 금지"
+                },
+                "document_checks": [
+                  "의결된 본예산서",
+                  "해당 추경 예산서",
+                  "결산서(결산 질문 시)"
+                ],
+                "rules": [
+                  "회의록의 예산안 설명액은 의결된 최종 본예산의 증거가 아닙니다.",
+                  "조회일 예산현액에는 변경·이월 등이 반영될 수 있어 본예산과 같다고 가정하지 않습니다.",
+                  "사업코드·지자체·회계·연도를 대조하기 전 관련 사업을 합산하지 않습니다.",
+                  "사업의 국비·시도비·구비는 재원 구성이며 지자체 전체 세입명세가 아닙니다.",
+                  "단위는 공식 명세·예산서에서 확인한 뒤 원·천원·백만원을 변환합니다."
+                ]
+              },
+              "query": {
+                "topic": "빌라가꿈관리소",
+                "council": "경기도 수원시의회",
+                "fiscal_year": 2026,
+                "requested_snapshot_date": "20261005",
+                "snapshot_date": "20261004",
+                "budget_stage": "current"
+              },
+              "date_resolution": {
+                "strategy": "LATEST_AVAILABLE_ON_OR_BEFORE_REQUESTED",
+                "fallback_used": true,
+                "date_attempts": [
+                  {
+                    "snapshot_date": "20261005",
+                    "data_available": false,
+                    "response_code": "INFO-200"
+                  },
+                  {
+                    "snapshot_date": "20261004",
+                    "data_available": true,
+                    "response_code": "INFO-000"
+                  }
+                ],
+                "max_lookback_days": 7,
+                "mixed_dates": false
+              },
+              "items": [
+                {
+                  "fiscal_year": "2026",
+                  "execution_date": "20261004",
+                  "local_government": "경기수원시",
+                  "local_government_code": "4111000",
+                  "account": "일반회계",
+                  "department_code": "1035030",
+                  "project_code": "37400002016300FF",
+                  "project_name": "소규모 공동주택 안전점검 지원(도비)",
+                  "field": "국토및지역개발",
+                  "part": "지역및도시",
+                  "budget_current_amount": 73000000,
+                  "national_fund": 0,
+                  "province_fund": 7300000,
+                  "district_fund": 65700000,
+                  "other_fund": 0,
+                  "expenditure": 0,
+                  "appropriated_amount": null,
+                  "execution_rate_percent": 0.0,
+                  "budget_stage": "current",
+                  "amount_unit": "SOURCE_CONFIRMATION_REQUIRED",
+                  "matched_query": "소규모 공동주택",
+                  "same_project_verified": false,
+                  "match_status": "RELATED_PROJECT_CANDIDATE",
+                  "unspent_current_amount": 73000000,
+                  "source_link": {
+                    "url": "https://www.lofin365.go.kr/portal/LF5120000.do?pdtaId=0GAR4HBB8LWEBSL4NIHZ817053",
+                    "label": "지방재정365 세부사업별 세출현황(공식 데이터셋)",
+                    "kind": "OFFICIAL_DATASET",
+                    "status": "DATASET_REFERENCE",
+                    "direct_document": false,
+                    "markdown": "[지방재정365 세부사업별 세출현황](https://www.lofin365.go.kr/portal/LF5120000.do?pdtaId=0GAR4HBB8LWEBSL4NIHZ817053)",
+                    "lookup": {
+                      "fiscal_year": "2026",
+                      "execution_date": "20261004",
+                      "local_government": "경기수원시",
+                      "local_government_code": "4111000",
+                      "account": "일반회계",
+                      "project_name": "소규모 공동주택 안전점검 지원(도비)",
+                      "project_code": "37400002016300FF"
+                    },
+                    "note": "데이터셋 안내 링크입니다. 특정 사업 예산서 원문이 아닙니다. 조회조건으로 대조하세요."
+                  },
+                  "unverified_fields": {
+                    "cpl_amt": 73000000
+                  },
+                  "recovery": {
+                    "tool": "council_finance_context",
+                    "arguments": {
+                      "topic": "소규모 공동주택 안전점검 지원(도비)",
+                      "council": "경기수원시",
+                      "fiscal_year": 2026,
+                      "snapshot_date": "20261004",
+                      "budget_stage": "current",
+                      "limit": 3
+                    }
+                  }
+                }
+              ],
+              "items_omitted": {
+                "count": 1,
+                "total": 3,
+                "retrieval": "같은 snapshot_id로 item_offset을 늘려 이어봅니다."
+              },
+              "errors": [],
+              "coverage": {
+                "source_items": 3,
+                "shown_items": 3,
+                "is_exhaustive": false,
+                "summary_only": true,
+                "original_status": "COMPLETE"
+              }
+            },
+            "same_project_verified": false,
+            "applicability_verified": false
+          }
+        ],
+        "unresolved": [
+          "사업명과 정식 예산사업의 동일성·상하위 관계 미확인",
+          "업무보고 금액과 의결 본예산·추경 금액의 동일성 미확인",
+          "조례의 현행 버전·적용대상·지출근거 및 금액 단위 별도 대조 필요"
+        ],
+        "ready_for_submission": false,
+        "legal_approval": false,
+        "same_project_verified": false
+      },
+      "search_strategy": {
+        "exact_first": true,
+        "expanded": true,
+        "candidate_source": "LOCATED_OFFICIAL_MEETING_QUOTES",
+        "same_project_verified": false,
+        "report_pass_separate": true
+      },
+      "execution_trace": {
+        "mcp_tool": "council_context_pack",
+        "stages": [
+          {
+            "stage": "council_evidence",
+            "status": "PARTIAL",
+            "elapsed_ms": 307
+          },
+          {
+            "stage": "report_mentions",
+            "status": "PARTIAL",
+            "elapsed_ms": 391
+          },
+          {
+            "stage": "related_bills",
+            "status": "EMPTY",
+            "elapsed_ms": 1032
+          },
+          {
+            "stage": "legal_and_ordinance_context",
+            "status": "EMPTY",
+            "elapsed_ms": 1079
+          },
+          {
+            "stage": "finance_context",
+            "status": "EMPTY",
+            "elapsed_ms": 0
+          },
+          {
+            "stage": "public_data_discovery",
+            "status": "SKIPPED",
+            "elapsed_ms": null
+          },
+          {
+            "stage": "member_record_discovery",
+            "status": "SKIPPED",
+            "elapsed_ms": null
+          },
+          {
+            "stage": "policy_background",
+            "status": "SKIPPED",
+            "elapsed_ms": null
+          },
+          {
+            "stage": "discovery_0",
+            "status": "PARTIAL",
+            "elapsed_ms": 302
+          },
+          {
+            "stage": "discovery_1",
+            "status": "PARTIAL",
+            "elapsed_ms": 3532
+          },
+          {
+            "stage": "discovery_2",
+            "status": "COMPLETE",
+            "elapsed_ms": 489
+          }
+        ]
+      },
+      "items": [],
+      "budget_fallback": {
+        "reason": "축약 후에도 응답 한도를 넘어 본문을 싣지 못했습니다.",
+        "retrieval": "max_docs·limit·max_evidence를 줄여 다시 조회하거나, snapshot_id와 item_offset으로 나눠 받고 원문은 council_read_source로 확인하세요.",
+        "cap_chars": 30000
+      },
+      "response_budget": {
+        "max_chars": 30000,
+        "original_chars": 79823,
+        "response_chars": 15410,
+        "truncated": true,
+        "reduced": [
+          {
+            "path": "council_evidence.items",
+            "kind": "array",
+            "original": 6,
+            "kept": 2,
+            "omitted": 4,
+            "retrieval": "같은 snapshot_id로 item_offset을 늘려 이어봅니다."
+          },
+          {
+            "path": "report_mentions.items",
+            "kind": "array",
+            "original": 7,
+            "kept": 2,
+            "omitted": 5,
+            "retrieval": "같은 snapshot_id로 item_offset을 늘려 이어봅니다."
+          },
+          {
+            "path": "linked_review.relationships[].result.items",
+            "kind": "array",
+            "original": 3,
+            "kept": 2,
+            "omitted": 1,
+            "retrieval": "같은 snapshot_id로 item_offset을 늘려 이어봅니다."
+          },
+          {
+            "path": "council_evidence.items[].answers[].text",
+            "kind": "text",
+            "original": 250,
+            "kept": 140,
+            "omitted": 110,
+            "retrieval": "council_read_source로 원문 전체를 확인합니다."
+          },
+          {
+            "path": "council_evidence.items[].question.text",
+            "kind": "text",
+            "original": 152,
+            "kept": 140,
+            "omitted": 12,
+            "retrieval": "council_read_source로 원문 전체를 확인합니다."
+          },
+          {
+            "path": "report_mentions.items[].speech.text",
+            "kind": "text",
+            "original": 1754,
+            "kept": 140,
+            "omitted": 1614,
+            "retrieval": "council_read_source로 원문 전체를 확인합니다."
+          },
+          {
+            "path": "discovery_candidates.budget[].quote",
+            "kind": "text",
+            "original": 154,
+            "kept": 140,
+            "omitted": 14,
+            "retrieval": "council_read_source로 원문 전체를 확인합니다."
+          },
+          {
+            "path": "discovery_candidates.budget[].evidence[].quote",
+            "kind": "text",
+            "original": 154,
+            "kept": 140,
+            "omitted": 14,
+            "retrieval": "council_read_source로 원문 전체를 확인합니다."
+          },
+          {
+            "path": "discovery_candidates.budget[].evidence[].quote",
+            "kind": "text",
+            "original": 154,
+            "kept": 140,
+            "omitted": 14,
+            "retrieval": "council_read_source로 원문 전체를 확인합니다."
+          },
+          {
+            "path": "linked_review.relationships[].candidate[].quote",
+            "kind": "text",
+            "original": 154,
+            "kept": 140,
+            "omitted": 14,
+            "retrieval": "council_read_source로 원문 전체를 확인합니다."
+          },
+          {
+            "path": "council_evidence.items",
+            "kind": "array_dropped",
+            "original": 2,
+            "kept": 1,
+            "omitted": 1,
+            "retrieval": "같은 snapshot_id로 item_offset을 늘려 이어봅니다."
+          },
+          {
+            "path": "report_mentions.items",
+            "kind": "array_dropped",
+            "original": 2,
+            "kept": 1,
+            "omitted": 1,
+            "retrieval": "같은 snapshot_id로 item_offset을 늘려 이어봅니다."
+          },
+          {
+            "path": "linked_review.relationships[].result.items",
+            "kind": "array_dropped",
+            "original": 2,
+            "kept": 1,
+            "omitted": 1,
+            "retrieval": "같은 snapshot_id로 item_offset을 늘려 이어봅니다."
+          },
+          {
+            "path": "linked_review.relationships[].result.items",
+            "kind": "array_dropped",
+            "original": 2,
+            "kept": 1,
+            "omitted": 1,
+            "retrieval": "같은 snapshot_id로 item_offset을 늘려 이어봅니다."
+          },
+          {
+            "path": "council_evidence.items[].answers[].text",
+            "kind": "text",
+            "original": 141,
+            "kept": 100,
+            "omitted": 41,
+            "retrieval": "council_read_source로 원문을 확인합니다."
+          },
+          {
+            "path": "report_mentions.items[].speech.text",
+            "kind": "text",
+            "original": 141,
+            "kept": 100,
+            "omitted": 41,
+            "retrieval": "council_read_source로 원문을 확인합니다."
+          },
+          {
+            "path": "discovery_candidates.ordinance[].quote",
+            "kind": "text",
+            "original": 105,
+            "kept": 100,
+            "omitted": 5,
+            "retrieval": "council_read_source로 원문을 확인합니다."
+          },
+          {
+            "path": "discovery_candidates.ordinance[].evidence[].quote",
+            "kind": "text",
+            "original": 105,
+            "kept": 100,
+            "omitted": 5,
+            "retrieval": "council_read_source로 원문을 확인합니다."
+          },
+          {
+            "path": "discovery_candidates.budget[].quote",
+            "kind": "text",
+            "original": 141,
+            "kept": 100,
+            "omitted": 41,
+            "retrieval": "council_read_source로 원문을 확인합니다."
+          },
+          {
+            "path": "discovery_candidates.budget[].evidence[].quote",
+            "kind": "text",
+            "original": 141,
+            "kept": 100,
+            "omitted": 41,
+            "retrieval": "council_read_source로 원문을 확인합니다."
+          },
+          {
+            "path": "discovery_candidates.budget[].evidence[].quote",
+            "kind": "text",
+            "original": 141,
+            "kept": 100,
+            "omitted": 41,
+            "retrieval": "council_read_source로 원문을 확인합니다."
+          },
+          {
+            "path": "linked_review.relationships[].candidate[].quote",
+            "kind": "text",
+            "original": 105,
+            "kept": 100,
+            "omitted": 5,
+            "retrieval": "council_read_source로 원문을 확인합니다."
+          },
+          {
+            "path": "linked_review.relationships[].candidate[].quote",
+            "kind": "text",
+            "original": 141,
+            "kept": 100,
+            "omitted": 41,
+            "retrieval": "council_read_source로 원문을 확인합니다."
+          },
+          {
+            "path": "(root)",
+            "kind": "envelope_reduced",
+            "original": 40978,
+            "kept": 15056,
+            "omitted": 25922,
+            "retrieval": "max_docs·limit·max_evidence를 줄여 다시 조회하거나, snapshot_id와 item_offset으로 나눠 받고 원문은 council_read_source로 확인하세요."
+          }
+        ],
+        "reduced_count": 24,
+        "note": "응답 한도를 지키기 위해 목록·인용을 축약했습니다. 생략된 항목은 존재하지 않는 것이 아니며 각 retrieval 경로로 확인합니다."
+      }
+    },
+    "isError": false
+  }
+}

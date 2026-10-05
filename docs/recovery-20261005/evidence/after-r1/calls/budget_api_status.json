@@ -1,0 +1,68 @@
+{
+  "call": {
+    "id": "budget_api_status",
+    "tool": "budget_api_status",
+    "purpose": "키 설정과 실제 출처 확인 상태를 구분",
+    "seconds": 0.11,
+    "isError": false,
+    "status": "CONFIGURATION_STATUS",
+    "code": null,
+    "classification": "RETURNED",
+    "receipt": {
+      "tool": "budget_api_status",
+      "server_version": "4.1.5-public.1",
+      "request_id": "6bddc25b52444add8490",
+      "elapsed_ms": 1,
+      "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+    },
+    "arguments": {},
+    "response_file": "calls/budget_api_status.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"CONFIGURATION_STATUS\", \"keys\": {\"LOFIN_API_KEY\": {\"configured\": true, \"value_disclosed\": false}, \"DATA_GO_KR_SERVICE_KEY\": {\"configured\": true, \"value_disclosed\": false}, \"KOSIS_API_KEY\": {\"configured\": true, \"value_disclosed\": false}, \"LAW_OC\": {\"configured\": true, \"value_disclosed\": false}}, \"last_checks\": {}, \"catalog_count\": 18, \"private_system_integrations\": {\"ehojo\": \"NOT_CONNECTED\", \"botem\": \"NOT_CONNECTED\"}, \"note\": \"키가 있음은 정상 인증·데이터 최신성 확인이 아닙니다. 비공개 시스템은 연결하지 않았습니다.\", \"mcp_receipt\": {\"tool\": \"budget_api_status\", \"server_version\": \"4.1.5-public.1\", \"request_id\": \"6bddc25b52444add8490\", \"elapsed_ms\": 1, \"meaning\": \"서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요.\"}}",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "CONFIGURATION_STATUS",
+      "keys": {
+        "LOFIN_API_KEY": {
+          "configured": true,
+          "value_disclosed": false
+        },
+        "DATA_GO_KR_SERVICE_KEY": {
+          "configured": true,
+          "value_disclosed": false
+        },
+        "KOSIS_API_KEY": {
+          "configured": true,
+          "value_disclosed": false
+        },
+        "LAW_OC": {
+          "configured": true,
+          "value_disclosed": false
+        }
+      },
+      "last_checks": {},
+      "catalog_count": 18,
+      "private_system_integrations": {
+        "ehojo": "NOT_CONNECTED",
+        "botem": "NOT_CONNECTED"
+      },
+      "note": "키가 있음은 정상 인증·데이터 최신성 확인이 아닙니다. 비공개 시스템은 연결하지 않았습니다.",
+      "mcp_receipt": {
+        "tool": "budget_api_status",
+        "server_version": "4.1.5-public.1",
+        "request_id": "6bddc25b52444add8490",
+        "elapsed_ms": 1,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      }
+    },
+    "isError": false
+  }
+}

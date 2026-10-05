@@ -1,0 +1,75 @@
+{
+  "call": {
+    "id": "budget_api_catalog",
+    "tool": "budget_api_catalog",
+    "purpose": "지방재정365 API ID·필수 조건·공식 명세 확인",
+    "seconds": 0.11,
+    "isError": false,
+    "status": "CATALOG",
+    "code": null,
+    "classification": "RETURNED",
+    "receipt": {
+      "tool": "budget_api_catalog",
+      "server_version": "4.1.5-public.1",
+      "request_id": "29fb40aad65a40628e3d",
+      "elapsed_ms": 2,
+      "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+    },
+    "arguments": {
+      "query": "lofin_projects"
+    },
+    "response_file": "calls/budget_api_catalog.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"CATALOG\", \"items\": [{\"id\": \"lofin_projects\", \"name\": \"세부사업별 세출현황\", \"provider\": \"lofin\", \"endpoint\": \"https://www.lofin365.go.kr/lf/hub/QWGJK\", \"credential_env\": \"LOFIN_API_KEY\", \"key_param\": \"Key\", \"allowed_params\": [\"fyr\", \"exe_ymd\", \"wa_laf_cd\", \"laf_cd\", \"dbiz_nm\"], \"required_params\": [\"fyr\", \"exe_ymd\"], \"application_url\": \"https://www.data.go.kr/data/15138857/openapi.do\", \"specification_state\": \"OFFICIAL_SPEC_READ\", \"authenticated_live_verified\": false, \"amount_unit\": \"SOURCE_CONFIRMATION_REQUIRED\", \"sample_live_verified\": true, \"registration_url\": \"https://www.lofin365.go.kr/\", \"note\": \"LOFIN 발급 Key 사용. 공식 샘플은 첫 5행이며 전체 검색결과가 아닙니다. 예산현액·지출액·집행기준일을 구분합니다.\", \"credential_configured\": true}], \"note\": \"명세 확인·코드 구현·실키 응답 검증은 별개입니다. 카탈로그에 없는 URL/동작은 호출하지 않습니다.\", \"mcp_receipt\": {\"tool\": \"budget_api_catalog\", \"server_version\": \"4.1.5-public.1\", \"request_id\": \"29fb40aad65a40628e3d\", \"elapsed_ms\": 2, \"meaning\": \"서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요.\"}}",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "CATALOG",
+      "items": [
+        {
+          "id": "lofin_projects",
+          "name": "세부사업별 세출현황",
+          "provider": "lofin",
+          "endpoint": "https://www.lofin365.go.kr/lf/hub/QWGJK",
+          "credential_env": "LOFIN_API_KEY",
+          "key_param": "Key",
+          "allowed_params": [
+            "fyr",
+            "exe_ymd",
+            "wa_laf_cd",
+            "laf_cd",
+            "dbiz_nm"
+          ],
+          "required_params": [
+            "fyr",
+            "exe_ymd"
+          ],
+          "application_url": "https://www.data.go.kr/data/15138857/openapi.do",
+          "specification_state": "OFFICIAL_SPEC_READ",
+          "authenticated_live_verified": false,
+          "amount_unit": "SOURCE_CONFIRMATION_REQUIRED",
+          "sample_live_verified": true,
+          "registration_url": "https://www.lofin365.go.kr/",
+          "note": "LOFIN 발급 Key 사용. 공식 샘플은 첫 5행이며 전체 검색결과가 아닙니다. 예산현액·지출액·집행기준일을 구분합니다.",
+          "credential_configured": true
+        }
+      ],
+      "note": "명세 확인·코드 구현·실키 응답 검증은 별개입니다. 카탈로그에 없는 URL/동작은 호출하지 않습니다.",
+      "mcp_receipt": {
+        "tool": "budget_api_catalog",
+        "server_version": "4.1.5-public.1",
+        "request_id": "29fb40aad65a40628e3d",
+        "elapsed_ms": 2,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      }
+    },
+    "isError": false
+  }
+}

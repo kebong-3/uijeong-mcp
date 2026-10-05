@@ -2,9 +2,9 @@
   "schema_version": 1,
   "requirement": "R02_ALL_PUBLIC_TOOLS_VALID_MINIMUM_INPUT",
   "generated_at_utc": "2026-10-05T13:45:11.205673+00:00",
-  "schema_source": "ACTUAL_LOCAL_BUILD_SERVER_TOOLS_LIST_AFTER_RECOVERY_CHANGES",
+  "schema_source": "ACTUAL_LOCAL_BUILD_SERVER_TOOLS_LIST_4.1.5-public.2",
   "expected_unique_tool_count": 40,
-  "planned_call_count": 41,
+  "planned_call_count": 42,
   "live_execution_performed_by_inventory_author": false,
   "scope": {
     "council": "수원시",
@@ -32,7 +32,7 @@
     {
       "tool": "ordinance_compare",
       "extra_call": "dependency_peer_ordinance_search",
-      "reason": "A distinct official comparison ordinance must be obtained through a prior actual search. This is the one additional call beyond the 40 unique tool tests."
+      "reason": "A distinct official comparison ordinance is obtained through actual search. A second extra call follows the returned comparison continuation using its fixed source hashes."
     },
     {
       "tool": "ordinance_diff_versions",
@@ -49,7 +49,8 @@
     "calls_checked": 41,
     "unique_tools_checked": 40,
     "budgets_checked_against_internal_operation_schemas": true,
-    "placeholder_values": "Synthetic type probes were used only in local validation and are deliberately not stored here. No tool functions were executed."
+    "placeholder_values": "Synthetic type probes were used only in local validation and are deliberately not stored here. No tool functions were executed.",
+    "scope_note": "41 original calls were validated at 4.1.5-public.1. The added whole-arguments comparison continuation is validated by the verifier against the actual live schema after extraction; this historical count is not a claim of a new static execution."
   },
   "tool_inventory": [
     {
@@ -90,7 +91,7 @@
       "required_arguments": [
         "keyword"
       ],
-      "input_schema_sha256": "e653443828e9694438cca3d786e1bd2ba0c0dae57138900d8f76e68b5ac5bbe5"
+      "input_schema_sha256": "031ad869f238557045641df03836ca8824a1db026aeabefa2bd8a47eeb9ca74d"
     },
     {
       "name": "council_evidence_search",
@@ -100,7 +101,7 @@
       "required_arguments": [
         "keyword"
       ],
-      "input_schema_sha256": "bb8b3e452dd50b0926ae51410df9693baddab12f225f3bcb20df0d88e2a92554"
+      "input_schema_sha256": "20ec434744e4803e87f63d9ac4d2018554b93e748c9cea5dad61ee87b8911685"
     },
     {
       "name": "council_period_review",
@@ -110,7 +111,7 @@
       "required_arguments": [
         "keyword"
       ],
-      "input_schema_sha256": "d92fef8bc10531825c5fdc8c502473b666f3285e9147b769d26fb5f083ccb861"
+      "input_schema_sha256": "34511142e1ec2bcbbf98feaea99b731bf0b4a42a0ee1bb68846c5674986f941e"
     },
     {
       "name": "council_department_brief",
@@ -120,7 +121,7 @@
       "required_arguments": [
         "department"
       ],
-      "input_schema_sha256": "5062520db8c8d71a61cb35f11747cc95f7d819d79f9f7ebdfe31f2dc0be2c787"
+      "input_schema_sha256": "92a4caddbaa073bae6ff363521790c503f7e5fc1063c035c6c72c8e2f7e2002d"
     },
     {
       "name": "council_recurring_issues",
@@ -128,7 +129,7 @@
         "council_recurring_issues"
       ],
       "required_arguments": [],
-      "input_schema_sha256": "01eca140a04d2e01a204e8af6bb80fce734cecf7e79f384b6ed1bd0b0ce3130c"
+      "input_schema_sha256": "acf3eaafc168f0347d7be06c8b2bfc79bf5bfe4199e495d4841d4ff3253a82b3"
     },
     {
       "name": "council_read_source",
@@ -176,7 +177,7 @@
       "required_arguments": [
         "keyword"
       ],
-      "input_schema_sha256": "791659ac3cd11ef002fcad5669e8363088acd05335be9002407fe093bdfbd4b4"
+      "input_schema_sha256": "09448103ac494c86ff0356003a378257e3eeb8e7b27b4fc1ac1df7b951b0bdf2"
     },
     {
       "name": "council_prepare_pack",
@@ -186,7 +187,7 @@
       "required_arguments": [
         "keyword"
       ],
-      "input_schema_sha256": "f3d8c0632a8e3729ff3f33713629fc83e95d5e295ea9b90db33434245132fafb"
+      "input_schema_sha256": "e001c743d2fb66b6b9a0cf9c64fe3e70378281c25b6aa02f0750c854be72edba"
     },
     {
       "name": "council_status",
@@ -194,7 +195,7 @@
         "council_status"
       ],
       "required_arguments": [],
-      "input_schema_sha256": "9615ead815b4074f4d790bcd3aa5820dea6ae16a75cdc3012e75baa017949886"
+      "input_schema_sha256": "46df5014f1df21b6d2348fb3c23a43a4b9f0c3b609d6123033e99ddd0a829353"
     },
     {
       "name": "council_legislation_context",
@@ -204,7 +205,7 @@
       "required_arguments": [
         "topic"
       ],
-      "input_schema_sha256": "b33dd9c9e32da894b22f780bf8b1b55968f2c737ea275d2d7faba0e369533a35"
+      "input_schema_sha256": "cedeef2c1d56a68246f8492706aa2c621bba9da74db368b584d7f7c8629254fa"
     },
     {
       "name": "council_finance_context",
@@ -214,7 +215,7 @@
       "required_arguments": [
         "topic"
       ],
-      "input_schema_sha256": "f9d5b3e0fb4560ddafabee6012e03838922298f8b2c7d26592a3fa030ef9e818"
+      "input_schema_sha256": "b130167cfc82ff87087f130c69ecb671ae3ba1941106ef64842802eb14f66ef7"
     },
     {
       "name": "council_context_pack",
@@ -224,7 +225,7 @@
       "required_arguments": [
         "topic"
       ],
-      "input_schema_sha256": "f2787be99fa3b62c8ab465eca142c0dcfad8c2a0ad639ec81d8070cf4bc74733"
+      "input_schema_sha256": "d11be143e9870b5ed8ff18d549a4a31c9019541c87437a2f843bb3b6fd5eb67a"
     },
     {
       "name": "council_session_ready_pack",
@@ -234,7 +235,7 @@
       "required_arguments": [
         "topic"
       ],
-      "input_schema_sha256": "fd5e5a5af1317538b406b2247490b8ad9a3b891ee6722af6cc1628dacdf2e73e"
+      "input_schema_sha256": "6b301600bd12c2de537ff8c2797fddf9a65607270dd3d2b0502d738452cb87dc"
     },
     {
       "name": "council_peer_cases",
@@ -254,7 +255,7 @@
       "required_arguments": [
         "department"
       ],
-      "input_schema_sha256": "fa4c40c61f695b3d216cc880d484af144d0d29e42b698ceb1be387f56705272e"
+      "input_schema_sha256": "5630535a2dd6d678ff4a495c4c0b9f619ac86c9b460e7ad4ce5f828e9a191034"
     },
     {
       "name": "budget_api_catalog",
@@ -326,7 +327,7 @@
         "year",
         "components"
       ],
-      "input_schema_sha256": "9d9031af56316f7cdc55da39cff121bbed934b36824413b72bd934d71e9d74b3"
+      "input_schema_sha256": "222f05a2fa66f569c330fad211e9100c736b682fb4551483fa14912f004248fb"
     },
     {
       "name": "budget_checklist",
@@ -381,13 +382,14 @@
     {
       "name": "ordinance_compare",
       "call_ids": [
-        "ordinance_compare"
+        "ordinance_compare",
+        "dependency_compare_next_page"
       ],
       "required_arguments": [
         "baseline",
         "comparisons"
       ],
-      "input_schema_sha256": "aab184025f67d2f01334ef9f0d9ffe5400b2b5f6560820c8457daa1d3e83bb4f"
+      "input_schema_sha256": "46d220f4446b0ceb9e2a8138a453ff74dd3805912b7e68840bb22271f12fa542"
     },
     {
       "name": "ordinance_diff_versions",
@@ -408,7 +410,7 @@
       "required_arguments": [
         "params"
       ],
-      "input_schema_sha256": "afd0552d547ea3bb09f2586f0744a58800a3f5fdea0c6614ee8bb0867ad8ec5b"
+      "input_schema_sha256": "2714f5c06ddd1b85e3085a3822b231fec28c57ba4e1a592eea15897f170d6859"
     },
     {
       "name": "ordinance_verify_references",
@@ -972,7 +974,9 @@
         },
         {
           "path": "articles.0.excerpt_location.excerpt_only",
-          "must_not_equal": true
+          "equals": false,
+          "missing_value": false,
+          "absence_basis": "ordinance_get_document adds excerpt_location only when the returned article is partial; exact article label is checked separately."
         }
       ],
       "scope_note": "draft의 expected_text는 해당 조문 전체여야 한다. excerpt_only=true이면 공식 continuation으로 동일 조문을 완전히 회수하기 전 draft를 호출하지 않는다."
@@ -1036,12 +1040,35 @@
         ],
         "as_of": "2026-10-05"
       },
-      "extract": {},
+      "extract": {
+        "comparison_continuation_args": "continuation.arguments"
+      },
       "purpose": "실제 검색에서 확보한 수원·성남 조례 각 1개의 기능 차이 비교",
       "depends_on": [
         "ordinance_search",
         "dependency_peer_ordinance_search"
-      ]
+      ],
+      "expected": {
+        "legal_approval": false,
+        "equivalence_verified": false,
+        "ready_for_submission": false
+      }
+    },
+    {
+      "id": "dependency_compare_next_page",
+      "name": "ordinance_compare",
+      "arguments": "@comparison_continuation_args",
+      "extract": {},
+      "depends_on": [
+        "ordinance_compare"
+      ],
+      "purpose": "실제 첫 비교 응답의 이어읽기 인자와 원문 해시를 사용하여 다음 조문 행을 회수",
+      "expected": {
+        "legal_approval": false,
+        "equivalence_verified": false,
+        "ready_for_submission": false
+      },
+      "scope_note": "첫 두 페이지의 연속성과 원문 고정을 검증한다. 모든 비교 행·법적 동등성을 검증한 것으로 보고하지 않는다."
     },
     {
       "id": "ordinance_diff_versions",
@@ -1171,7 +1198,9 @@
         {
           "source": "ordinance_get_document",
           "path": "articles.0.excerpt_location.excerpt_only",
-          "must_not_equal": true
+          "equals": false,
+          "missing_value": false,
+          "absence_basis": "ordinance_get_document adds excerpt_location only when the returned article is partial; exact article label is checked separately."
         }
       ]
     },

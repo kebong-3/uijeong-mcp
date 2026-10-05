@@ -1,0 +1,177 @@
+{
+  "tool": "council_finance_context",
+  "arguments": {
+    "topic": "빌라가꿈관리소",
+    "council": "수원시",
+    "fiscal_year": 2026,
+    "snapshot_date": "2026-10-05",
+    "limit": 3,
+    "search_terms": [
+      "소규모 공동주택"
+    ]
+  },
+  "seconds": 7.96,
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"EMPTY\", \"source\": \"행정안전부 지방재정365 세부사업별 세출현황\", \"service_code\": \"QWGJK\", \"dataset_url\": \"https://www.lofin365.go.kr/portal/LF5120000.do?pdtaId=0GAR4HBB8LWEBSL4NIHZ817053\", \"source_url\": \"https://www.data.go.kr/data/15138857/openapi.do\", \"query\": {\"topic\": \"빌라가꿈관리소\", \"council\": \"경기도 수원시의회\", \"fiscal_year\": 2026, \"requested_snapshot_date\": \"20261005\", \"snapshot_date\": \"20261004\", \"budget_stage\": \"current\"}, \"items\": [], \"upstream_total\": 0, \"matched_local_government_count\": 0, \"date_resolution\": {\"strategy\": \"LATEST_AVAILABLE_ON_OR_BEFORE_REQUESTED\", \"fallback_used\": true, \"date_attempts\": [{\"snapshot_date\": \"20261005\", \"data_available\": false, \"response_code\": \"INFO-200\"}, {\"snapshot_date\": \"20261004\", \"data_available\": true, \"response_code\": \"INFO-000\"}], \"max_lookback_days\": 7, \"mixed_dates\": false}, \"search_strategy\": {\"exact_first\": true, \"progressive_widening\": false, \"attempts\": [{\"term\": \"빌라가꿈관리소\", \"match_kind\": \"EXACT_TEXT\", \"snapshot_date\": \"20261004\", \"upstream_total\": 0, \"rows_received\": 0, \"matched_local_government\": 0, \"response_code\": \"INFO-200\"}], \"request_count\": 3}, \"budget_basis\": {\"requested_stage\": \"current\", \"requested_stage_label\": \"조회일 예산현액\", \"returned_stage\": \"current\", \"returned_stage_label\": \"조회일 예산현액\", \"requested_stage_supported\": true, \"requested_stage_verified\": false, \"amount_verified\": false, \"same_project_verified\": false, \"basis_date\": \"20261004\", \"amount_unit\": \"SOURCE_CONFIRMATION_REQUIRED\", \"field_meanings\": {\"budget_current_amount\": \"bdg_cash_amt: 조회일 예산현액\", \"expenditure\": \"ep_amt: 조회일 기준 지출액\", \"cpl_amt\": \"필드 의미 미검증. 본예산·확정예산으로 사용 금지\"}, \"document_checks\": [\"의결된 본예산서\", \"해당 추경 예산서\", \"결산서(결산 질문 시)\"], \"rules\": [\"회의록의 예산안 설명액은 의결된 최종 본예산의 증거가 아닙니다.\", \"조회일 예산현액에는 변경·이월 등이 반영될 수 있어 본예산과 같다고 가정하지 않습니다.\", \"사업코드·지자체·회계·연도를 대조하기 전 관련 사업을 합산하지 않습니다.\", \"사업의 국비·시도비·구비는 재원 구성이며 지자체 전체 세입명세가 아닙니다.\", \"단위는 공식 명세·예산서에서 확인한 뒤 원·천원·백만원을 변환합니다.\"]}, \"coverage\": {\"limited\": false, \"is_exhaustive\": false, \"scanned_pages_per_query\": 1, \"has_unread_pages\": false, \"date_data_available\": true, \"requested_stage_complete\": false}, \"errors\": [], \"configured\": true, \"answer_guidance\": [\"결론에 실제 반환된 예산 단계와 기준일을 표시하세요.\", \"각 수치 뒤에 source_links 또는 source_link의 markdown을 붙이세요.\", \"데이터셋 링크를 특정 사업 예산서 원문 링크라고 소개하지 마세요.\", \"requested_stage_verified가 false이면 요청한 본예산·추경·예산안·결산 금액은 미확인이라고 표시하세요.\"], \"limitations\": [\"미발견·날짜 미제공·조회 오류는 예산 없음이나 0원이 아닙니다.\", \"같은 기준일의 사업·회계별 행만 반환합니다. 다른 날짜나 관련 사업을 자동 합산하지 않습니다.\", \"단위·확정 본예산·추경·결산은 공식 명세·예산서에서 대조하세요.\", \"전국 첫 1,000건만 확인했으면 누락 가능성을 PARTIAL로 표시합니다.\"], \"council\": {\"id\": \"031014\", \"name\": \"경기도 수원시의회\"}, \"execution_trace\": {\"mcp_tool\": \"council_finance_context\", \"source\": \"FINANCE365\", \"used\": true}, \"mcp_receipt\": {\"request_id\": \"6e815c1e9b904c39a877\", \"tool\": \"council_finance_context\", \"server_version\": \"4.1.4-public.4\", \"returned_at\": \"2026-10-05T22:43:07.119662+09:00\", \"elapsed_ms\": 7845, \"result_reuse\": \"fresh\", \"meaning\": \"서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요.\"}, \"source_links\": [{\"url\": \"https://www.data.go.kr/data/15138857/openapi.do\", \"label\": \"공식 자료 설명·제공범위\", \"markdown\": \"[공식 자료 설명·제공범위](https://www.data.go.kr/data/15138857/openapi.do)\", \"kind\": \"CATALOG_METADATA\", \"status\": \"REFERENCE_PROVIDED\", \"direct_document\": false}, {\"url\": \"https://www.lofin365.go.kr/portal/LF5120000.do?pdtaId=0GAR4HBB8LWEBSL4NIHZ817053\", \"label\": \"공식 데이터셋 확인\", \"markdown\": \"[공식 데이터셋 확인](https://www.lofin365.go.kr/portal/LF5120000.do?pdtaId=0GAR4HBB8LWEBSL4NIHZ817053)\", \"kind\": \"OFFICIAL_DATASET\", \"status\": \"REFERENCE_PROVIDED\", \"direct_document\": false}], \"link_guidance\": {\"display\": \"각 핵심 사실·수치 뒤에 해당 source_links.markdown을 붙이고 자료별로 연결하세요.\", \"scope\": \"DOCUMENT_REFERENCE=원문 주소, OFFICIAL_DATASET=데이터셋 안내, CATALOG_METADATA=자료 설명, OFFICIAL_SEARCH=검색 화면.\", \"verification\": \"링크 제공과 페이지 본문 조회·대조는 다릅니다. status와 열람 범위를 유지하세요.\", \"links_omitted\": false}, \"response_budget\": {\"max_chars\": 30000, \"original_chars\": 3666, \"response_chars\": 3666, \"truncated\": false}}",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "EMPTY",
+      "source": "행정안전부 지방재정365 세부사업별 세출현황",
+      "service_code": "QWGJK",
+      "dataset_url": "https://www.lofin365.go.kr/portal/LF5120000.do?pdtaId=0GAR4HBB8LWEBSL4NIHZ817053",
+      "source_url": "https://www.data.go.kr/data/15138857/openapi.do",
+      "query": {
+        "topic": "빌라가꿈관리소",
+        "council": "경기도 수원시의회",
+        "fiscal_year": 2026,
+        "requested_snapshot_date": "20261005",
+        "snapshot_date": "20261004",
+        "budget_stage": "current"
+      },
+      "items": [],
+      "upstream_total": 0,
+      "matched_local_government_count": 0,
+      "date_resolution": {
+        "strategy": "LATEST_AVAILABLE_ON_OR_BEFORE_REQUESTED",
+        "fallback_used": true,
+        "date_attempts": [
+          {
+            "snapshot_date": "20261005",
+            "data_available": false,
+            "response_code": "INFO-200"
+          },
+          {
+            "snapshot_date": "20261004",
+            "data_available": true,
+            "response_code": "INFO-000"
+          }
+        ],
+        "max_lookback_days": 7,
+        "mixed_dates": false
+      },
+      "search_strategy": {
+        "exact_first": true,
+        "progressive_widening": false,
+        "attempts": [
+          {
+            "term": "빌라가꿈관리소",
+            "match_kind": "EXACT_TEXT",
+            "snapshot_date": "20261004",
+            "upstream_total": 0,
+            "rows_received": 0,
+            "matched_local_government": 0,
+            "response_code": "INFO-200"
+          }
+        ],
+        "request_count": 3
+      },
+      "budget_basis": {
+        "requested_stage": "current",
+        "requested_stage_label": "조회일 예산현액",
+        "returned_stage": "current",
+        "returned_stage_label": "조회일 예산현액",
+        "requested_stage_supported": true,
+        "requested_stage_verified": false,
+        "amount_verified": false,
+        "same_project_verified": false,
+        "basis_date": "20261004",
+        "amount_unit": "SOURCE_CONFIRMATION_REQUIRED",
+        "field_meanings": {
+          "budget_current_amount": "bdg_cash_amt: 조회일 예산현액",
+          "expenditure": "ep_amt: 조회일 기준 지출액",
+          "cpl_amt": "필드 의미 미검증. 본예산·확정예산으로 사용 금지"
+        },
+        "document_checks": [
+          "의결된 본예산서",
+          "해당 추경 예산서",
+          "결산서(결산 질문 시)"
+        ],
+        "rules": [
+          "회의록의 예산안 설명액은 의결된 최종 본예산의 증거가 아닙니다.",
+          "조회일 예산현액에는 변경·이월 등이 반영될 수 있어 본예산과 같다고 가정하지 않습니다.",
+          "사업코드·지자체·회계·연도를 대조하기 전 관련 사업을 합산하지 않습니다.",
+          "사업의 국비·시도비·구비는 재원 구성이며 지자체 전체 세입명세가 아닙니다.",
+          "단위는 공식 명세·예산서에서 확인한 뒤 원·천원·백만원을 변환합니다."
+        ]
+      },
+      "coverage": {
+        "limited": false,
+        "is_exhaustive": false,
+        "scanned_pages_per_query": 1,
+        "has_unread_pages": false,
+        "date_data_available": true,
+        "requested_stage_complete": false
+      },
+      "errors": [],
+      "configured": true,
+      "answer_guidance": [
+        "결론에 실제 반환된 예산 단계와 기준일을 표시하세요.",
+        "각 수치 뒤에 source_links 또는 source_link의 markdown을 붙이세요.",
+        "데이터셋 링크를 특정 사업 예산서 원문 링크라고 소개하지 마세요.",
+        "requested_stage_verified가 false이면 요청한 본예산·추경·예산안·결산 금액은 미확인이라고 표시하세요."
+      ],
+      "limitations": [
+        "미발견·날짜 미제공·조회 오류는 예산 없음이나 0원이 아닙니다.",
+        "같은 기준일의 사업·회계별 행만 반환합니다. 다른 날짜나 관련 사업을 자동 합산하지 않습니다.",
+        "단위·확정 본예산·추경·결산은 공식 명세·예산서에서 대조하세요.",
+        "전국 첫 1,000건만 확인했으면 누락 가능성을 PARTIAL로 표시합니다."
+      ],
+      "council": {
+        "id": "031014",
+        "name": "경기도 수원시의회"
+      },
+      "execution_trace": {
+        "mcp_tool": "council_finance_context",
+        "source": "FINANCE365",
+        "used": true
+      },
+      "mcp_receipt": {
+        "request_id": "6e815c1e9b904c39a877",
+        "tool": "council_finance_context",
+        "server_version": "4.1.4-public.4",
+        "returned_at": "2026-10-05T22:43:07.119662+09:00",
+        "elapsed_ms": 7845,
+        "result_reuse": "fresh",
+        "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+      },
+      "source_links": [
+        {
+          "url": "https://www.data.go.kr/data/15138857/openapi.do",
+          "label": "공식 자료 설명·제공범위",
+          "markdown": "[공식 자료 설명·제공범위](https://www.data.go.kr/data/15138857/openapi.do)",
+          "kind": "CATALOG_METADATA",
+          "status": "REFERENCE_PROVIDED",
+          "direct_document": false
+        },
+        {
+          "url": "https://www.lofin365.go.kr/portal/LF5120000.do?pdtaId=0GAR4HBB8LWEBSL4NIHZ817053",
+          "label": "공식 데이터셋 확인",
+          "markdown": "[공식 데이터셋 확인](https://www.lofin365.go.kr/portal/LF5120000.do?pdtaId=0GAR4HBB8LWEBSL4NIHZ817053)",
+          "kind": "OFFICIAL_DATASET",
+          "status": "REFERENCE_PROVIDED",
+          "direct_document": false
+        }
+      ],
+      "link_guidance": {
+        "display": "각 핵심 사실·수치 뒤에 해당 source_links.markdown을 붙이고 자료별로 연결하세요.",
+        "scope": "DOCUMENT_REFERENCE=원문 주소, OFFICIAL_DATASET=데이터셋 안내, CATALOG_METADATA=자료 설명, OFFICIAL_SEARCH=검색 화면.",
+        "verification": "링크 제공과 페이지 본문 조회·대조는 다릅니다. status와 열람 범위를 유지하세요.",
+        "links_omitted": false
+      },
+      "response_budget": {
+        "max_chars": 30000,
+        "original_chars": 3666,
+        "response_chars": 3666,
+        "truncated": false
+      }
+    },
+    "isError": false
+  }
+}

@@ -1,0 +1,171 @@
+{
+  "call": {
+    "id": "ordinance_diff_versions",
+    "tool": "ordinance_diff_versions",
+    "purpose": "같은 공식 버전을 양쪽에 넣은 무변경 대조 시험",
+    "seconds": 0.16,
+    "isError": false,
+    "status": null,
+    "code": null,
+    "classification": "RETURNED",
+    "receipt": {
+      "tool": "ordinance_diff_versions",
+      "server_version": "4.1.5-public.1",
+      "request_id": "5582276bf4354179bdbf",
+      "elapsed_ms": 39,
+      "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+    },
+    "arguments": {
+      "old": {
+        "kind": "ordinance",
+        "document_id": "2209592",
+        "mst": "2102111",
+        "title_hint": "수원시 소규모 공동주택관리 지원 조례"
+      },
+      "new": {
+        "kind": "ordinance",
+        "document_id": "2209592",
+        "mst": "2102111",
+        "title_hint": "수원시 소규모 공동주택관리 지원 조례"
+      }
+    },
+    "response_file": "calls/ordinance_diff_versions.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"old\": {\"kind\": \"ordinance\", \"document_id\": \"2209592\", \"title\": \"수원시 소규모 공동주택관리 지원 조례\", \"jurisdiction\": \"경기도 수원시\", \"version\": \"2102111\", \"effective_date\": \"20251231\", \"promulgation_date\": \"20251231\", \"source_url\": \"https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111\", \"retrieved_at\": \"2026-10-05T13:56:46.159656+00:00\", \"source_state\": \"cache\", \"version_scope\": \"version\", \"warnings\": [\"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"자치법규 별표 API 제공범위 제한: 별표·별지·서식은 소관기관 원문과 별도 대조 필요\", \"별표 첨부파일의 본문 미수집: 메타데이터 비교만 가능하며 원본 표·서식 확인 필요\"], \"department\": \"녹색건축팀\", \"phone\": \"031-5191-3373\", \"upstream_hash\": \"e8d7f89f5b78484d6fb89312299483ea670bba43a63a322ecefc02ef76c56040\", \"identity\": \"ordinance:2209592:2102111:version:87998bc47f967361\", \"content_hash\": \"87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210\", \"article_count\": 22, \"supplement_count\": 1, \"annex_count\": 2}, \"new\": {\"kind\": \"ordinance\", \"document_id\": \"2209592\", \"title\": \"수원시 소규모 공동주택관리 지원 조례\", \"jurisdiction\": \"경기도 수원시\", \"version\": \"2102111\", \"effective_date\": \"20251231\", \"promulgation_date\": \"20251231\", \"source_url\": \"https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111\", \"retrieved_at\": \"2026-10-05T13:56:46.159656+00:00\", \"source_state\": \"cache\", \"version_scope\": \"version\", \"warnings\": [\"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"자치법규 별표 API 제공범위 제한: 별표·별지·서식은 소관기관 원문과 별도 대조 필요\", \"별표 첨부파일의 본문 미수집: 메타데이터 비교만 가능하며 원본 표·서식 확인 필요\"], \"department\": \"녹색건축팀\", \"phone\": \"031-5191-3373\", \"upstream_hash\": \"e8d7f89f5b78484d6fb89312299483ea670bba43a63a322ecefc02ef76c56040\", \"identity\": \"ordinance:2209592:2102111:version:87998bc47f967361\", \"content_hash\": \"87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210\", \"article_count\": 22, \"supplement_count\": 1, \"annex_count\": 2}, \"changes\": [], \"renumbering_candidates\": [], \"supplementary_changed\": false, \"annexes_changed\": false, \"metadata_changed\": {}, \"warning\": \"문자 비교는 법적 효력 변화의 확정판단이 아닙니다. 부칙/별표·표현 변화의 취지를 확인하세요.\", \"source_links\": [{\"url\": \"https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111\", \"label\": \"수원시 소규모 공동주택관리 지원 조례\", \"markdown\": \"[수원시 소규모 공동주택관리 지원 조례](https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111)\", \"kind\": \"DOCUMENT_REFERENCE\", \"status\": \"REFERENCE_PROVIDED\", \"direct_document\": true}], \"link_guidance\": {\"display\": \"각 핵심 사실·수치 뒤에 해당 source_links.markdown을 붙이고 자료별로 연결하세요.\", \"scope\": \"DOCUMENT_REFERENCE=원문 주소, OFFICIAL_DATASET=데이터셋 안내, CATALOG_METADATA=자료 설명, OFFICIAL_SEARCH=검색 화면.\", \"verification\": \"링크 제공과 페이지 본문 조회·대조는 다릅니다. status와 열람 범위를 유지하세요.\", \"links_omitted\": false}, \"mcp_receipt\": {\"tool\": \"ordinance_diff_versions\", \"server_version\": \"4.1.5-public.1\", \"request_id\": \"5582276bf4354179bdbf\", \"elapsed_ms\": 39, \"meaning\": \"서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요.\"}}",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "old": {
+        "kind": "ordinance",
+        "document_id": "2209592",
+        "title": "수원시 소규모 공동주택관리 지원 조례",
+        "jurisdiction": "경기도 수원시",
+        "version": "2102111",
+        "effective_date": "20251231",
+        "promulgation_date": "20251231",
+        "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+        "retrieved_at": "2026-10-05T13:56:46.159656+00:00",
+        "source_state": "cache",
+        "version_scope": "version",
+        "warnings": [
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "자치법규 별표 API 제공범위 제한: 별표·별지·서식은 소관기관 원문과 별도 대조 필요",
+          "별표 첨부파일의 본문 미수집: 메타데이터 비교만 가능하며 원본 표·서식 확인 필요"
+        ],
+        "department": "녹색건축팀",
+        "phone": "031-5191-3373",
+        "upstream_hash": "e8d7f89f5b78484d6fb89312299483ea670bba43a63a322ecefc02ef76c56040",
+        "identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+        "content_hash": "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210",
+        "article_count": 22,
+        "supplement_count": 1,
+        "annex_count": 2
+      },
+      "new": {
+        "kind": "ordinance",
+        "document_id": "2209592",
+        "title": "수원시 소규모 공동주택관리 지원 조례",
+        "jurisdiction": "경기도 수원시",
+        "version": "2102111",
+        "effective_date": "20251231",
+        "promulgation_date": "20251231",
+        "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+        "retrieved_at": "2026-10-05T13:56:46.159656+00:00",
+        "source_state": "cache",
+        "version_scope": "version",
+        "warnings": [
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "자치법규 별표 API 제공범위 제한: 별표·별지·서식은 소관기관 원문과 별도 대조 필요",
+          "별표 첨부파일의 본문 미수집: 메타데이터 비교만 가능하며 원본 표·서식 확인 필요"
+        ],
+        "department": "녹색건축팀",
+        "phone": "031-5191-3373",
+        "upstream_hash": "e8d7f89f5b78484d6fb89312299483ea670bba43a63a322ecefc02ef76c56040",
+        "identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+        "content_hash": "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210",
+        "article_count": 22,
+        "supplement_count": 1,
+        "annex_count": 2
+      },
+      "changes": [],
+      "renumbering_candidates": [],
+      "supplementary_changed": false,
+      "annexes_changed": false,
+      "metadata_changed": {},
+      "warning": "문자 비교는 법적 효력 변화의 확정판단이 아닙니다. 부칙/별표·표현 변화의 취지를 확인하세요.",
+      "source_links": [
+        {
+          "url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+          "label": "수원시 소규모 공동주택관리 지원 조례",
+          "markdown": "[수원시 소규모 공동주택관리 지원 조례](https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111)",
+          "kind": "DOCUMENT_REFERENCE",
+          "status": "REFERENCE_PROVIDED",
+          "direct_document": true
+        }
+      ],
+      "link_guidance": {
+        "display": "각 핵심 사실·수치 뒤에 해당 source_links.markdown을 붙이고 자료별로 연결하세요.",
+        "scope": "DOCUMENT_REFERENCE=원문 주소, OFFICIAL_DATASET=데이터셋 안내, CATALOG_METADATA=자료 설명, OFFICIAL_SEARCH=검색 화면.",
+        "verification": "링크 제공과 페이지 본문 조회·대조는 다릅니다. status와 열람 범위를 유지하세요.",
+        "links_omitted": false
+      },
+      "mcp_receipt": {
+        "tool": "ordinance_diff_versions",
+        "server_version": "4.1.5-public.1",
+        "request_id": "5582276bf4354179bdbf",
+        "elapsed_ms": 39,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      }
+    },
+    "isError": false
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "tool_count": 40,
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"unit\": \"원\", \"input_unit\": \"천원\", \"before_won\": 0, \"after_won\": 120000, \"delta_won\": 120000, \"rate_pct\": null, \"rate_status\": \"ZERO_BASE_NOT_COMPUTABLE\", \"mcp_receipt\": {\"tool\": \"budget_calculate\", \"server_version\": \"4.1.5-public.1\", \"request_id\": \"d55a55e9008f40d1afc2\", \"elapsed_ms\": 1, \"meaning\": \"서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요.\"}}",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "unit": "원",
+      "input_unit": "천원",
+      "before_won": 0,
+      "after_won": 120000,
+      "delta_won": 120000,
+      "rate_pct": null,
+      "rate_status": "ZERO_BASE_NOT_COMPUTABLE",
+      "mcp_receipt": {
+        "tool": "budget_calculate",
+        "server_version": "4.1.5-public.1",
+        "request_id": "d55a55e9008f40d1afc2",
+        "elapsed_ms": 1,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      }
+    },
+    "isError": false
+  }
+}

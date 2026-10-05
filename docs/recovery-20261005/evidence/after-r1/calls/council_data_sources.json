@@ -1,0 +1,105 @@
+{
+  "call": {
+    "id": "council_data_sources",
+    "tool": "council_data_sources",
+    "purpose": "공식 의회 자료 진입점 1건 확인",
+    "seconds": 0.12,
+    "isError": false,
+    "status": "COMPLETE",
+    "code": null,
+    "classification": "RETURNED",
+    "receipt": {
+      "request_id": "5c1c61e8148644ceb0dd",
+      "tool": "council_data_sources",
+      "server_version": "4.1.5-public.1",
+      "returned_at": "2026-10-05T22:56:17.021392+09:00",
+      "elapsed_ms": 4,
+      "result_reuse": "fresh",
+      "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+    },
+    "arguments": {
+      "query": "수원",
+      "limit": 1
+    },
+    "response_file": "calls/council_data_sources.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"COMPLETE\", \"checked_at\": \"2026-09-17\", \"registry_scope\": \"공식 디렉터리 호스트·공식 코드표·선별 홈페이지 관측을 분리한 정적 목록. 디렉터리 등록은 자동수집 지원·자료 전수성·실시간 상태를 뜻하지 않음.\", \"official_directory_url\": \"https://clik.nanet.go.kr/potal/guide/relateSite.do\", \"registry_total\": 248, \"directory_host_count\": 243, \"current_code_count\": 243, \"historical_code_count\": 2, \"direct_adapter_count\": 0, \"total_matches\": 1, \"offset\": 0, \"returned\": 1, \"next_offset\": null, \"sources\": [{\"source_id\": \"council-031014\", \"council_id\": \"031014\", \"name\": \"경기도 수원시의회\", \"region\": \"경기도\", \"directory_name\": \"경기도 수원시의회\", \"official_host\": \"council.suwon.go.kr\", \"official_homepage\": null, \"directory_url\": \"https://clik.nanet.go.kr/potal/guide/relateSite.do\", \"directory_checked_at\": \"2026-09-17\", \"name_mapping_status\": \"matched_current_or_historical_code\", \"homepage_check\": {\"status\": \"lookup_failed\", \"observed_url\": \"https://council.suwon.go.kr/\", \"observed_title\": \"Internal Error ()\", \"checked_at\": \"2026-09-17\", \"method\": \"public_web_lookup\", \"note\": \"페이지 관측이며 MCP 자동수집·원문 추출 성공 검증이 아님\"}, \"minutes_entry_url\": null, \"minutes_entry_status\": \"not_verified\", \"api_adapter\": \"clik\", \"clik_coverage\": \"must_check_per_query\", \"direct_adapter\": null, \"direct_adapter_status\": \"not_implemented\", \"aliases\": [\"경기도 수원시의회\"], \"notes\": []}], \"limits\": [\"등록된 의회 수와 CLIK에 자료가 수록된 의회 수는 다릅니다.\", \"홈페이지 관측은 MCP 자동수집·회의록 원문 추출 성공을 뜻하지 않습니다.\", \"공식 디렉터리에 남은 구 명칭·구 주소는 신설 의회로 자동 연결하지 않습니다.\"], \"mcp_receipt\": {\"request_id\": \"5c1c61e8148644ceb0dd\", \"tool\": \"council_data_sources\", \"server_version\": \"4.1.5-public.1\", \"returned_at\": \"2026-10-05T22:56:17.021392+09:00\", \"elapsed_ms\": 4, \"result_reuse\": \"fresh\", \"meaning\": \"서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요.\"}, \"response_budget\": {\"max_chars\": 30000, \"original_chars\": 1639, \"response_chars\": 1639, \"truncated\": false}}",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "COMPLETE",
+      "checked_at": "2026-09-17",
+      "registry_scope": "공식 디렉터리 호스트·공식 코드표·선별 홈페이지 관측을 분리한 정적 목록. 디렉터리 등록은 자동수집 지원·자료 전수성·실시간 상태를 뜻하지 않음.",
+      "official_directory_url": "https://clik.nanet.go.kr/potal/guide/relateSite.do",
+      "registry_total": 248,
+      "directory_host_count": 243,
+      "current_code_count": 243,
+      "historical_code_count": 2,
+      "direct_adapter_count": 0,
+      "total_matches": 1,
+      "offset": 0,
+      "returned": 1,
+      "next_offset": null,
+      "sources": [
+        {
+          "source_id": "council-031014",
+          "council_id": "031014",
+          "name": "경기도 수원시의회",
+          "region": "경기도",
+          "directory_name": "경기도 수원시의회",
+          "official_host": "council.suwon.go.kr",
+          "official_homepage": null,
+          "directory_url": "https://clik.nanet.go.kr/potal/guide/relateSite.do",
+          "directory_checked_at": "2026-09-17",
+          "name_mapping_status": "matched_current_or_historical_code",
+          "homepage_check": {
+            "status": "lookup_failed",
+            "observed_url": "https://council.suwon.go.kr/",
+            "observed_title": "Internal Error ()",
+            "checked_at": "2026-09-17",
+            "method": "public_web_lookup",
+            "note": "페이지 관측이며 MCP 자동수집·원문 추출 성공 검증이 아님"
+          },
+          "minutes_entry_url": null,
+          "minutes_entry_status": "not_verified",
+          "api_adapter": "clik",
+          "clik_coverage": "must_check_per_query",
+          "direct_adapter": null,
+          "direct_adapter_status": "not_implemented",
+          "aliases": [
+            "경기도 수원시의회"
+          ],
+          "notes": []
+        }
+      ],
+      "limits": [
+        "등록된 의회 수와 CLIK에 자료가 수록된 의회 수는 다릅니다.",
+        "홈페이지 관측은 MCP 자동수집·회의록 원문 추출 성공을 뜻하지 않습니다.",
+        "공식 디렉터리에 남은 구 명칭·구 주소는 신설 의회로 자동 연결하지 않습니다."
+      ],
+      "mcp_receipt": {
+        "request_id": "5c1c61e8148644ceb0dd",
+        "tool": "council_data_sources",
+        "server_version": "4.1.5-public.1",
+        "returned_at": "2026-10-05T22:56:17.021392+09:00",
+        "elapsed_ms": 4,
+        "result_reuse": "fresh",
+        "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+      },
+      "response_budget": {
+        "max_chars": 30000,
+        "original_chars": 1639,
+        "response_chars": 1639,
+        "truncated": false
+      }
+    },
+    "isError": false
+  }
+}

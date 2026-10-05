@@ -1,0 +1,120 @@
+{
+  "call": {
+    "id": "ordinance_verify_references",
+    "tool": "ordinance_verify_references",
+    "purpose": "실제 법령 ID에서 예시 인용의 조문 존재만 대조",
+    "seconds": 3.67,
+    "isError": false,
+    "status": null,
+    "code": null,
+    "classification": "RETURNED",
+    "receipt": {
+      "tool": "ordinance_verify_references",
+      "server_version": "4.1.5-public.1",
+      "request_id": "165ce96983cd42aeb516",
+      "elapsed_ms": 3555,
+      "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+    },
+    "arguments": {
+      "text": "[기능검증용 예시] 「공동주택관리법」 제1조를 인용한다.",
+      "parents": [
+        {
+          "kind": "law",
+          "document_id": "012345",
+          "title_hint": "공동주택관리법"
+        }
+      ],
+      "as_of": "2026-10-05"
+    },
+    "response_file": "calls/ordinance_verify_references.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"checks\": [{\"law_title\": \"공동주택관리법\", \"article\": \"제1조\", \"paragraph\": \"\", \"item\": \"\", \"quote\": \"「공동주택관리법」 제1조\", \"versions\": [{\"document_identity\": \"law:012345::current:b2c29712b9025e2d\", \"status\": \"article_present\", \"evidence_id\": \"E-1260d8f210b24613f76e\", \"temporal\": {\"state\": \"effective_on_or_before_as_of\", \"as_of\": \"2026-10-05\", \"version_current_verified\": true, \"caveat\": \"시행일이 과거라는 사실만으로 해당 기준일의 현행본임이 증명되지 않습니다. 후속개정·조문별 시행일·부칙을 확인하세요.\"}, \"source_state\": \"live\", \"subdivision_status\": \"not_requested\"}], \"warning\": \"조문 존재 확인은 인용 취지의 정확성·사업 근거·위임 적합성 검증과 다릅니다.\"}], \"documents\": [{\"kind\": \"law\", \"document_id\": \"012345\", \"title\": \"공동주택관리법\", \"jurisdiction\": \"\", \"version\": \"\", \"effective_date\": \"20260701\", \"promulgation_date\": \"20260305\", \"source_url\": \"https://www.law.go.kr/lsInfoP.do?lsId=012345\", \"retrieved_at\": \"2026-10-05T13:56:53.919246+00:00\", \"source_state\": \"live\", \"version_scope\": \"current\", \"warnings\": [\"응답 버전 식별자 미확인: 요청 MST 또는 본문 해시를 기록했으나 버전 메타데이터 독립 대조 필요\"], \"department\": \"\", \"phone\": \"044-201-3375\", \"upstream_hash\": \"48b4ed1c1d4d9f6eeb3542e78d322ca847af06db15f0a6eaf95c7f261a2bcb5a\", \"identity\": \"law:012345::current:b2c29712b9025e2d\", \"content_hash\": \"b2c29712b9025e2dc71b86b951513aa3ff92ccb64468527126e89094ac8dbb6f\", \"article_count\": 113, \"supplement_count\": 31, \"annex_count\": 0}], \"warning\": \"인용 존재 확인이며 법적 근거의 적합성 확정은 아닙니다.\", \"source_links\": [{\"url\": \"https://www.law.go.kr/lsInfoP.do?lsId=012345\", \"label\": \"공동주택관리법\", \"markdown\": \"[공동주택관리법](https://www.law.go.kr/lsInfoP.do?lsId=012345)\", \"kind\": \"DOCUMENT_REFERENCE\", \"status\": \"REFERENCE_PROVIDED\", \"direct_document\": true}], \"link_guidance\": {\"display\": \"각 핵심 사실·수치 뒤에 해당 source_links.markdown을 붙이고 자료별로 연결하세요.\", \"scope\": \"DOCUMENT_REFERENCE=원문 주소, OFFICIAL_DATASET=데이터셋 안내, CATALOG_METADATA=자료 설명, OFFICIAL_SEARCH=검색 화면.\", \"verification\": \"링크 제공과 페이지 본문 조회·대조는 다릅니다. status와 열람 범위를 유지하세요.\", \"links_omitted\": false}, \"mcp_receipt\": {\"tool\": \"ordinance_verify_references\", \"server_version\": \"4.1.5-public.1\", \"request_id\": \"165ce96983cd42aeb516\", \"elapsed_ms\": 3555, \"meaning\": \"서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요.\"}}",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "checks": [
+        {
+          "law_title": "공동주택관리법",
+          "article": "제1조",
+          "paragraph": "",
+          "item": "",
+          "quote": "「공동주택관리법」 제1조",
+          "versions": [
+            {
+              "document_identity": "law:012345::current:b2c29712b9025e2d",
+              "status": "article_present",
+              "evidence_id": "E-1260d8f210b24613f76e",
+              "temporal": {
+                "state": "effective_on_or_before_as_of",
+                "as_of": "2026-10-05",
+                "version_current_verified": true,
+                "caveat": "시행일이 과거라는 사실만으로 해당 기준일의 현행본임이 증명되지 않습니다. 후속개정·조문별 시행일·부칙을 확인하세요."
+              },
+              "source_state": "live",
+              "subdivision_status": "not_requested"
+            }
+          ],
+          "warning": "조문 존재 확인은 인용 취지의 정확성·사업 근거·위임 적합성 검증과 다릅니다."
+        }
+      ],
+      "documents": [
+        {
+          "kind": "law",
+          "document_id": "012345",
+          "title": "공동주택관리법",
+          "jurisdiction": "",
+          "version": "",
+          "effective_date": "20260701",
+          "promulgation_date": "20260305",
+          "source_url": "https://www.law.go.kr/lsInfoP.do?lsId=012345",
+          "retrieved_at": "2026-10-05T13:56:53.919246+00:00",
+          "source_state": "live",
+          "version_scope": "current",
+          "warnings": [
+            "응답 버전 식별자 미확인: 요청 MST 또는 본문 해시를 기록했으나 버전 메타데이터 독립 대조 필요"
+          ],
+          "department": "",
+          "phone": "044-201-3375",
+          "upstream_hash": "48b4ed1c1d4d9f6eeb3542e78d322ca847af06db15f0a6eaf95c7f261a2bcb5a",
+          "identity": "law:012345::current:b2c29712b9025e2d",
+          "content_hash": "b2c29712b9025e2dc71b86b951513aa3ff92ccb64468527126e89094ac8dbb6f",
+          "article_count": 113,
+          "supplement_count": 31,
+          "annex_count": 0
+        }
+      ],
+      "warning": "인용 존재 확인이며 법적 근거의 적합성 확정은 아닙니다.",
+      "source_links": [
+        {
+          "url": "https://www.law.go.kr/lsInfoP.do?lsId=012345",
+          "label": "공동주택관리법",
+          "markdown": "[공동주택관리법](https://www.law.go.kr/lsInfoP.do?lsId=012345)",
+          "kind": "DOCUMENT_REFERENCE",
+          "status": "REFERENCE_PROVIDED",
+          "direct_document": true
+        }
+      ],
+      "link_guidance": {
+        "display": "각 핵심 사실·수치 뒤에 해당 source_links.markdown을 붙이고 자료별로 연결하세요.",
+        "scope": "DOCUMENT_REFERENCE=원문 주소, OFFICIAL_DATASET=데이터셋 안내, CATALOG_METADATA=자료 설명, OFFICIAL_SEARCH=검색 화면.",
+        "verification": "링크 제공과 페이지 본문 조회·대조는 다릅니다. status와 열람 범위를 유지하세요.",
+        "links_omitted": false
+      },
+      "mcp_receipt": {
+        "tool": "ordinance_verify_references",
+        "server_version": "4.1.5-public.1",
+        "request_id": "165ce96983cd42aeb516",
+        "elapsed_ms": 3555,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      }
+    },
+    "isError": false
+  }
+}

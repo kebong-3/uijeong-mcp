@@ -42,6 +42,24 @@ def lookup(value, path):
     return value
 
 
+def condition_value(value, condition):
+    """Honor an explicitly documented optional field without inventing IDs.
+
+    Some response fields (for example an article's excerpt marker) are absent
+    for a complete item. Only a condition declaring missing_value can accept
+    that absence. A missing list item, malformed parent, or explicit null is
+    never converted to the default.
+    """
+    try:
+        for key in condition["path"].split("."):
+            value = value[int(key)] if isinstance(value, list) else value[key]
+    except KeyError:
+        if "missing_value" in condition:
+            return condition["missing_value"]
+        raise
+    return value
+
+
 def substitute(value, variables):
     if isinstance(value, str) and value.startswith("@"):
         return variables[value[1:]]
@@ -96,6 +114,9 @@ async def verify(args):
             report["checks"]["background_default_off"] = all(
                 schemas["council_context_pack"]["properties"].get(key, {}).get("default") is False
                 for key in ("include_member_records", "include_policy_background"))
+            report["checks"]["compare_pagination_exposed"] = all(
+                key in schemas["ordinance_compare"]["properties"]
+                for key in ("offset", "limit", "max_chars", "expected_hashes"))
             for index, case in enumerate(calls, 1):
                 call_id = case.get("id") or f"call-{index:02d}"
                 if not re.fullmatch(r"[A-Za-z0-9_-]+", call_id):
@@ -107,7 +128,7 @@ async def verify(args):
                         if "placeholder" in condition:
                             observed = variables[condition["placeholder"]]
                         else:
-                            observed = lookup(responses[condition["source"]][-1], condition["path"])
+                            observed = condition_value(responses[condition["source"]][-1], condition)
                         if "equals" in condition and observed != condition["equals"]:
                             raise ValueError("A prerequisite value does not match")
                         if "must_not_equal" in condition and observed == condition["must_not_equal"]:
@@ -140,7 +161,7 @@ async def verify(args):
                     extraction_allowed = True
                     for condition in case.get("preconditions_for_extraction", []):
                         try:
-                            observed = lookup(data, condition["path"])
+                            observed = condition_value(data, condition)
                             passed = (("equals" not in condition or observed == condition["equals"]) and
                                       ("must_not_equal" not in condition or observed != condition["must_not_equal"]))
                         except (KeyError, IndexError, TypeError, ValueError):
@@ -198,6 +219,18 @@ async def verify(args):
         report["checks"]["expected_version"] = status.get("version") == args.expect_version
     if args.expect_commit:
         report["checks"]["expected_commit"] = status.get("deployment_commit") == args.expect_commit
+    comparison_pages = responses.get("ordinance_compare", [])
+    if any(case.get("id") == "dependency_compare_next_page" for case in calls):
+        first = comparison_pages[0] if comparison_pages else {}
+        second = comparison_pages[1] if len(comparison_pages)>1 else {}
+        first_coverage, second_coverage = first.get("coverage", {}), second.get("coverage", {})
+        report["checks"]["comparison_continuation_preserves_source"] = bool(
+            first_coverage.get("returned_alignments", 0) > 0 and
+            second_coverage.get("returned_alignments", 0) > 0 and
+            first_coverage.get("next_offset") == second_coverage.get("offset") and
+            first_coverage.get("source_content_hashes") == second_coverage.get("source_content_hashes") and
+            (first.get("continuation") or {}).get("arguments", {}).get("expected_hashes") == second_coverage.get("source_content_hashes") and
+            first.get("legal_approval") is False and second.get("legal_approval") is False)
     contexts = responses.get("council_context_pack", [])
     if contexts:
         context = contexts[-1]

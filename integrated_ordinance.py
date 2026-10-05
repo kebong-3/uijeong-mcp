@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import copy
 import json
+from collections import Counter
 from dataclasses import replace
 from datetime import date, datetime
 from typing import Literal, Annotated
@@ -73,6 +74,141 @@ def _compact_review(result:dict, detail_level:str, max_evidence:int) -> dict:
         "note":"응답 크기만 줄였으며 생략된 근거를 검토 완료로 간주하지 않습니다. 필요한 공식 원문은 ordinance_get_document로 별도 조회하세요."
     }
     return compact
+
+
+def _comparison_page(result, docs, as_of, offset, limit, max_chars):
+    """Page computed alignments while keeping source recovery and uncertainty."""
+    from evidence_links import attach_source_links
+
+    summaries = [doc.summary() for doc in docs]
+    references = [{'kind':'ordinance', 'document_id':doc.document_id,
+                   **({'mst':doc.version} if doc.version else {}), 'title_hint':doc.title}
+                  for doc in docs]
+    hashes = [doc.content_hash for doc in docs]
+    by_identity = {doc.identity:i for i,doc in enumerate(docs)}
+    article_offsets = {(doc.identity, article.key):index for doc in docs
+                       for index,article in enumerate(doc.articles)}
+    evidence_locations = {evidence(doc, article)['id']:{'article':article.label, 'article_offset':index}
+                          for doc in docs for index,article in enumerate(doc.articles)}
+    flattened = [(index,row) for index,comparison in enumerate(result['comparisons'])
+                 for row in comparison['alignments']]
+    if offset > len(flattened):
+        raise ValueError('offset_out_of_range')
+
+    def summary(value):
+        fields = ('kind','document_id','title','jurisdiction','version','effective_date','promulgation_date',
+                  'source_url','source_state','version_scope','retrieved_at','identity','content_hash',
+                  'article_count','supplement_count','annex_count')
+        small = {key:value[key] for key in fields if key in value}
+        warnings = list(dict.fromkeys(value.get('warnings', [])))
+        small['warnings'] = [warning[:300] for warning in warnings[:3]]
+        small['warning_coverage'] = {'unique_warnings':len(warnings), 'returned_warnings':min(3,len(warnings)),
+            'truncated':len(warnings)>3 or any(len(warning)>300 for warning in warnings[:3]),
+            'recovery':'해당 문서의 ordinance_get_document summary에서 전체 경고를 확인하세요.'}
+        return small
+
+    compact_summaries = [summary(value) for value in summaries]
+    source_recovery = [{'document_identity':doc.identity, 'expected_content_hash':hashes[index],
+        'tool':'ordinance_get_document', 'arguments':{'reference':references[index],
+            'section':'articles','offset':0,'limit':1,'max_chars':2000}}
+        for index,doc in enumerate(docs)]
+    matrix = copy.deepcopy(result['dimension_matrix'])
+    for dimension in matrix:
+        for cell in dimension['cells']:
+            ids = cell['evidence_ids']
+            cell['evidence_count'] = len(ids)
+            cell['evidence_ids'] = ids[:1]
+            cell['evidence_ids_omitted'] = max(0,len(ids)-1)
+            cell['sample_article'] = evidence_locations.get(ids[0]) if ids else None
+            cell['recovery_basis'] = 'document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용'
+
+    def build(selected, quote_cap):
+        excerpts = 0
+        omitted_paragraphs = 0
+
+        def quote(entry):
+            nonlocal excerpts
+            small = copy.deepcopy(entry)
+            raw = small.get('text','')
+            small['text'] = raw[:quote_cap]
+            index = article_offsets[(small['document_identity'],small['article_key'])]
+            partial = len(raw)>quote_cap
+            excerpts += int(partial)
+            small['excerpt_location'] = {'item_offset':index,'char_start':0,
+                'char_end':len(small['text']),'total_chars':len(raw),'excerpt_only':partial,
+                'offset_basis':'ARTICLE_TEXT'}
+            source = by_identity[small['document_identity']]
+            small['recovery'] = {'tool':'ordinance_get_document',
+                'arguments':{'reference':references[source],'section':'articles','offset':index,
+                             'limit':1,'max_chars':2000},
+                'expected_content_hash':hashes[source]}
+            return small
+
+        comparisons = [{**{key:copy.deepcopy(value) for key,value in comparison.items()
+                           if key not in {'alignments','peer_document'}},
+                        'peer_document':compact_summaries[index+1], 'alignments':[]}
+                       for index,comparison in enumerate(result['comparisons'])]
+        for comparison_index,row in selected:
+            small = copy.deepcopy(row)
+            small['peer'] = quote(row['peer'])
+            for candidate in small['baseline_candidates']:
+                candidate['evidence'] = quote(candidate['evidence'])
+                paragraphs = candidate.get('paragraphs_only_in_peer_candidate', [])
+                candidate['paragraphs_only_in_peer_candidate'] = [text[:quote_cap] for text in paragraphs[:1]]
+                omitted_paragraphs += max(0,len(paragraphs)-1)
+                excerpts += int(bool(paragraphs) and len(paragraphs[0])>quote_cap)
+                candidate['paragraph_coverage'] = {'candidate_paragraphs':len(paragraphs),
+                    'returned_paragraphs':min(1,len(paragraphs)),
+                    'excerpt_only':bool(paragraphs) and len(paragraphs[0])>quote_cap,
+                    'recovery':'같은 행의 peer.recovery로 조문 전체를 확인하세요.'}
+            comparisons[comparison_index]['alignments'].append(small)
+        next_offset = offset+len(selected) if offset+len(selected)<len(flattened) else None
+        matrix_omitted = sum(cell['evidence_ids_omitted'] for dimension in matrix for cell in dimension['cells'])
+        complete_output = offset==0 and next_offset is None and not excerpts and not omitted_paragraphs \
+            and not matrix_omitted and not any(value['warning_coverage']['truncated'] for value in compact_summaries)
+        analysis_complete = result['coverage'].get('comparison_complete',False)
+        continuation = None if next_offset is None else {'tool':'ordinance_compare', 'arguments':{
+            'baseline':references[0], 'comparisons':references[1:], 'as_of':as_of,
+            'offset':next_offset,'limit':limit,'max_chars':max_chars,'expected_hashes':hashes}}
+        return {'status':'COMPLETE' if complete_output and analysis_complete else 'PARTIAL',
+            'baseline':compact_summaries[0], 'comparisons':comparisons, 'dimension_matrix':matrix,
+            'method':result['method'], 'guardrails':copy.deepcopy(result['guardrails']),
+            'legal_approval':False, 'equivalence_verified':False, 'ready_for_submission':False,
+            'alignment_counts':dict(Counter(row['category'] for _,row in flattened)),
+            'coverage':{**result['coverage'],'analysis_comparison_complete':analysis_complete,
+                'comparison_complete':bool(complete_output and analysis_complete),
+                'total_alignments':len(flattened),'offset':offset,'requested_limit':limit,
+                'returned_alignments':len(selected),'next_offset':next_offset,'output_complete':complete_output,
+                'quote_excerpt_count':excerpts,'paragraph_candidates_omitted':omitted_paragraphs,
+                'matrix_evidence_ids_omitted':matrix_omitted,
+                'order':'입력 comparisons 순서, 각 비교 문서의 원문 조문 순서',
+                'source_content_hashes':hashes,'effective_max_chars':quote_cap,
+                'scope':'계산한 대응 후보와 현재 반환한 구간은 다릅니다. 법적 동등성·미비 조항·현행 효력 승인 아님.'},
+            'continuation':continuation, 'document_recovery':source_recovery,
+            'response_budget':{'max_chars':25000,'note':'조문 대응 행과 인용을 나누어 반환합니다. 생략된 원문은 각 recovery, 다음 대응 행은 continuation으로 확인하세요.'}}
+
+    selected = flattened[offset:offset+limit]
+    quote_cap = max_chars
+    while True:
+        page = attach_source_links(build(selected,quote_cap),'ordinance_compare')
+        size = len(json.dumps(page,ensure_ascii=False,default=str))
+        if size <= 25000:
+            page['response_budget']['response_chars'] = size
+            return page
+        if len(selected)>1:
+            selected = selected[:-1]
+        elif quote_cap>100:
+            quote_cap = 100
+        else:
+            # A pathological metadata-only payload must still expose source
+            # retrieval rather than direct the caller to retry unchanged input.
+            return {'status':'PARTIAL','code':'COMPARISON_METADATA_LIMIT',
+                'baseline':{'document_id':docs[0].document_id,'content_hash':hashes[0]},
+                'coverage':{'total_alignments':len(flattened),'returned_alignments':0,
+                    'analysis_comparison_complete':result['coverage'].get('comparison_complete',False),
+                    'output_complete':False}, 'document_recovery':source_recovery,
+                'legal_approval':False,'equivalence_verified':False,'ready_for_submission':False,
+                'message':'출처 메타데이터가 큰 경우입니다. document_recovery의 원문을 문서·조문별로 조회하세요.'}
 
 async def _run(action):
     try:
@@ -206,12 +342,27 @@ def register(mcp):
             return await c.linked_ordinances(law_id,article,max_pages)
         return await _run(action)
 
-    @tool('ordinance_compare','선택한 기준·비교 조례의 기능과 조문 차이 검토. 차이는 위법성·필수 신설 판단이 아님. 비교 최대 3개.')
-    async def ordinance_compare(baseline:DocumentRef, comparisons:list[DocumentRef], as_of:str='') -> dict:
+    @tool('ordinance_compare','선택한 기준·비교 조례의 기능과 조문 차이 후보를 나누어 반환. 비교 최대 3개. offset/limit으로 대응 조문 행, max_chars로 각 인용 길이를 조절. 다음 행은 반환 continuation, 조문 전체는 peer/evidence.recovery. 차이는 위법성·필수 신설 판단 아님.')
+    async def ordinance_compare(baseline:DocumentRef, comparisons:list[DocumentRef], as_of:str='',
+                                offset:Annotated[int,Field(ge=0)]=0,
+                                limit:Annotated[int,Field(ge=1,le=10)]=3,
+                                max_chars:Annotated[int,Field(ge=100,le=1500)]=400,
+                                expected_hashes:Annotated[list[str]|None,Field(min_length=2,max_length=4)]=None) -> dict:
         async def action(c):
             if baseline.kind!='ordinance' or not 1<=len(comparisons)<=3 or any(r.kind!='ordinance' for r in comparisons): raise ValueError('input')
+            if type(offset) is not int or offset<0 or type(limit) is not int or not 1<=limit<=10 \
+                    or type(max_chars) is not int or not 100<=max_chars<=1500:
+                raise ValueError('range')
+            if expected_hashes is not None and (not isinstance(expected_hashes,list)
+                    or len(expected_hashes)!=1+len(comparisons) or any(not isinstance(value,str) or len(value)!=64 for value in expected_hashes)):
+                raise ValueError('expected_hashes')
             docs=await asyncio.gather(c.get_document(baseline),*(c.get_document(r) for r in comparisons))
-            return await asyncio.to_thread(compare_documents,docs[0],docs[1:],_date(as_of))
+            if expected_hashes is not None and expected_hashes != [doc.content_hash for doc in docs]:
+                return {'status':'unavailable','code':'source_changed',
+                        'message':'이전 비교 페이지 이후 원문 내용이 달라졌습니다. 결과를 합치지 말고 첫 페이지부터 새로 비교하세요.'}
+            review_date = _date(as_of)
+            result = await asyncio.to_thread(compare_documents,docs[0],docs[1:],review_date)
+            return _comparison_page(result,docs,review_date.isoformat(),offset,limit,max_chars)
         return await _run(action)
 
     @tool('ordinance_diff_versions','같은 법규의 공식 구·신 버전을 지정하여 조문·부칙 변경 비교. 개정 취지나 법적 영향 확정 아님.')

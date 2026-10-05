@@ -20,14 +20,18 @@
   },
   "today_before_patch": {
     "observed_version": "4.1.4-public.4",
-    "source_directory": "/workspace/scratch/0f8070660f49/verification-before",
+    "source_directory": "evidence/before",
     "finance": {
       "source_file": "council_finance_context.json",
       "returned_at": "2026-10-05T22:43:07.119662+09:00",
       "request_id": "6e815c1e9b904c39a877",
       "status": "EMPTY",
-      "supplied_search_terms": ["소규모 공동주택"],
-      "observed_attempt_terms": ["빌라가꿈관리소"],
+      "supplied_search_terms": [
+        "소규모 공동주택"
+      ],
+      "observed_attempt_terms": [
+        "빌라가꿈관리소"
+      ],
       "progressive_widening": false
     },
     "integration": {
@@ -43,26 +47,47 @@
     "scope_note": "Selected observations from today's pre-patch production calls. Not post-deployment verification."
   },
   "new_release": {
-    "planned_version": "4.1.5-public.1",
+    "planned_version": "4.1.5-public.2",
     "actual_version": "PENDING",
     "commit": "PENDING",
-    "render_service_id": "PENDING",
+    "tree": "PENDING",
+    "render_service_id": "srv-dalbmfe7bikc73fnnr90",
+    "render_workspace_id": "tea-dakfagoae00c73b8o460",
     "render_deploy_id": "PENDING",
     "live_confirmed_at_utc": "PENDING",
     "public_tool_count": "PENDING",
     "tool_schema_sha256": "PENDING",
     "runtime_fingerprint": "PENDING",
     "manifest_status": "PENDING",
-    "tracked_defect_ids": ["REC-01", "REC-02", "REC-03", "REC-04", "REC-05", "REC-06", "REC-07", "REC-08"],
+    "tracked_defect_ids": [
+      "REC-01",
+      "REC-02",
+      "REC-03",
+      "REC-04",
+      "REC-05",
+      "REC-06",
+      "REC-07",
+      "REC-08",
+      "REC-09",
+      "REC-10",
+      "VFY-01"
+    ],
     "fixture_test_result": "PENDING",
     "minimum_call_verifier": "scripts/verify_recovery.py",
-    "minimum_call_inventory": "PENDING",
+    "minimum_call_inventory": "scripts/recovery_minimum_calls.json",
     "live_acceptance_result": "PENDING",
     "sdk_connection_result": "PENDING",
     "four_domain_examples": "PENDING",
-    "environment_changes": "PENDING",
-    "sites_changes": "PENDING",
-    "final_status": "PENDING"
+    "environment_changes": {
+      "api_keys": false,
+      "environment_variables": false,
+      "plan": false,
+      "authentication": false
+    },
+    "sites_changes": false,
+    "final_status": "PENDING",
+    "planned_call_count": 42,
+    "expected_unique_tool_count": 40
   },
   "not_claimed_complete": [
     "General automatic collection and validated extraction of official budget PDF/HWP/HWPX documents",
@@ -70,5 +95,82 @@
     "Full semantic grouping of discussions and verified project-amount attribution",
     "All-account and all-client installation and end-to-end execution",
     "Nationwide positive-source coverage and long-running operational validation"
+  ],
+  "release_attempts": [
+    {
+      "planned_version": "4.1.5-public.1",
+      "actual_version": "4.1.5-public.1",
+      "commit": "de2e6f5a7c35448609a22985108515c00dc17d5f",
+      "render_service_id": "srv-dalbmfe7bikc73fnnr90",
+      "render_deploy_id": "dep-db1qmjtckfvc73e2eiv0",
+      "live_confirmed_at_utc": "2026-10-05T13:52:00.778431Z",
+      "public_tool_count": 40,
+      "tool_schema_sha256": "0437b8a705cdf4818bd1d2268f4cc4be2c3d43d16f0e17b340903b94e66bfd7a",
+      "runtime_fingerprint": "0e9228563fbf15501e7afb61cde49994d65b0f8b38d65fe81d6e1f8d01d564e7",
+      "manifest_status": "MATCH",
+      "tracked_defect_ids": [
+        "REC-01",
+        "REC-02",
+        "REC-03",
+        "REC-04",
+        "REC-05",
+        "REC-06",
+        "REC-07",
+        "REC-08"
+      ],
+      "fixture_test_result": {
+        "passed": 791,
+        "seconds": 7.53,
+        "source_file": "evidence/pytest-final.txt"
+      },
+      "minimum_call_verifier": "scripts/verify_recovery.py",
+      "minimum_call_inventory": "scripts/recovery_minimum_calls.json",
+      "live_acceptance_result": {
+        "round": "r1",
+        "status": "REVIEW_REQUIRED",
+        "planned_calls": 41,
+        "unique_advertised_tools": 40,
+        "response_calls": 39,
+        "unique_tools_returned": 38,
+        "classifications": {
+          "RETURNED": 25,
+          "RETURNED_WITH_SCOPE": 11,
+          "TOOL_ERROR": 3,
+          "UNEXECUTED_INPUT_OR_DEPENDENCY": 2
+        },
+        "core_fiscal_and_integration_checks_passed": true,
+        "source_file": "evidence/after-r1/summary.json"
+      },
+      "sdk_connection_result": {
+        "same_version_and_commit": true,
+        "manifest_matches": true,
+        "reconnect_and_zero_base": true,
+        "source_file": "evidence/after-r1/sdk-reconnect.json"
+      },
+      "four_domain_examples": "FIRST_ROUND_RESPONSES_AVAILABLE_FINAL_FOLLOWUP_PENDING",
+      "environment_changes": {
+        "api_keys": false,
+        "environment_variables": false,
+        "plan": false,
+        "authentication": false
+      },
+      "sites_changes": false,
+      "final_status": "REVIEW_REQUIRED",
+      "tree": "ee3e7326857e02e2e8a27498ef891264c7e2891c",
+      "render_workspace_id": "tea-dakfagoae00c73b8o460",
+      "deployment_started_at_utc": "2026-10-05T13:51:11.730405Z",
+      "runtime_file_count": 80,
+      "native_status_observation": {
+        "request_id": "57704c1e276449cb93e9",
+        "returned_at": "2026-10-05T22:55:27.397170+09:00",
+        "observation_source": "Release agent observed existing native Render connector"
+      },
+      "followup_items": [
+        "REC-09",
+        "REC-10",
+        "VFY-01"
+      ],
+      "round": "r1"
+    }
   ]
 }

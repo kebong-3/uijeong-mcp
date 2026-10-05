@@ -76,6 +76,8 @@ def install(U):
 
     def safe_failure(source, stage, exc, ref=None):
         result={'source':source,'stage':stage,'ref':ref,'message':R.safe_error(exc)}
+        if isinstance(exc, getattr(U, 'ClikError', ())):
+            result.update(exc.diagnostics())
         code=getattr(exc,'reason_code',None)
         if code in ('ROBOTS_UNAVAILABLE','ROBOTS_DISALLOWED','SITE_UNAVAILABLE'):
             result['code']=code

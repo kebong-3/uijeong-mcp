@@ -1,7 +1,8 @@
 # 2026-10-05 결함 및 수정 추적
 
-예정 버전: `4.1.5-public.1`
-최종 commit / 시험 / 배포: **PENDING**
+1차 배포: `4.1.5-public.1`, commit `de2e6f5a7c35448609a22985108515c00dc17d5f`
+1차 고정시험: **791개 통과**. 전체 공개 도구의 1차 실호출에서 추가 문제를 발견했다.
+후속 예정 버전: `4.1.5-public.2`; 최종 commit / 시험 / 배포: **PENDING**
 
 아래 심각도는 이번 작업의 우선순위다. P0는 발언·금액·출처의 오귀속 또는 잘못된 확정으로 이어질 수 있는 문제, P1은 조회 누락·호출 낭비·결과 오독을 일으키는 문제다. 과거 수정 내용과 이번 수정 대상을 구분한다.
 
@@ -9,16 +10,28 @@
 
 | ID / 심각도 | 관측과 재현 조건 | 업무 영향 | 수정·회귀 합격 기준 | 수정 위치 / 최종 상태 |
 |---|---|---|---|---|
-| REC-01 / P1 | 내부 재정 조회의 `search_terms`가 공개 schema에 없고 실행에 전달되지 않음. 오늘 운영 재현에서도 추가 필드를 보냈지만 실제 검색 시도는 원명 1개뿐 | 정책 브랜드명 0건 이후의 공식 사업명 탐색이 끊김 | 공개 schema에 optional `search_terms`를 선언하고 내부 함수에 전달. 생략 호출은 기존과 동일. 타입·길이를 일관되게 검증하고 전체 표현 한도로 미실행한 부분은 REC-08 기준으로 표시 | `council_extensions.py`; 최종 시험 `PENDING` |
-| REC-02 / P1 | 후속 조회로 법규·재정 후보를 발견해도 `linked_review` 요약 `status`에 최초 `EMPTY`가 남음 | 정상적으로 확보한 후보를 자료 없음으로 오독 | 최초 조회 상태와 통합 후 최종 상태를 구분. 후보가 있으면 발견 사실을 표시하되 단위·동일사업·적용 검증 false를 보존. 응답 축약 후에도 상태·후보수·식별자 일치 | 통합 결과 조립·축약 경로; 패치·시험 `PENDING` |
-| REC-03 / P1 | 기본 `council_context_pack`에서 요청하지 않은 `member_record_discovery`, `policy_background` 단계가 실행됨 | 조회 지연과 불필요한 출처 호출, 질문 범위 확대 | 기본 통합 요청은 필요한 경로만 실행. 생략한 단계는 상태와 사유를 표시. 의회·법규·재정의 요청된 근거 탐색은 유지 | `v3_reliability.py` 등 실제 통합 경로; 패치·시험 `PENDING` |
-| REC-04 / P1 | 법규 첫 페이지에 해당 지역 후보가 없지만 다음 페이지가 남은 상황에서 `EMPTY`를 반환. 구형 조회와 공개 검색의 페이지 크기가 다르면 같은 페이지 번호로 복구할 때 자료 누락 가능 | 검색을 끝까지 확인하지 않은 결과가 조례 부재로 읽히거나, 복구 중 중간 후보를 빠뜨림 | 남은 페이지를 `PARTIAL`로 표시. 복구는 `RESTART_WITH_PUBLIC_SEARCH`로 공개 검색의 1페이지부터 시작함을 명시. 서로 다른 페이지 크기의 페이지 번호를 직접 변환하지 않음. 다른 지역을 대신 채택하지 않음 | `legal_context.py`, `v3_reliability.py`; 최종 시험 `PENDING` |
-| REC-05 / P0 | 통합 후보 요약에서 재정자료의 회계·실제 자료 기준일이 빠짐 | 다른 회계·기준일의 금액 비교 또는 중복 합산 위험 | 원천이 제공한 회계·요청일·실제 기준일·사업코드·연도·단계·단위와 확인상태를 요약·재조회 경로에 보존. 없는 값은 미확인으로 남김 | 후보 요약·`v3_reliability.py` 등; 패치·시험 `PENDING` |
-| REC-06 / P0 | 독립적인 정식 업무보고가 앞 의원 질문의 집행부 답변으로 연결됨 | 실제 답변 취지·약속·책임부서의 오귀속 | 질문 뒤 정식보고가 시작되면 앞 QA 답변의 수집을 종료. 정식보고 자체와 원문 위치는 별도 보존. 정상적인 후속 답변은 유지 | `evidence_core.py`; 패치·시험 `PENDING` |
-| REC-07 / P0 | `council_legislation_context`가 응답 전체의 `jurisdiction_match`를 각 조례에 적용. 제명 검색의 수원 조례와 본문 검색의 용인 조례가 함께 오면 모두 현지 조례로 분류될 수 있음 | 다른 지자체의 조례를 해당 사업의 법적 근거로 오인 | shared `same_jurisdiction`으로 매 행의 관할 대조. 외지 조례는 비교 후보로만 분류. `중구` 등 모호한 명시 관할은 검색 전에 후보·오류 반환 | 법규 맥락 조립 경로; 최종 시험 `PENDING` |
-| REC-08 / P1 | 추가 검색어 3개를 수용하지만 원명·띄어쓰기 변형을 포함한 총 4개 표현 한도에서 마지막 추가 검색어가 제외됨. 제외 사실이 없으면 요청 전체를 검색한 것으로 보임 | 실제 미검색 용어를 검색 0건으로 오인, 후속 재조회 기회 소실 | 4개 호출 한도는 유지. 요청·계획·실제 시도·제외·미시도 용어를 구분하고 `SEARCH_EXPRESSION_LIMIT` 사유, `PARTIAL`, coverage를 반환. 미검색을 자료 없음으로 바꾸지 않음 | 재정 제한 검색 경로; 최종 시험 `PENDING` |
+| REC-01 / P1 | 내부 재정 조회의 `search_terms`가 공개 schema에 없고 실행에 전달되지 않음. 오늘 운영 재현에서도 추가 필드를 보냈지만 실제 검색 시도는 원명 1개뿐 | 정책 브랜드명 0건 이후의 공식 사업명 탐색이 끊김 | 공개 schema에 optional `search_terms`를 선언하고 내부 함수에 전달. 생략 호출은 기존과 동일. 타입·길이를 일관되게 검증하고 전체 표현 한도로 미실행한 부분은 REC-08 기준으로 표시 | `council_extensions.py`; 1차 고정시험 통과 |
+| REC-02 / P1 | 후속 조회로 법규·재정 후보를 발견해도 `linked_review` 요약 `status`에 최초 `EMPTY`가 남음 | 정상적으로 확보한 후보를 자료 없음으로 오독 | 최초 조회 상태와 통합 후 최종 상태를 구분. 후보가 있으면 발견 사실을 표시하되 단위·동일사업·적용 검증 false를 보존. 응답 축약 후에도 상태·후보수·식별자 일치 | 통합 결과 조립·축약 경로; 1차 구현·고정시험 통과 |
+| REC-03 / P1 | 기본 `council_context_pack`에서 요청하지 않은 `member_record_discovery`, `policy_background` 단계가 실행됨 | 조회 지연과 불필요한 출처 호출, 질문 범위 확대 | 기본 통합 요청은 필요한 경로만 실행. 생략한 단계는 상태와 사유를 표시. 의회·법규·재정의 요청된 근거 탐색은 유지 | `v3_reliability.py` 등 실제 통합 경로; 1차 구현·고정시험 통과 |
+| REC-04 / P1 | 법규 첫 페이지에 해당 지역 후보가 없지만 다음 페이지가 남은 상황에서 `EMPTY`를 반환. 구형 조회와 공개 검색의 페이지 크기가 다르면 같은 페이지 번호로 복구할 때 자료 누락 가능 | 검색을 끝까지 확인하지 않은 결과가 조례 부재로 읽히거나, 복구 중 중간 후보를 빠뜨림 | 남은 페이지를 `PARTIAL`로 표시. 복구는 `RESTART_WITH_PUBLIC_SEARCH`로 공개 검색의 1페이지부터 시작함을 명시. 서로 다른 페이지 크기의 페이지 번호를 직접 변환하지 않음. 다른 지역을 대신 채택하지 않음 | `legal_context.py`, `v3_reliability.py`; 1차 고정시험 통과 |
+| REC-05 / P0 | 통합 후보 요약에서 재정자료의 회계·실제 자료 기준일이 빠짐 | 다른 회계·기준일의 금액 비교 또는 중복 합산 위험 | 원천이 제공한 회계·요청일·실제 기준일·사업코드·연도·단계·단위와 확인상태를 요약·재조회 경로에 보존. 없는 값은 미확인으로 남김 | 후보 요약·`v3_reliability.py` 등; 1차 구현·고정시험 통과 |
+| REC-06 / P0 | 독립적인 정식 업무보고가 앞 의원 질문의 집행부 답변으로 연결됨 | 실제 답변 취지·약속·책임부서의 오귀속 | 질문 뒤 정식보고가 시작되면 앞 QA 답변의 수집을 종료. 정식보고 자체와 원문 위치는 별도 보존. 정상적인 후속 답변은 유지 | `evidence_core.py`; 1차 구현·고정시험 통과 |
+| REC-07 / P0 | `council_legislation_context`가 응답 전체의 `jurisdiction_match`를 각 조례에 적용. 제명 검색의 수원 조례와 본문 검색의 용인 조례가 함께 오면 모두 현지 조례로 분류될 수 있음 | 다른 지자체의 조례를 해당 사업의 법적 근거로 오인 | shared `same_jurisdiction`으로 매 행의 관할 대조. 외지 조례는 비교 후보로만 분류. `중구` 등 모호한 명시 관할은 검색 전에 후보·오류 반환 | 법규 맥락 조립 경로; 1차 고정시험 통과 |
+| REC-08 / P1 | 추가 검색어 3개를 수용하지만 원명·띄어쓰기 변형을 포함한 총 4개 표현 한도에서 마지막 추가 검색어가 제외됨. 제외 사실이 없으면 요청 전체를 검색한 것으로 보임 | 실제 미검색 용어를 검색 0건으로 오인, 후속 재조회 기회 소실 | 4개 호출 한도는 유지. 요청·계획·실제 시도·제외·미시도 용어를 구분하고 `SEARCH_EXPRESSION_LIMIT` 사유, `PARTIAL`, coverage를 반환. 미검색을 자료 없음으로 바꾸지 않음 | 재정 제한 검색 경로; 1차 고정시험 통과 |
 
 최종 검증 기록에는 각 행에 대응하는 테스트 파일·함수, 실호출 request_id, 실제 결과를 기록한다. 고정시험 통과를 실제 원천자료 확인으로 대체하지 않는다.
+
+## 1차 운영 검증에서 추가 발견
+
+| ID / 분류 | 실제 관측·원인 확인 | 후속 수정 기준 | 현재 판정 |
+|---|---|---|---|
+| REC-09 / P1, 원천 오류의 제한된 복구 | `council_recurring_issues`와 `council_peer_cases`가 `소규모 공동주택` 조회에서 `ERROR`. 같은 수원·기간 조건의 직접 대조에서 전체검색은 상류 855건, 공백 포함 내용검색은 `MINTS_HTML`에 `CLIK_ERRORS ERROR11` 문구, 공백 제거 내용검색은 상류 842건 반환 | 원본 조회가 특정 `ERROR11` 조합으로 실패했을 때 공백 제거 검색을 1회만 추가. 원래 질의·실제 질의·실패·재시도·조회범위를 보존하고 `PARTIAL` 표시. 인증·쿼터·네트워크 오류에는 이 복구를 적용하지 않음 | 원인 대조 완료, 후속 최종 검증 PENDING |
+| REC-10 / P1, 조례 비교 출력한도 | 실제 검색한 수원·성남 조례 각 1개를 비교했지만 50,409자 결과가 `OUTPUT_LIMIT`로 반환. 최소 비교 입력에서도 내용을 읽을 수 없음 | 공개 비교의 `offset`·`limit`·`max_chars`와 이어읽기·원문 재조회 경로 제공. 비교 항목을 생략하면 생략범위와 복구방법을 표시. 단순 문자열 절단으로 조문·판본·근거를 훼손하지 않음 | 후속 구현·최종 검증 PENDING |
+| VFY-01 / 검증기 결함 | 원문 도구가 전체 조문을 정상 반환하여 선택적 `excerpt_location`이 없었는데 검사기가 추출 조건 불충족으로 취급. 개정안·근거검토 2개 후속 호출의 ID/hash가 전달되지 않아 미실행 | 선택 필드 부재를 false로 허용하는 명시 조건에 한정해 처리. 정확한 조문 전체·문서 hash·원문 근거 확인은 유지하고 실제 읽기 실패를 통과시키지 않음 | 검증기 수정·별도 5개 고정시험 통과. 최종 전체 실행 PENDING |
+
+REC-09의 855건과 842건은 서로 다른 검색방식의 상류 건수다. 같은 결과집합, 독립 질의 수 또는 공백이 있는 모든 질의의 보편적 장애 규칙을 의미하지 않는다. 제한된 세 호출의 원시 진단은 [native-clik-space.json](evidence/after-r1/diagnostics/native-clik-space.json)에 보존한다.
+
+1차 전체 계획은 41회였고 39회 응답·38종 도구 반환으로 끝났다. 응답 내 도구 오류 3회와 검증기 의존성 미실행 2회를 분리한다. 후속 수정 뒤에는 같은 검증 입력을 다시 실행하되 [첫 결과](evidence/after-r1/summary.json)를 덮어쓰지 않는다.
 
 ## 오늘 수정 전 실호출 증거
 
@@ -44,18 +57,20 @@
 
 이번 결과에는 테스트 실패가 있으면 원인, 수정, 재실행 결과를 함께 남긴다. 같은 실패를 숨기기 위해 시험을 제외하거나 과거 통과 수치를 재사용하지 않는다.
 
-## 최종 검증 기록 — PENDING
+## 검증 기록 — 1차 고정시험 통과, 후속 최종 검증 PENDING
 
 | 항목 | 증거 파일 / 실행 시각 | 결과 |
 |---|---|---|
-| REC-01 공개 인자·schema·전달 | [test_finance_public_search_terms.py](../../tests/test_finance_public_search_terms.py) — 선언·실제 SDK 전달·생략 호환·잘못된 값 거절 | 최종 실행 PENDING |
-| REC-02 후속 후보 발견 상태·축약 | [test_recovery_context_summary.py](../../tests/test_recovery_context_summary.py), `test_followup_candidates_survive_initial_empty_or_failure` | 최종 실행 PENDING |
-| REC-03 요청하지 않은 경로 생략 | 같은 파일의 `test_background_requests_are_opt_in_and_traceable` | 최종 실행 PENDING |
-| REC-04 법규 페이지 부분범위·복구 | [test_recovery_contract_edges.py](../../tests/test_recovery_contract_edges.py), `test_unread_legal_search_page_does_not_become_empty_local_search`, `test_legal_recovery_does_not_skip_candidates_when_adapter_page_size_changes` | 최종 실행 PENDING |
-| REC-05 재정 회계·기준일 보존 | 같은 파일의 `test_fiscal_candidates_keep_account_snapshot_and_government_identity` — 서로 다른 회계와 축약 후 식별자 유지 | 최종 실행 PENDING |
-| REC-06 QA와 정식보고 경계 | [test_recovery_speech_boundaries.py](../../tests/test_recovery_speech_boundaries.py) — 정식보고 보존·QA 제외·정상 답변 유지 | 최종 실행 PENDING |
-| REC-07 조례 행별 관할·모호지역 | [test_legislation_jurisdiction_boundaries.py](../../tests/test_legislation_jurisdiction_boundaries.py) — 수원·용인 행 구분, 모호지역 상류 요청 전 거절 | 최종 실행 PENDING |
-| REC-08 제한 검색의 제외어 표시 | [test_recovery_fiscal_search_scope.py](../../tests/test_recovery_fiscal_search_scope.py), `test_accepted_extra_term_is_not_silently_lost_at_expression_limit` | 최종 실행 PENDING |
-| 기존 전체 고정 회귀시험 | PENDING | PENDING |
-| 배포본 schema·버전·commit | PENDING | PENDING |
-| 실제 4분야 예시 | PENDING | PENDING |
+| REC-01 공개 인자·schema·전달 | [test_finance_public_search_terms.py](../../tests/test_finance_public_search_terms.py) — 선언·실제 SDK 전달·생략 호환·잘못된 값 거절 | PASS (1차 고정시험) |
+| REC-02 후속 후보 발견 상태·축약 | [test_recovery_context_summary.py](../../tests/test_recovery_context_summary.py), `test_followup_candidates_survive_initial_empty_or_failure` | PASS (1차 고정시험) |
+| REC-03 요청하지 않은 경로 생략 | 같은 파일의 `test_background_requests_are_opt_in_and_traceable` | PASS (1차 고정시험) |
+| REC-04 법규 페이지 부분범위·복구 | [test_recovery_contract_edges.py](../../tests/test_recovery_contract_edges.py), `test_unread_legal_search_page_does_not_become_empty_local_search`, `test_legal_recovery_does_not_skip_candidates_when_adapter_page_size_changes` | PASS (1차 고정시험) |
+| REC-05 재정 회계·기준일 보존 | 같은 파일의 `test_fiscal_candidates_keep_account_snapshot_and_government_identity` — 서로 다른 회계와 축약 후 식별자 유지 | PASS (1차 고정시험) |
+| REC-06 QA와 정식보고 경계 | [test_recovery_speech_boundaries.py](../../tests/test_recovery_speech_boundaries.py) — 정식보고 보존·QA 제외·정상 답변 유지 | PASS (1차 고정시험) |
+| REC-07 조례 행별 관할·모호지역 | [test_legislation_jurisdiction_boundaries.py](../../tests/test_legislation_jurisdiction_boundaries.py) — 수원·용인 행 구분, 모호지역 상류 요청 전 거절 | PASS (1차 고정시험) |
+| REC-08 제한 검색의 제외어 표시 | [test_recovery_fiscal_search_scope.py](../../tests/test_recovery_fiscal_search_scope.py), `test_accepted_extra_term_is_not_silently_lost_at_expression_limit` | PASS (1차 고정시험) |
+| 기존 전체 고정 회귀시험 | [pytest-final.txt](evidence/pytest-final.txt) | 1차 791개 PASS |
+| 배포본 schema·버전·commit | [council_status](evidence/after-r1/calls/council_status.json), [tools/list](evidence/after-r1/tools-list.json) | 1차 .5 / de2e6f5 / 40 / MATCH |
+| 실제 4분야 예시 | [1차 실호출](evidence/after-r1/summary.json) | 실제 응답 확보, 부서 첫 범위는 0건; 후속 최종판 PENDING |
+
+REC-01~08을 포함한 1차 전체 고정시험 결과는 [pytest-final.txt](evidence/pytest-final.txt)에 있다. REC-09·10과 VFY-01을 추가한 후속 버전의 최종 시험 수는 이 791개와 별도로 기록한다.

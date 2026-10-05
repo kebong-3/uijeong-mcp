@@ -1,0 +1,229 @@
+{
+  "call": {
+    "id": "budget_review_project",
+    "tool": "budget_review_project",
+    "purpose": "최소 산출안 검산과 승인 보류 상태 확인",
+    "seconds": 0.12,
+    "isError": false,
+    "status": "REVIEW_REQUIRED",
+    "code": null,
+    "classification": "RETURNED",
+    "receipt": {
+      "tool": "budget_review_project",
+      "server_version": "4.1.5-public.1",
+      "request_id": "0df520624fb047eb9b33",
+      "elapsed_ms": 4,
+      "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+    },
+    "arguments": {
+      "title": "[기능검증용 예시] 소규모 공동주택 공동 관리소 산출안",
+      "year": 2026,
+      "components": [
+        {
+          "name": "[기능검증용 예시] 공동 관리소 운영비",
+          "basis": "기능검증을 위한 가상단가 1,000원과 물량 1회. 실제 사업비 또는 공인 단가가 아님.",
+          "unit_price": "1000",
+          "quantity": "1"
+        }
+      ],
+      "topic": "시설",
+      "unit": "원"
+    },
+    "response_file": "calls/budget_review_project.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"REVIEW_REQUIRED\", \"title\": \"[기능검증용 예시] 소규모 공동주택 공동 관리소 산출안\", \"year\": 2026, \"amount_won\": 1000, \"agents\": [{\"agent\": \"A1_자료범위\", \"fiscal_year\": 2026, \"source_state\": \"USER_PROVIDED_ASSUMPTIONS\", \"privacy\": \"공개 가능한 산출자료만 입력. 비공개 자료는 승인된 로컬 환경에서 처리.\", \"input_hash\": \"c45601d1191663bf7275cd5037756441e770eb5b49c412bcba23c2836ad89629\", \"scope_missing\": [\"beneficiaries\", \"delivery_period\", \"service_level\"]}, {\"agent\": \"A2_예산산출\", \"ledger\": {\"analysis\": \"사용자 가정에 따른 소요예산 계산\", \"dataset_ids\": [], \"unit\": \"원\", \"summary\": {\"total_won\": 1000, \"note\": \"입력 항목만 계산합니다. 주휴·퇴직·보험료·부가세·법정단가를 자동 포함/검증하지 않습니다.\"}, \"items\": [{\"name\": \"[기능검증용 예시] 공동 관리소 운영비\", \"amount_won\": 1000, \"formula\": \"1000원 × 1 × 1 × 1\", \"basis\": \"기능검증을 위한 가상단가 1,000원과 물량 1회. 실제 사업비 또는 공인 단가가 아님.\", \"rounding\": \"행별 원 단위 반올림\"}]}, \"ledger_hash\": \"679056651fc6b23279bb63e7d8216c4349f166e2310567ced6c7aa83dcd7cfbc\", \"challenge\": \"입력에 없는 보험료·세금·유지비는 총액에 포함되었다고 해석할 수 없습니다.\"}, {\"agent\": \"A3_근거절차\", \"checklist\": {\"topic\": \"시설\", \"year\": 2026, \"items\": [{\"category\": \"연도·단계\", \"question\": \"요구안·본예산·추경·예산현액·결산 중 어떤 금액인가?\", \"status\": \"확인 필요\"}, {\"category\": \"통계목\", \"question\": \"지출의 실질과 당해 연도 편성목·통계목 설명을 대조했는가?\", \"status\": \"확인 필요\"}, {\"category\": \"근거\", \"question\": \"단가·물량·기간과 근거 문서의 해당 페이지/조문을 제시했는가?\", \"status\": \"확인 필요\"}, {\"category\": \"사업 범위\", \"question\": \"토지·공사·설계·감리·물품·운영비와 다년도 총사업비를 구분했는가?\", \"status\": \"확인 필요\"}, {\"category\": \"사전절차\", \"question\": \"투자심사·중기재정계획·공유재산 절차 등의 적용 여부를 최신 기준에서 확인했는가?\", \"status\": \"확인 필요\"}, {\"category\": \"재정부담\", \"question\": \"시설 개관 후 인력·유지보수·운영비를 별도로 산출했는가?\", \"status\": \"확인 필요\"}], \"basis_verified\": false, \"note\": \"검토 질문 목록입니다. 특정 심사·동의 의무나 금액기준의 적용을 확정하지 않습니다.\", \"source_candidates\": [{\"id\": \"law\", \"name\": \"국가법령정보 공동활용\", \"url\": \"https://open.law.go.kr/LSO/openApi/guideList.do\", \"purpose\": \"지방재정법·지방회계법·보조금법령·행정규칙 검색\", \"status\": \"목록검색 어댑터 구현; 실키 호출 미검증\"}, {\"id\": \"law_admrul\", \"name\": \"행정규칙 목록 API\", \"url\": \"https://open.law.go.kr/LSO/openApi/guideResult.do?htmlName=admrulListGuide\", \"purpose\": \"예산편성 운영기준·회계관리 훈령 등의 목록·시행일 확인\", \"status\": \"공식 명세 확인\"}, {\"id\": \"mois\", \"name\": \"행정안전부 지방재정 업무\", \"url\": \"https://www.mois.go.kr/frt/sub/a06/b07/localTaxMainBis/screen.do\", \"purpose\": \"연도별 운영기준·업무편람 원문 확보\", \"status\": \"최신 연도 원문은 별도 확보·검수 필요\"}]}, \"legal_eligibility\": \"NOT_DETERMINED\", \"challenge\": \"산출액이 계산되었다는 사실은 편성가능·보조대상·사전절차 완료의 증거가 아닙니다.\"}, {\"agent\": \"A4_교차검토\", \"arithmetic_reconciled\": true, \"meeting\": [{\"from\": \"A1_자료범위\", \"to\": \"A2_예산산출\", \"issue\": \"사업대상·기간·서비스 수준이 비교에 충분한가?\", \"response\": \"명시적 누락을 유지하고 입력 산식만 계산\", \"unresolved\": [\"beneficiaries\", \"delivery_period\", \"service_level\"]}, {\"from\": \"A2_예산산출\", \"to\": \"A3_근거절차\", \"issue\": \"산출내역의 적용단가와 과목 근거가 확보되었는가?\", \"response\": \"입력 basis는 가정이며 공식 승인으로 승격하지 않음\", \"unresolved\": [\"당해연도 지침·조문·별표 대조\"]}, {\"from\": \"A3_근거절차\", \"to\": \"A4_교차검토\", \"issue\": \"총액·법적판단·미확인 사항을 섞지 않았는가?\", \"response\": \"총액 재계산과 해시 일치 확인; 적법성·정책우선순위 판단은 보류\", \"unresolved\": [\"담당부서 확인\", \"기관 보안기준 확인\"]}], \"conclusion\": \"REVIEW_REQUIRED\", \"human_decisions\": [\"예산과목 확정\", \"단가·규격 검수\", \"법령·조례 및 사전절차 확인\"]}], \"ledger_hash\": \"679056651fc6b23279bb63e7d8216c4349f166e2310567ced6c7aa83dcd7cfbc\", \"brief\": {\"사업명\": \"[기능검증용 예시] 소규모 공동주택 공동 관리소 산출안\", \"회계연도\": 2026, \"요구액_원\": 1000, \"산출근거\": [{\"name\": \"[기능검증용 예시] 공동 관리소 운영비\", \"amount_won\": 1000, \"formula\": \"1000원 × 1 × 1 × 1\", \"basis\": \"기능검증을 위한 가상단가 1,000원과 물량 1회. 실제 사업비 또는 공인 단가가 아님.\", \"rounding\": \"행별 원 단위 반올림\"}], \"법적근거\": \"확인 필요\", \"추가확인\": [\"beneficiaries\", \"delivery_period\", \"service_level\", \"예산과목 확정\", \"단가·규격 검수\", \"법령·조례 및 사전절차 확인\"]}, \"method\": \"외부 LLM 호출 없이 네 Python 역할이 자료 인계·반론·재검산을 수행. 네 독립 전문가의 승인 아님.\", \"mcp_receipt\": {\"tool\": \"budget_review_project\", \"server_version\": \"4.1.5-public.1\", \"request_id\": \"0df520624fb047eb9b33\", \"elapsed_ms\": 4, \"meaning\": \"서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요.\"}}",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "REVIEW_REQUIRED",
+      "title": "[기능검증용 예시] 소규모 공동주택 공동 관리소 산출안",
+      "year": 2026,
+      "amount_won": 1000,
+      "agents": [
+        {
+          "agent": "A1_자료범위",
+          "fiscal_year": 2026,
+          "source_state": "USER_PROVIDED_ASSUMPTIONS",
+          "privacy": "공개 가능한 산출자료만 입력. 비공개 자료는 승인된 로컬 환경에서 처리.",
+          "input_hash": "c45601d1191663bf7275cd5037756441e770eb5b49c412bcba23c2836ad89629",
+          "scope_missing": [
+            "beneficiaries",
+            "delivery_period",
+            "service_level"
+          ]
+        },
+        {
+          "agent": "A2_예산산출",
+          "ledger": {
+            "analysis": "사용자 가정에 따른 소요예산 계산",
+            "dataset_ids": [],
+            "unit": "원",
+            "summary": {
+              "total_won": 1000,
+              "note": "입력 항목만 계산합니다. 주휴·퇴직·보험료·부가세·법정단가를 자동 포함/검증하지 않습니다."
+            },
+            "items": [
+              {
+                "name": "[기능검증용 예시] 공동 관리소 운영비",
+                "amount_won": 1000,
+                "formula": "1000원 × 1 × 1 × 1",
+                "basis": "기능검증을 위한 가상단가 1,000원과 물량 1회. 실제 사업비 또는 공인 단가가 아님.",
+                "rounding": "행별 원 단위 반올림"
+              }
+            ]
+          },
+          "ledger_hash": "679056651fc6b23279bb63e7d8216c4349f166e2310567ced6c7aa83dcd7cfbc",
+          "challenge": "입력에 없는 보험료·세금·유지비는 총액에 포함되었다고 해석할 수 없습니다."
+        },
+        {
+          "agent": "A3_근거절차",
+          "checklist": {
+            "topic": "시설",
+            "year": 2026,
+            "items": [
+              {
+                "category": "연도·단계",
+                "question": "요구안·본예산·추경·예산현액·결산 중 어떤 금액인가?",
+                "status": "확인 필요"
+              },
+              {
+                "category": "통계목",
+                "question": "지출의 실질과 당해 연도 편성목·통계목 설명을 대조했는가?",
+                "status": "확인 필요"
+              },
+              {
+                "category": "근거",
+                "question": "단가·물량·기간과 근거 문서의 해당 페이지/조문을 제시했는가?",
+                "status": "확인 필요"
+              },
+              {
+                "category": "사업 범위",
+                "question": "토지·공사·설계·감리·물품·운영비와 다년도 총사업비를 구분했는가?",
+                "status": "확인 필요"
+              },
+              {
+                "category": "사전절차",
+                "question": "투자심사·중기재정계획·공유재산 절차 등의 적용 여부를 최신 기준에서 확인했는가?",
+                "status": "확인 필요"
+              },
+              {
+                "category": "재정부담",
+                "question": "시설 개관 후 인력·유지보수·운영비를 별도로 산출했는가?",
+                "status": "확인 필요"
+              }
+            ],
+            "basis_verified": false,
+            "note": "검토 질문 목록입니다. 특정 심사·동의 의무나 금액기준의 적용을 확정하지 않습니다.",
+            "source_candidates": [
+              {
+                "id": "law",
+                "name": "국가법령정보 공동활용",
+                "url": "https://open.law.go.kr/LSO/openApi/guideList.do",
+                "purpose": "지방재정법·지방회계법·보조금법령·행정규칙 검색",
+                "status": "목록검색 어댑터 구현; 실키 호출 미검증"
+              },
+              {
+                "id": "law_admrul",
+                "name": "행정규칙 목록 API",
+                "url": "https://open.law.go.kr/LSO/openApi/guideResult.do?htmlName=admrulListGuide",
+                "purpose": "예산편성 운영기준·회계관리 훈령 등의 목록·시행일 확인",
+                "status": "공식 명세 확인"
+              },
+              {
+                "id": "mois",
+                "name": "행정안전부 지방재정 업무",
+                "url": "https://www.mois.go.kr/frt/sub/a06/b07/localTaxMainBis/screen.do",
+                "purpose": "연도별 운영기준·업무편람 원문 확보",
+                "status": "최신 연도 원문은 별도 확보·검수 필요"
+              }
+            ]
+          },
+          "legal_eligibility": "NOT_DETERMINED",
+          "challenge": "산출액이 계산되었다는 사실은 편성가능·보조대상·사전절차 완료의 증거가 아닙니다."
+        },
+        {
+          "agent": "A4_교차검토",
+          "arithmetic_reconciled": true,
+          "meeting": [
+            {
+              "from": "A1_자료범위",
+              "to": "A2_예산산출",
+              "issue": "사업대상·기간·서비스 수준이 비교에 충분한가?",
+              "response": "명시적 누락을 유지하고 입력 산식만 계산",
+              "unresolved": [
+                "beneficiaries",
+                "delivery_period",
+                "service_level"
+              ]
+            },
+            {
+              "from": "A2_예산산출",
+              "to": "A3_근거절차",
+              "issue": "산출내역의 적용단가와 과목 근거가 확보되었는가?",
+              "response": "입력 basis는 가정이며 공식 승인으로 승격하지 않음",
+              "unresolved": [
+                "당해연도 지침·조문·별표 대조"
+              ]
+            },
+            {
+              "from": "A3_근거절차",
+              "to": "A4_교차검토",
+              "issue": "총액·법적판단·미확인 사항을 섞지 않았는가?",
+              "response": "총액 재계산과 해시 일치 확인; 적법성·정책우선순위 판단은 보류",
+              "unresolved": [
+                "담당부서 확인",
+                "기관 보안기준 확인"
+              ]
+            }
+          ],
+          "conclusion": "REVIEW_REQUIRED",
+          "human_decisions": [
+            "예산과목 확정",
+            "단가·규격 검수",
+            "법령·조례 및 사전절차 확인"
+          ]
+        }
+      ],
+      "ledger_hash": "679056651fc6b23279bb63e7d8216c4349f166e2310567ced6c7aa83dcd7cfbc",
+      "brief": {
+        "사업명": "[기능검증용 예시] 소규모 공동주택 공동 관리소 산출안",
+        "회계연도": 2026,
+        "요구액_원": 1000,
+        "산출근거": [
+          {
+            "name": "[기능검증용 예시] 공동 관리소 운영비",
+            "amount_won": 1000,
+            "formula": "1000원 × 1 × 1 × 1",
+            "basis": "기능검증을 위한 가상단가 1,000원과 물량 1회. 실제 사업비 또는 공인 단가가 아님.",
+            "rounding": "행별 원 단위 반올림"
+          }
+        ],
+        "법적근거": "확인 필요",
+        "추가확인": [
+          "beneficiaries",
+          "delivery_period",
+          "service_level",
+          "예산과목 확정",
+          "단가·규격 검수",
+          "법령·조례 및 사전절차 확인"
+        ]
+      },
+      "method": "외부 LLM 호출 없이 네 Python 역할이 자료 인계·반론·재검산을 수행. 네 독립 전문가의 승인 아님.",
+      "mcp_receipt": {
+        "tool": "budget_review_project",
+        "server_version": "4.1.5-public.1",
+        "request_id": "0df520624fb047eb9b33",
+        "elapsed_ms": 4,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      }
+    },
+    "isError": false
+  }
+}

@@ -1,8 +1,21 @@
-# 실제 업무 예시 — 실행·출력 PENDING
+# 실제 업무 예시 — 1차 응답 확보, 후속 최종판 PENDING
 
-아래 네 호출은 `4.1.4-public.4`의 실제 공개 schema와 대조한 재현 입력이다. **이 문서 작성 시점에 2026-10-05의 실제 출력은 아직 받지 않았다.** 입력 계획을 조회 결과로 표시하지 않는다. 기계 판독용 입력은 [example-calls.json](example-calls.json)에 있다.
+아래 네 호출은 처음 제안한 재현 입력이며 `4.1.4-public.4`의 실제 공개 schema와 대조했다. 1차 `4.1.5-public.1` 검증에서는 더 작은 문서·표시 한도를 사용하는 입력 inventory로 네 도구의 실제 응답을 받았다. **제안 입력과 실제 실행 입력을 구분한다.** 실행한 값은 아래 원시 파일의 `call.arguments`에 있으며, 후속 `4.1.5-public.2`의 최종 실제 예시는 아직 PENDING이다. 최초 제안 입력은 [example-calls.json](example-calls.json)에 보존한다.
 
 지역은 명시적으로 수원시를 지정한다. 기존 확인자료가 있는 동일 시나리오를 우선 재검증하는 것이며, 이 네 사례만으로 전국 일반화 성능을 주장하지 않는다.
+
+## 1차 실제 결과의 핵심
+
+| 분야 | 실제 1차 결과 | 확인된 범위·한계 | 원시 근거 |
+|---|---|---|---|
+| 부서 의회대응 | `PARTIAL`. 회의록 1개·발언 후보 7개를 검토했고 해당 부서로 분류된 답변은 0건 | 상류 `건축과` 검색 1,260건 중 1개만 읽었고 다음 offset=1. 부서 전체 질의가 없다는 의미가 아님. 실제 답변을 보여주는 양성 예시는 후속 추가조회 예정 | [council_department_brief](evidence/after-r1/calls/council_department_brief.json) |
+| 사업예산 | `빌라가꿈관리소` 원명은 0건, 추가어 `소규모 공동주택`으로 수원 관련 사업 3개 발견 | 실제 기준일 2026-10-04, 일반회계. 후보는 안전점검 지원·노후 공동주택 유지관리·소규모 공동주택 활성화. 단위 및 같은 사업 관계는 미확인 | [council_finance_context](evidence/after-r1/calls/council_finance_context.json) |
+| 조례 | `제5조의2(공동 관리소 설치 등)`을 원문과 같은 label/key로 반환 | 청소·안전 등 주거환경 개선을 위한 공동 관리소 설치·운영 규정 확인. 지정 판본 시행일 2025-12-31; 조회 기준일의 최신 판본은 별도 확인 필요 | [ordinance_get_document](evidence/after-r1/calls/ordinance_get_document.json) |
+| 통합검토 | 법규·재정 각각 후보 3개, 대표 상태 `PARTIAL`, `candidate_status=CANDIDATES_FOUND` | 초기 `EMPTY`와 후속 발견을 구분. 재정 후보의 일반회계·20261004·기관코드 보존. 의원자료·정책배경 `SKIPPED`. 동일사업·법적 승인·제출완료를 확정하지 않음 | [council_context_pack](evidence/after-r1/calls/council_context_pack.json) |
+
+예산 예시에서 `소규모 공동주택 활성화` 사업코드는 `37400002025302B6`이다. API가 현액 원시값 `627780000`, 지출 원시값 `443022560`을 반환했지만 `amount_unit=SOURCE_CONFIRMATION_REQUIRED`이므로 원 단위 금액으로 환산하지 않았다. 이 사업 전체를 빌라가꿈관리소의 확정 예산으로 귀속하지도 않았다.
+
+1차 최소입력의 실제 자료와 별개로, 아래 제안 입력에 대응한 최종 출력란은 후속 검증 때 채운다.
 
 ## 1. 부서 의회대응
 
@@ -115,9 +128,11 @@ ID/MST는 이전 실제 공식 API 반환 식별자다. 같은 판본의 원문�
 
 | 예시 | 실행시각 KST | 서버 버전 / commit | 상태·반환범위 | 실제 결과 파일 | request_id |
 |---|---|---|---|---|---|
-| 부서 의회대응 | PENDING | PENDING | PENDING | PENDING | PENDING |
-| 사업예산 | PENDING | PENDING | PENDING | PENDING | PENDING |
-| 조례 검토 | PENDING | PENDING | PENDING | PENDING | PENDING |
-| 통합검토 | PENDING | PENDING | PENDING | PENDING | PENDING |
+| 부서 의회대응 (1차) | 2026-10-05 22:56:25 | 4.1.5-public.1 / de2e6f5 | PARTIAL, 1개 문서에서 부서 답변 0건 | [원시 응답](evidence/after-r1/calls/council_department_brief.json) | `e74e50e2dc7c4660854b` |
+| 사업예산 (1차) | 2026-10-05 22:56:41 | 4.1.5-public.1 / de2e6f5 | COMPLETE, 관련 사업 3개; 단위·동일사업 미확인 | [원시 응답](evidence/after-r1/calls/council_finance_context.json) | `ec4b8eb0e46843e6ae3b` |
+| 조례 검토 (1차) | 2026-10-05 22:56:46경 원문 수집 | 4.1.5-public.1 / de2e6f5 | retrieved, 해당 조문 1개 | [원시 응답](evidence/after-r1/calls/ordinance_get_document.json) | `dd850cafd2c14663adf7` |
+| 통합검토 (1차) | 원시 요청순서·stage trace 참조 | 4.1.5-public.1 / de2e6f5 | PARTIAL, 법규·재정 후보 각 3개 | [원시 응답](evidence/after-r1/calls/council_context_pack.json) | 출력에 receipt 미포함; trace 보존 |
+
+후속 최종 버전의 4분야 결과와 양성 부서 예시는 PENDING이다.
 
 원시 응답은 근거이고 사용자 예시는 읽기 쉬운 실제 결과 요약이다. 결과 JSON을 임의 길이에서 잘라 문서가 끊기게 만들지 않는다. 오류·부분완료·미확인 상태가 있으면 해당 예시 안에 함께 기록한다.

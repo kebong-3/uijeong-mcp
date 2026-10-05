@@ -138,6 +138,14 @@ async def _peer_cases(
                 searchKeyword=term,
                 sort="MTG_DE/DESC",
             )
+            recovery = obj.get("query_recovery")
+            if recovery:
+                recovery = {**recovery, "local_filters": {"date_from": date_from, "date_to": date_to}}
+                errors.append({
+                    "source": "CLIK", "stage": "nationwide_list_query_recovery", "term": term,
+                    "code": "ERROR11", "query_recovery": recovery,
+                    "message": "원문구 내용검색 실패 후 공백 제거 검색을 확인했습니다. 원문구 조회 실패 범위는 미확인입니다.",
+                })
             rows = U._rows(obj)
             accepted = 0
             for row in rows:
@@ -150,15 +158,24 @@ async def _peer_cases(
                 elif term not in list_candidates[docid]["_matched_terms"]:
                     list_candidates[docid]["_matched_terms"].append(term)
                 accepted += 1
-            list_calls.append({
+            list_call = {
                 "term": term,
                 "upstream_total": int(obj.get("TOTAL_COUNT") or 0),
                 "rows_received": len(rows),
                 "rows_in_period": accepted,
-            })
+            }
+            if recovery:
+                list_call["query_recovery"] = recovery
+            list_calls.append(list_call)
         except Exception as exc:
-            errors.append({"source": "CLIK", "stage": "nationwide_list", "term": term,
-                           "message": R.safe_error(exc)})
+            failure = {"source": "CLIK", "stage": "nationwide_list", "term": term,
+                       "message": R.safe_error(exc)}
+            if isinstance(exc, getattr(U, "ClikError", ())):
+                if exc.query_recovery:
+                    exc.query_recovery = {**exc.query_recovery,
+                        "local_filters": {"date_from": date_from, "date_to": date_to}}
+                failure.update(exc.diagnostics())
+            errors.append(failure)
 
     candidates = sorted(
         list_candidates.values(),
@@ -219,6 +236,9 @@ async def _peer_cases(
                            "message": R.safe_error(exc)})
 
     status = _coverage_status(errors=errors, returned=len(cases), requested=case_count)
+    if status == "ERROR" and any(x.get("query_recovery", {}).get("recovered") for x in list_calls):
+        # A successful fallback listing (including zero rows) is usable partial coverage.
+        status = "PARTIAL"
     limited = details_checked >= max_details or any(x["upstream_total"] > x["rows_received"] for x in list_calls)
     if limited and len(cases) < case_count and status == "EMPTY":
         status = "PARTIAL"

@@ -1,0 +1,32 @@
+{
+  "call": {
+    "id": "council_find_council",
+    "tool": "council_find_council",
+    "purpose": "수원시의 공식 의회 식별자 확인",
+    "seconds": 0.12,
+    "isError": false,
+    "status": null,
+    "code": null,
+    "classification": "RETURNED",
+    "receipt": null,
+    "arguments": {
+      "query": "수원시"
+    },
+    "response_file": "calls/council_find_council.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "'수원시' 검색 결과 1건\n- 경기도 수원시의회 (ID: 031014)",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "result": "'수원시' 검색 결과 1건\n- 경기도 수원시의회 (ID: 031014)"
+    },
+    "isError": false
+  }
+}

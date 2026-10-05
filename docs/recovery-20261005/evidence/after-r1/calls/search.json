@@ -1,0 +1,83 @@
+{
+  "call": {
+    "id": "search",
+    "tool": "search",
+    "purpose": "표준 지식검색의 실제 반환 ID 확보",
+    "seconds": 3.55,
+    "isError": false,
+    "status": null,
+    "code": null,
+    "classification": "RETURNED",
+    "receipt": null,
+    "arguments": {
+      "query": "수원시 빌라가꿈관리소"
+    },
+    "response_file": "calls/search.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"results\": [\n    {\n      \"id\": \"uc1_eyJ2IjoxLCJyIjoiQ0xJS0MyNDc5MzU4MDg2NzE0OTE1IiwidCI6MjE5LCJ1IjoiaHR0cHM6Ly9jbGlrLm5hbmV0LmdvLmtyLyJ9\",\n      \"title\": \"경기도 수원시의회 · 2026.07.15. · 도시미래위원회 · 발언 [CLIK 원문링크 미제공]\",\n      \"url\": \"https://clik.nanet.go.kr/\"\n    },\n    {\n      \"id\": \"uc1_eyJ2IjoxLCJyIjoiQ0xJS0MyNDc5MzU4MDg2NzE0OTE1IiwidCI6MjY5LCJ1IjoiaHR0cHM6Ly9jbGlrLm5hbmV0LmdvLmtyLyJ9\",\n      \"title\": \"경기도 수원시의회 · 2026.07.15. · 도시미래위원회 · 발언 [CLIK 원문링크 미제공]\",\n      \"url\": \"https://clik.nanet.go.kr/\"\n    },\n    {\n      \"id\": \"uc1_eyJ2IjoxLCJyIjoiQ0xJS0MyNDc5MzU4MDg2NzE0OTE1IiwidCI6Mjg3LCJ1IjoiaHR0cHM6Ly9jbGlrLm5hbmV0LmdvLmtyLyJ9\",\n      \"title\": \"경기도 수원시의회 · 2026.07.15. · 도시미래위원회 · 발언 [CLIK 원문링크 미제공]\",\n      \"url\": \"https://clik.nanet.go.kr/\"\n    },\n    {\n      \"id\": \"uc1_eyJ2IjoxLCJyIjoiQ0xJS0MyNDc5MzU4MDg2NzE0OTE1IiwidCI6Mjk1LCJ1IjoiaHR0cHM6Ly9jbGlrLm5hbmV0LmdvLmtyLyJ9\",\n      \"title\": \"경기도 수원시의회 · 2026.07.15. · 도시미래위원회 · 발언 [CLIK 원문링크 미제공]\",\n      \"url\": \"https://clik.nanet.go.kr/\"\n    },\n    {\n      \"id\": \"uc1_eyJ2IjoxLCJyIjoiQ0xJS0MyNDc5MzU4MDg2NzE0OTE1IiwidCI6MzMzLCJ1IjoiaHR0cHM6Ly9jbGlrLm5hbmV0LmdvLmtyLyJ9\",\n      \"title\": \"경기도 수원시의회 · 2026.07.15. · 도시미래위원회 · 발언 [CLIK 원문링크 미제공]\",\n      \"url\": \"https://clik.nanet.go.kr/\"\n    },\n    {\n      \"id\": \"uc1_eyJ2IjoxLCJyIjoiQ0xJS0MyNDc5MzU4MDg2NzE0OTE1IiwidCI6MzY5LCJ1IjoiaHR0cHM6Ly9jbGlrLm5hbmV0LmdvLmtyLyJ9\",\n      \"title\": \"경기도 수원시의회 · 2026.07.15. · 도시미래위원회 · 발언 [CLIK 원문링크 미제공]\",\n      \"url\": \"https://clik.nanet.go.kr/\"\n    },\n    {\n      \"id\": \"uc1_eyJ2IjoxLCJyIjoiQ0xJS0MyNDc5MzU4MDg2NzE0OTE1IiwidCI6NDQxLCJ1IjoiaHR0cHM6Ly9jbGlrLm5hbmV0LmdvLmtyLyJ9\",\n      \"title\": \"경기도 수원시의회 · 2026.07.15. · 도시미래위원회 · 발언 [CLIK 원문링크 미제공]\",\n      \"url\": \"https://clik.nanet.go.kr/\"\n    },\n    {\n      \"id\": \"uc1_eyJ2IjoxLCJyIjoiQ0xJS0MyNzk5MDQyNDY4MDQ0OTg0IiwidCI6MjE5LCJ1IjoiaHR0cHM6Ly9jbGlrLm5hbmV0LmdvLmtyLyJ9\",\n      \"title\": \"경기도 수원시의회 · 2026.07.15. · 도시미래위원회 · 발언 [CLIK 원문링크 미제공]\",\n      \"url\": \"https://clik.nanet.go.kr/\"\n    },\n    {\n      \"id\": \"uc1_eyJ2IjoxLCJyIjoiQ0xJS0MyNzk5MDQyNDY4MDQ0OTg0IiwidCI6MjY5LCJ1IjoiaHR0cHM6Ly9jbGlrLm5hbmV0LmdvLmtyLyJ9\",\n      \"title\": \"경기도 수원시의회 · 2026.07.15. · 도시미래위원회 · 발언 [CLIK 원문링크 미제공]\",\n      \"url\": \"https://clik.nanet.go.kr/\"\n    },\n    {\n      \"id\": \"uc1_eyJ2IjoxLCJyIjoiQ0xJS0MyNzk5MDQyNDY4MDQ0OTg0IiwidCI6Mjg3LCJ1IjoiaHR0cHM6Ly9jbGlrLm5hbmV0LmdvLmtyLyJ9\",\n      \"title\": \"경기도 수원시의회 · 2026.07.15. · 도시미래위원회 · 발언 [CLIK 원문링크 미제공]\",\n      \"url\": \"https://clik.nanet.go.kr/\"\n    }\n  ]\n}",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "results": [
+        {
+          "id": "uc1_eyJ2IjoxLCJyIjoiQ0xJS0MyNDc5MzU4MDg2NzE0OTE1IiwidCI6MjE5LCJ1IjoiaHR0cHM6Ly9jbGlrLm5hbmV0LmdvLmtyLyJ9",
+          "title": "경기도 수원시의회 · 2026.07.15. · 도시미래위원회 · 발언 [CLIK 원문링크 미제공]",
+          "url": "https://clik.nanet.go.kr/"
+        },
+        {
+          "id": "uc1_eyJ2IjoxLCJyIjoiQ0xJS0MyNDc5MzU4MDg2NzE0OTE1IiwidCI6MjY5LCJ1IjoiaHR0cHM6Ly9jbGlrLm5hbmV0LmdvLmtyLyJ9",
+          "title": "경기도 수원시의회 · 2026.07.15. · 도시미래위원회 · 발언 [CLIK 원문링크 미제공]",
+          "url": "https://clik.nanet.go.kr/"
+        },
+        {
+          "id": "uc1_eyJ2IjoxLCJyIjoiQ0xJS0MyNDc5MzU4MDg2NzE0OTE1IiwidCI6Mjg3LCJ1IjoiaHR0cHM6Ly9jbGlrLm5hbmV0LmdvLmtyLyJ9",
+          "title": "경기도 수원시의회 · 2026.07.15. · 도시미래위원회 · 발언 [CLIK 원문링크 미제공]",
+          "url": "https://clik.nanet.go.kr/"
+        },
+        {
+          "id": "uc1_eyJ2IjoxLCJyIjoiQ0xJS0MyNDc5MzU4MDg2NzE0OTE1IiwidCI6Mjk1LCJ1IjoiaHR0cHM6Ly9jbGlrLm5hbmV0LmdvLmtyLyJ9",
+          "title": "경기도 수원시의회 · 2026.07.15. · 도시미래위원회 · 발언 [CLIK 원문링크 미제공]",
+          "url": "https://clik.nanet.go.kr/"
+        },
+        {
+          "id": "uc1_eyJ2IjoxLCJyIjoiQ0xJS0MyNDc5MzU4MDg2NzE0OTE1IiwidCI6MzMzLCJ1IjoiaHR0cHM6Ly9jbGlrLm5hbmV0LmdvLmtyLyJ9",
+          "title": "경기도 수원시의회 · 2026.07.15. · 도시미래위원회 · 발언 [CLIK 원문링크 미제공]",
+          "url": "https://clik.nanet.go.kr/"
+        },
+        {
+          "id": "uc1_eyJ2IjoxLCJyIjoiQ0xJS0MyNDc5MzU4MDg2NzE0OTE1IiwidCI6MzY5LCJ1IjoiaHR0cHM6Ly9jbGlrLm5hbmV0LmdvLmtyLyJ9",
+          "title": "경기도 수원시의회 · 2026.07.15. · 도시미래위원회 · 발언 [CLIK 원문링크 미제공]",
+          "url": "https://clik.nanet.go.kr/"
+        },
+        {
+          "id": "uc1_eyJ2IjoxLCJyIjoiQ0xJS0MyNDc5MzU4MDg2NzE0OTE1IiwidCI6NDQxLCJ1IjoiaHR0cHM6Ly9jbGlrLm5hbmV0LmdvLmtyLyJ9",
+          "title": "경기도 수원시의회 · 2026.07.15. · 도시미래위원회 · 발언 [CLIK 원문링크 미제공]",
+          "url": "https://clik.nanet.go.kr/"
+        },
+        {
+          "id": "uc1_eyJ2IjoxLCJyIjoiQ0xJS0MyNzk5MDQyNDY4MDQ0OTg0IiwidCI6MjE5LCJ1IjoiaHR0cHM6Ly9jbGlrLm5hbmV0LmdvLmtyLyJ9",
+          "title": "경기도 수원시의회 · 2026.07.15. · 도시미래위원회 · 발언 [CLIK 원문링크 미제공]",
+          "url": "https://clik.nanet.go.kr/"
+        },
+        {
+          "id": "uc1_eyJ2IjoxLCJyIjoiQ0xJS0MyNzk5MDQyNDY4MDQ0OTg0IiwidCI6MjY5LCJ1IjoiaHR0cHM6Ly9jbGlrLm5hbmV0LmdvLmtyLyJ9",
+          "title": "경기도 수원시의회 · 2026.07.15. · 도시미래위원회 · 발언 [CLIK 원문링크 미제공]",
+          "url": "https://clik.nanet.go.kr/"
+        },
+        {
+          "id": "uc1_eyJ2IjoxLCJyIjoiQ0xJS0MyNzk5MDQyNDY4MDQ0OTg0IiwidCI6Mjg3LCJ1IjoiaHR0cHM6Ly9jbGlrLm5hbmV0LmdvLmtyLyJ9",
+          "title": "경기도 수원시의회 · 2026.07.15. · 도시미래위원회 · 발언 [CLIK 원문링크 미제공]",
+          "url": "https://clik.nanet.go.kr/"
+        }
+      ]
+    },
+    "isError": false
+  }
+}
