@@ -1,0 +1,14 @@
+{
+  "connector": "existing Render MCP connector",
+  "version": "4.1.4-public.4",
+  "deployment_commit": "305c0468374b44377966870b5cb6b34132de648f",
+  "tool_count": 40,
+  "status": "COMPLETE",
+  "release_verification": {
+    "status": "MATCH",
+    "expected_version": "4.1.4-public.4",
+    "different_paths": [],
+    "file_count": 80,
+    "note": "파일 내용 일치 확인이며 제작자 서명·실제 클라이언트 인증 성공을 증명하지 않습니다."
+  }
+}

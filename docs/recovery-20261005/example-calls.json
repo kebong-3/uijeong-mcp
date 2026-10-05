@@ -1,33 +1,75 @@
 {
-  "prepared_on": "2026-10-05",
+  "recorded_on": "2026-10-05",
   "timezone": "Asia/Seoul",
-  "schema_basis": "4.1.4-public.4 live tools/list",
-  "execution_status": "PENDING",
+  "schema_basis": "4.1.5-public.2 actual server tools/list via MCP SDK",
+  "server_version": "4.1.5-public.2",
+  "code_commit": "541cd09b95fa233d5bed003045a5b49a28dd5c31",
+  "tool_schema_sha256": "4507baf3e18b62e927b6ce7c5530aa658a77afdd0efb4774509a864485fa0b26",
+  "execution_status": "EXECUTED_WITH_SOURCE_SCOPE_RECORDED",
+  "host_metadata_scope_file": "evidence/after-r2/host-metadata-scope.json",
+  "host_connection_refresh_performed": false,
   "examples": [
     {
       "id": "department",
       "tool": "council_department_brief",
       "arguments": {
         "department": "건축과",
-        "council": "수원시의회",
-        "date_from": "2025-01-01",
-        "date_to": "2026-10-05",
+        "council": "수원시",
+        "date_from": "2026-07-15",
+        "date_to": "2026-07-15",
+        "committee": "도시미래위원회",
         "max_docs": 2,
-        "source": "clik",
-        "limit": 3
+        "limit": 3,
+        "source": "clik"
+      },
+      "execution_status": "EXECUTED",
+      "observed_status": "PARTIAL",
+      "result_file": "evidence/after-r2/department-located-meeting.json",
+      "receipt": {
+        "request_id": "04686bf33e6a42a6aa2e",
+        "tool": "council_department_brief",
+        "server_version": "4.1.5-public.2",
+        "returned_at": "2026-10-05T23:20:18.368721+09:00",
+        "elapsed_ms": 326,
+        "result_reuse": "fresh",
+        "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+      },
+      "scope_note": "Actual located meeting from the preceding evidence bundle/read_source metadata; not exhaustive period coverage. Substantive example is answered_items[1], turns 269 to 270. The 80 classified events are not 80 independent questions.",
+      "source_location": {
+        "document_id": "CLIKC2479358086714915",
+        "question_turn": 269,
+        "answer_turn": 270,
+        "questioner": "김은수 위원",
+        "answerer": "건축과장 이순헌"
       }
     },
     {
       "id": "budget",
       "tool": "council_finance_context",
       "arguments": {
-        "topic": "소규모 공동주택 활성화",
+        "topic": "빌라가꿈관리소",
         "council": "수원시",
         "fiscal_year": 2026,
-        "snapshot_date": "2026-10-05",
+        "snapshot_date": "20261005",
         "budget_stage": "current",
+        "search_terms": [
+          "소규모 공동주택"
+        ],
         "limit": 3
-      }
+      },
+      "execution_status": "EXECUTED",
+      "observed_status": "COMPLETE",
+      "result_file": "evidence/after-r2/calls/council_finance_context.json",
+      "receipt": {
+        "request_id": "54049eae06004a90b8ca",
+        "tool": "council_finance_context",
+        "server_version": "4.1.5-public.2",
+        "returned_at": "2026-10-05T23:18:32.859102+09:00",
+        "elapsed_ms": 14343,
+        "result_reuse": "fresh",
+        "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+      },
+      "scope_note": "Brand name had no rows; the additional term returned three local candidates. Effective source date 20261004; raw unit and same-project attribution remain unverified."
     },
     {
       "id": "ordinance",
@@ -41,25 +83,42 @@
         },
         "keyword": "공동 관리소",
         "section": "articles",
-        "offset": 0,
-        "limit": 3,
+        "limit": 1,
         "max_chars": 2000
-      }
+      },
+      "execution_status": "EXECUTED",
+      "observed_status": "retrieved",
+      "result_file": "evidence/after-r2/calls/ordinance_get_document.json",
+      "receipt": {
+        "tool": "ordinance_get_document",
+        "server_version": "4.1.5-public.2",
+        "request_id": "5a04fd7147c8419c8756",
+        "elapsed_ms": 965,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "scope_note": "Reference ID and MST came from the actual preceding ordinance_search response. Exact article label is 제5조의2. One article was read; latest-version verification remains false."
     },
     {
       "id": "integration",
       "tool": "council_context_pack",
       "arguments": {
         "topic": "빌라가꿈관리소",
-        "council": "수원시의회",
+        "council": "수원시",
         "date_from": "2025-01-01",
         "date_to": "2026-10-05",
         "fiscal_year": 2026,
-        "max_docs": 2,
+        "max_docs": 1,
         "include_legal": true,
         "include_finance": true,
-        "include_public_data": false
-      }
+        "include_public_data": false,
+        "include_member_records": false,
+        "include_policy_background": false
+      },
+      "execution_status": "EXECUTED",
+      "observed_status": "PARTIAL",
+      "result_file": "evidence/after-r2/calls/council_context_pack.json",
+      "receipt": null,
+      "scope_note": "Candidate discovery returns PARTIAL/CANDIDATES_FOUND despite initial EMPTY. Same-project, amount, applicability and submission approval remain unverified. No top-level receipt was provided; use the preserved execution trace."
     }
   ]
 }

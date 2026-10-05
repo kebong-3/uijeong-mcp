@@ -1,0 +1,13 @@
+{
+  "observed_date": "2026-10-05",
+  "endpoint": "https://uijeong-mcp.onrender.com/healthz",
+  "method": "GET",
+  "status_code": 200,
+  "content_type": "application/json",
+  "body": {
+    "status": "ok",
+    "version": "4.1.5-public.2"
+  },
+  "source": "Direct httpx GET executed from the workspace; exact result copied from tool output.",
+  "recorded_at": "2026-10-05 14:21:28 UTC"
+}

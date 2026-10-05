@@ -1,0 +1,235 @@
+........................................................................ [  8%]
+........................................................................ [ 17%]
+........................................................................ [ 26%]
+........................................................................ [ 34%]
+........................................................................ [ 43%]
+......................................................................F. [ 52%]
+........................................................................ [ 60%]
+.....................................F.F................................ [ 69%]
+........................................................................ [ 78%]
+........................................................................ [ 86%]
+........................................................................ [ 95%]
+.....................................                                    [100%]
+=================================== FAILURES ===================================
+__________ test_source_failure_not_confused_with_absence[error-ERROR] __________
+
+keyword = '천원국시', council = '광주 서구', mode = '질의답변', answerer = None
+committee = None, date_from = '2024-01-01', date_to = '2026-09-20', max_docs = 6
+source = 'clik', search_terms = None, snapshot_id = None, item_offset = 0
+limit = 1, source_offset = 0, site_start_page = 1
+
+    @register
+    async def council_evidence_bundle(keyword:str,council:str='광주 서구',mode:str='질의답변',
+            answerer:Optional[str]=None,committee:Optional[str]=None,date_from:Optional[str]=None,
+            date_to:Optional[str]=None,max_docs:int=6,source:str='auto',search_terms:Optional[list[str]]=None,
+            snapshot_id:Optional[str]=None,item_offset:int=0,limit:int=10,source_offset:int=0,site_start_page:int=1)->dict[str, Any]:
+        """근거 중심 CLIK 검색. source=auto|clik이며 auto도 CLIK만 사용한다.
+        서구의회 홈페이지 직접 자동수집은 안정성을 위해 제거했다.
+        max_docs=검색어별 최대 상세 건수(1~15); search_terms=사용자가 승인한 추가 검색어 최대2개.
+        snapshot_id+item_offset으로 동일 결과를 재조회 없이 이어보기.
+        source_offset으로 CLIK 목록 이어검색. site_start_page는 기존 호출 호환용으로 남아 있지만 사용하지 않는다.
+        검색 결과의 PARTIAL·오류·미확인 범위를 최종 답변에 반드시 포함한다.
+        """
+        if not isinstance(keyword,str) or not keyword.strip() or len(keyword)>200: return invalid('검색어는 1~200자로 입력하세요.')
+        if mode not in MODES or source not in ('auto','clik'): return invalid('source는 auto|clik만 지원합니다. 서구의회 홈페이지 직접 검색은 안정성을 위해 제거되었습니다.')
+        if any(type(v) is not int for v in (max_docs,limit,item_offset,source_offset,site_start_page)):
+            return invalid('건수·위치 인자는 정수입니다.')
+        if not (1<=max_docs<=15 and 1<=limit<=30 and 0<=item_offset and 0<=source_offset and 1<=site_start_page<=10000):
+            return invalid('max_docs 1~15, limit 1~30, offset 0 이상, site_start_page 1~10000이 필요합니다.')
+        if search_terms is not None and (not isinstance(search_terms,list) or any(not isinstance(t,str) for t in search_terms)):
+            return invalid('search_terms는 문자열 목록입니다.')
+        terms=list(dict.fromkeys([keyword]+(search_terms or [])))
+        if len(terms)>3 or any(not x.strip() or len(x)>200 for x in terms): return invalid('추가 검색어는 1~200자, 최대 2개입니다.')
+        cid,cname,error=U.pick_council(council)
+        if error:return invalid(error)
+        df,dto,error=U.check_dates(date_from,date_to)
+        if error:return invalid(error)
+        parameters=params_for(keyword,cid,mode,answerer,committee,df,dto,max_docs,source,terms)
+        parameters.update(source_offset=source_offset,site_start_page=site_start_page)
+        store_warnings=[]
+        if snapshot_id:
+            try: payload=snapshots.get(snapshot_id)
+            except Exception: return invalid('스냅샷이 없거나 만료되었습니다. 새로 검색하세요.')
+            if not payload or payload.get('parameters')!=parameters:return invalid('스냅샷 검색조건과 요청조건이 다릅니다.')
+        else:
+            records=[];errors=[];coverage=[]
+            if source in ('auto','clik'):
+                for term in terms:
+                    try:
+>                       rec,errs,cov=await collect_clik(term,cid,df,dto,committee,max_docs,source_offset)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+service_v2.py:158: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+service_v2.py:92: in collect_clik
+    rows, total = await U.list_minutes(keyword,cid,'MINTS_HTML' if keyword else 'ALL',df,dto,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+keyword = '천원국시', cid = '062006', kind = 'MINTS_HTML', df = '20240101'
+dto = '20260920', unused = None, max_docs = 6, offset = 0
+args = ('MTG_DE/DESC', 3), kwargs = {'committee': None}
+
+    async def listing(keyword,cid,kind,df,dto,unused,max_docs,offset,*args,**kwargs):
+        U.calls.append((keyword,df,dto,offset))
+>       if U.fail:raise RuntimeError('synthetic upstream unavailable')
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       RuntimeError: synthetic upstream unavailable
+
+tests/test_service24_offline.py:35: RuntimeError
+
+During handling of the above exception, another exception occurred:
+
+app = namespace(profile_allows=<function app.<locals>.<lambda> at 0x7f3599fb7c40>, LITE_TOOLS={'council_evidence_bundle', 'c...ce at 0x7f359a692b60>, council_prepare_response=<function install.<locals>.council_prepare_response at 0x7f359a692ca0>)
+state = 'error', expected = 'ERROR'
+
+    @pytest.mark.parametrize('state,expected', [('empty','EMPTY'),('partial','PARTIAL'),('error','ERROR')])
+    def test_source_failure_not_confused_with_absence(app,state,expected):
+        app.exhausted=state!='partial';app.fail=state=='error'
+>       r=prepare(app)
+          ^^^^^^^^^^^^
+
+tests/test_response25.py:179: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_response25.py:151: in prepare
+    return run(app.council_prepare_response(**args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_service24_offline.py:52: in run
+    def run(coro):return asyncio.run(coro)
+                         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+response_tools.py:86: in council_prepare_response
+    bundle=await U.council_evidence_bundle(keyword=topic,council=council,committee=committee,
+service_v2.py:161: in council_evidence_bundle
+    errors.append(safe_failure('CLIK','list',exc))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = 'CLIK', stage = 'list'
+exc = RuntimeError('synthetic upstream unavailable'), ref = None
+
+    def safe_failure(source, stage, exc, ref=None):
+        result={'source':source,'stage':stage,'ref':ref,'message':R.safe_error(exc)}
+>       if isinstance(exc, U.ClikError):
+                           ^^^^^^^^^^^
+E       AttributeError: 'types.SimpleNamespace' object has no attribute 'ClikError'
+
+service_v2.py:79: AttributeError
+____________________ test_department_failed_source_is_error ____________________
+
+keyword = '복지정책과', cid = '062006', kind = 'MINTS_HTML', df = None, dto = None
+unused = None, max_docs = 6, offset = 0, args = ('MTG_DE/DESC', 3)
+kwargs = {'committee': None}
+
+    async def listing(keyword,cid,kind,df,dto,unused,max_docs,offset,*args,**kwargs):
+        U.calls.append((keyword,df,dto,offset))
+>       if U.fail:raise RuntimeError('synthetic upstream unavailable')
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       RuntimeError: synthetic upstream unavailable
+
+tests/test_service24_offline.py:35: RuntimeError
+
+During handling of the above exception, another exception occurred:
+
+app = namespace(profile_allows=<function app.<locals>.<lambda> at 0x7f359a4060c0>, LITE_TOOLS={'council_evidence_bundle', 'c...install.<locals>.parse_ref at 0x7f359a395c60>, 'snapshots': <runtime_security.SnapshotStore object at 0x7f359a62d7c0>})
+
+    def test_department_failed_source_is_error(app):
+        app.fail=True
+>       assert run(app.council_department_brief('복지정책과',source='clik'))['status']=='ERROR'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_service24_offline.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_service24_offline.py:52: in run
+    def run(coro):return asyncio.run(coro)
+                         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+service_v2.py:370: in council_department_brief
+    errors.append(safe_failure('CLIK','list',exc))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = 'CLIK', stage = 'list'
+exc = RuntimeError('synthetic upstream unavailable'), ref = None
+
+    def safe_failure(source, stage, exc, ref=None):
+        result={'source':source,'stage':stage,'ref':ref,'message':R.safe_error(exc)}
+>       if isinstance(exc, U.ClikError):
+                           ^^^^^^^^^^^
+E       AttributeError: 'types.SimpleNamespace' object has no attribute 'ClikError'
+
+service_v2.py:79: AttributeError
+________________________ test_repeat_all_fail_is_error _________________________
+
+keyword = '천원국시', cid = '062006', kind = 'MINTS_HTML', df = '20240101'
+dto = '20241231', unused = None, max_docs = 4, offset = 0
+args = ('MTG_DE/DESC', 3), kwargs = {'committee': None}
+
+    async def listing(keyword,cid,kind,df,dto,unused,max_docs,offset,*args,**kwargs):
+        U.calls.append((keyword,df,dto,offset))
+>       if U.fail:raise RuntimeError('synthetic upstream unavailable')
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       RuntimeError: synthetic upstream unavailable
+
+tests/test_service24_offline.py:35: RuntimeError
+
+During handling of the above exception, another exception occurred:
+
+app = namespace(profile_allows=<function app.<locals>.<lambda> at 0x7f359a4071a0>, LITE_TOOLS={'council_evidence_bundle', 'c...install.<locals>.parse_ref at 0x7f359a3947c0>, 'snapshots': <runtime_security.SnapshotStore object at 0x7f359a480ef0>})
+
+    def test_repeat_all_fail_is_error(app):
+        app.fail=True
+>       assert run(app.council_recurring_issues(keyword='천원국시',years=2,as_of='2026-09-21',source='clik'))['status']=='ERROR'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_service24_offline.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_service24_offline.py:52: in run
+    def run(coro):return asyncio.run(coro)
+                         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+service_v2.py:476: in council_recurring_issues
+    result=await council_evidence_bundle(anchor,council,'질의답변',None,committee,df,dto,
+service_v2.py:161: in council_evidence_bundle
+    errors.append(safe_failure('CLIK','list',exc))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = 'CLIK', stage = 'list'
+exc = RuntimeError('synthetic upstream unavailable'), ref = None
+
+    def safe_failure(source, stage, exc, ref=None):
+        result={'source':source,'stage':stage,'ref':ref,'message':R.safe_error(exc)}
+>       if isinstance(exc, U.ClikError):
+                           ^^^^^^^^^^^
+E       AttributeError: 'types.SimpleNamespace' object has no attribute 'ClikError'
+
+service_v2.py:79: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_response25.py::test_source_failure_not_confused_with_absence[error-ERROR]
+FAILED tests/test_service24_offline.py::test_department_failed_source_is_error
+FAILED tests/test_service24_offline.py::test_repeat_all_fail_is_error - Attri...
+3 failed, 826 passed in 34.25s

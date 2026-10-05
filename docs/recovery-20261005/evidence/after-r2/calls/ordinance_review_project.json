@@ -1,0 +1,730 @@
+{
+  "call": {
+    "id": "ordinance_review_project",
+    "tool": "ordinance_review_project",
+    "purpose": "실제 기준조례를 선택한 검토 초안의 미확인 항목과 승인 불가 상태 확인",
+    "seconds": 0.71,
+    "isError": false,
+    "status": "review_completed",
+    "code": null,
+    "classification": "RETURNED",
+    "receipt": {
+      "tool": "ordinance_review_project",
+      "server_version": "4.1.5-public.2",
+      "request_id": "67f771906cc440128a2f",
+      "elapsed_ms": 597,
+      "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+    },
+    "arguments": {
+      "params": {
+        "project": "[기능검증용 예시] 수원시 소규모 공동주택 공동 관리소의 설치·운영 근거를 검토한다. 실제 신규사업·개정안·지출 승인 요청이 아니다.",
+        "jurisdiction": "경기도 수원시",
+        "as_of": "2026-10-05",
+        "topic": "소규모 공동주택",
+        "baseline": {
+          "kind": "ordinance",
+          "document_id": "2209592",
+          "mst": "2102111",
+          "title_hint": "수원시 소규모 공동주택관리 지원 조례"
+        },
+        "auto_search": false,
+        "reasoning": "rules",
+        "allow_external_llm": false,
+        "budget_calls": 1
+      },
+      "detail_level": "summary",
+      "max_evidence": 1
+    },
+    "response_file": "calls/ordinance_review_project.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "ordinance_review_project: REVIEW_COMPLETED. 전체 결과와 출처는 structuredContent에 있습니다.",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "schema_version": "2.0",
+      "version": "2.0.0-rc.2-public",
+      "report_id": "R-b28ed18255c8cf6f3351",
+      "generated_at": "2026-10-05T14:18:44.381648+00:00",
+      "project": "[기능검증용 예시] 수원시 소규모 공동주택 공동 관리소의 설치·운영 근거를 검토한다. 실제 신규사업·개정안·지출 승인 요청이 아니다.",
+      "jurisdiction": "경기도 수원시",
+      "as_of": "2026-10-05",
+      "reasoning": "rules",
+      "documents": [
+        {
+          "kind": "ordinance",
+          "document_id": "2209592",
+          "title": "수원시 소규모 공동주택관리 지원 조례",
+          "jurisdiction": "경기도 수원시",
+          "version": "2102111",
+          "effective_date": "20251231",
+          "promulgation_date": "20251231",
+          "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+          "retrieved_at": "2026-10-05T14:18:37.519350+00:00",
+          "source_state": "cache",
+          "version_scope": "version",
+          "warnings": [
+            "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+            "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+            "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+            "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용"
+          ],
+          "department": "녹색건축팀",
+          "phone": "031-5191-3373",
+          "upstream_hash": "e8d7f89f5b78484d6fb89312299483ea670bba43a63a322ecefc02ef76c56040",
+          "identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+          "content_hash": "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210",
+          "article_count": 22,
+          "supplement_count": 1,
+          "annex_count": 2
+        }
+      ],
+      "searches": [],
+      "selection_log": [
+        {
+          "role": "baseline",
+          "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+          "selection": "explicit_identifier"
+        }
+      ],
+      "legal_review": {
+        "findings": [
+          {
+            "id": "R01",
+            "topic": "권리제한·의무부과",
+            "status": "review_required",
+            "priority": "high",
+            "trigger_evidence_ids": [
+              "E-5be247007c8cda2c126a",
+              "E-e21376d21c8a295b95b2"
+            ],
+            "triggered_by_project": false,
+            "action": "소관사무 및 법률 유보·위임 범위를 확인",
+            "rule_basis_type": "screening_checklist_not_legal_determination",
+            "method_reference": "https://opinion.lawmaking.go.kr/lmKnlg/loPlanGud"
+          },
+          {
+            "id": "R03",
+            "topic": "지원금·보조금",
+            "status": "review_required",
+            "priority": "normal",
+            "trigger_evidence_ids": [
+              "E-e70b3bea2dad02cd6095",
+              "E-15054bee9576426973b5",
+              "E-6aba01bf5e42d170915e",
+              "E-1a6a83ba551731d168d9"
+            ],
+            "triggered_by_project": false,
+            "action": "지방재정·지방보조금 법령, 공익성·지원근거·중복지원·집행절차 확인",
+            "rule_basis_type": "screening_checklist_not_legal_determination",
+            "method_reference": "https://opinion.lawmaking.go.kr/lmKnlg/loPlanGud"
+          },
+          {
+            "id": "R04",
+            "topic": "사회보장 신설·변경",
+            "status": "review_required",
+            "priority": "normal",
+            "trigger_evidence_ids": [
+              "E-823adb1b85468d0e5d6d"
+            ],
+            "triggered_by_project": false,
+            "action": "사회보장제도 신설·변경 협의 대상 여부 및 협의 진행상태 확인",
+            "rule_basis_type": "screening_checklist_not_legal_determination",
+            "method_reference": "https://opinion.lawmaking.go.kr/lmKnlg/loPlanGud"
+          },
+          {
+            "id": "R08",
+            "topic": "위원회·이해충돌",
+            "status": "review_required",
+            "priority": "normal",
+            "trigger_evidence_ids": [
+              "E-5be247007c8cda2c126a",
+              "E-1a6a83ba551731d168d9",
+              "E-072ca09e1094d74f8b34",
+              "E-6c75c3514f9b093a0985"
+            ],
+            "triggered_by_project": false,
+            "action": "기존 위원회 활용 가능성·구성·임기·제척기피회피·수당·권한 침해 확인",
+            "rule_basis_type": "screening_checklist_not_legal_determination",
+            "method_reference": "https://opinion.lawmaking.go.kr/lmKnlg/loPlanGud"
+          }
+        ],
+        "explicit_references": [
+          {
+            "law_title": "건축법",
+            "article": "제11조",
+            "paragraph": "",
+            "item": "",
+            "quote": "「건축법」 제11조"
+          },
+          {
+            "law_title": "집합건물의 소유 및 관리에 관한 법률",
+            "article": "제24조",
+            "paragraph": "",
+            "item": "",
+            "quote": "「집합건물의 소유 및 관리에 관한 법률」제24조"
+          },
+          {
+            "law_title": "수원시 건축 조례",
+            "article": "제9조",
+            "paragraph": "제1항",
+            "item": "제5호",
+            "quote": "「수원시 건축 조례」제9조제1항제5호"
+          },
+          {
+            "law_title": "수원시 공동주택 관리 지원 조례",
+            "article": "",
+            "paragraph": "",
+            "item": "",
+            "quote": "「수원시 공동주택 관리 지원 조례」"
+          }
+        ],
+        "unresolved_short_references": false,
+        "legal_conclusion": "자동 적법/위법 판정 없음. 규칙 탐지 여부와 법적 결론을 구분하세요.",
+        "negative_result_warning": "단서가 발견되지 않아도 검토 항목이 불필요하거나 적법하다는 뜻이 아닙니다.",
+        "reference_checks": [
+          {
+            "law_title": "건축법",
+            "article": "제11조",
+            "paragraph": "",
+            "item": "",
+            "quote": "「건축법」 제11조",
+            "status": "source_missing",
+            "message": "공식 원문 미확보. 해당 법령을 검색·조회하세요."
+          },
+          {
+            "law_title": "집합건물의 소유 및 관리에 관한 법률",
+            "article": "제24조",
+            "paragraph": "",
+            "item": "",
+            "quote": "「집합건물의 소유 및 관리에 관한 법률」제24조",
+            "status": "source_missing",
+            "message": "공식 원문 미확보. 해당 법령을 검색·조회하세요."
+          },
+          {
+            "law_title": "수원시 건축 조례",
+            "article": "제9조",
+            "paragraph": "제1항",
+            "item": "제5호",
+            "quote": "「수원시 건축 조례」제9조제1항제5호",
+            "status": "source_missing",
+            "message": "공식 원문 미확보. 해당 법령을 검색·조회하세요."
+          },
+          {
+            "law_title": "수원시 공동주택 관리 지원 조례",
+            "article": "",
+            "paragraph": "",
+            "item": "",
+            "quote": "「수원시 공동주택 관리 지원 조례」",
+            "status": "source_missing",
+            "message": "공식 원문 미확보. 해당 법령을 검색·조회하세요."
+          }
+        ]
+      },
+      "comparison": {
+        "baseline": {
+          "kind": "ordinance",
+          "document_id": "2209592",
+          "title": "수원시 소규모 공동주택관리 지원 조례",
+          "jurisdiction": "경기도 수원시",
+          "version": "2102111",
+          "effective_date": "20251231",
+          "promulgation_date": "20251231",
+          "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+          "retrieved_at": "2026-10-05T14:18:37.519350+00:00",
+          "source_state": "cache",
+          "version_scope": "version",
+          "warnings": [
+            "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+            "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+            "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+            "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용"
+          ],
+          "department": "녹색건축팀",
+          "phone": "031-5191-3373",
+          "upstream_hash": "e8d7f89f5b78484d6fb89312299483ea670bba43a63a322ecefc02ef76c56040",
+          "identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+          "content_hash": "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210",
+          "article_count": 22,
+          "supplement_count": 1,
+          "annex_count": 2
+        },
+        "comparisons": [],
+        "dimension_matrix": [
+          {
+            "dimension": "목적·정의",
+            "cells": [
+              {
+                "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+                "observed": true,
+                "evidence_ids": [
+                  "E-e12a338a1fb050352851",
+                  "E-5be247007c8cda2c126a",
+                  "E-e21376d21c8a295b95b2"
+                ]
+              }
+            ]
+          },
+          {
+            "dimension": "소관사무·책무",
+            "cells": [
+              {
+                "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+                "observed": true,
+                "evidence_ids": [
+                  "E-6c0330942b3aa0f99044",
+                  "E-e70b3bea2dad02cd6095",
+                  "E-deb742ddf2f1ee38af95",
+                  "E-15054bee9576426973b5"
+                ]
+              }
+            ]
+          },
+          {
+            "dimension": "지원대상·제외",
+            "cells": [
+              {
+                "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+                "observed": true,
+                "evidence_ids": [
+                  "E-1a3d1743e60b2d5fa5f3",
+                  "E-e70b3bea2dad02cd6095",
+                  "E-15054bee9576426973b5",
+                  "E-dbd62491a4c76e645f80"
+                ]
+              }
+            ]
+          },
+          {
+            "dimension": "지원내용·금액",
+            "cells": [
+              {
+                "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+                "observed": true,
+                "evidence_ids": [
+                  "E-e70b3bea2dad02cd6095",
+                  "E-15054bee9576426973b5",
+                  "E-6aba01bf5e42d170915e",
+                  "E-1a6a83ba551731d168d9"
+                ]
+              }
+            ]
+          }
+        ],
+        "method": "제목 0.30 + 본문 3글자 집합 0.55 + 기능단서 0.15. 법적 적합성 점수 아님",
+        "coverage": {
+          "pairs_compared": 0,
+          "unprocessed_articles": 0,
+          "comparison_complete": true
+        },
+        "guardrails": [
+          "조항 수가 많거나 여러 지자체가 채택했다고 우수·적법한 것은 아닙니다.",
+          "possible_gap은 기능이 다른 조문·다른 조례·상위법에 있을 수 있는 검토 후보입니다.",
+          "대상·사무·재정·광역/기초 권한·시행시점을 확인한 후 적용하세요."
+        ]
+      },
+      "impact": {
+        "status": "version_pair_missing",
+        "impacts": [],
+        "warning": "구·신 상위법의 식별자·시행일이 필요합니다."
+      },
+      "feasibility": {
+        "steps": [
+          {
+            "name": "소관사무·입법형식",
+            "applicability": "항상",
+            "owner_role": "사업부서+법무부서",
+            "check": "조례가 필요한지, 기존 조례·규칙·지침·예산 집행으로 가능한지 비교",
+            "completed": false
+          },
+          {
+            "name": "입법예고",
+            "applicability": "적용·예외 확인",
+            "owner_role": "입안부서",
+            "check": "행정절차법·지방자치법·우리 입법절차 조례상 기간/예외·제출주체 확인",
+            "completed": false
+          },
+          {
+            "name": "비용추계·예산협의",
+            "applicability": "재정수반 여부 확인",
+            "owner_role": "예산부서",
+            "check": "우리 비용추계 조례의 대상·기준금액·면제사유; 재원·연도별 수요 확인",
+            "completed": false
+          },
+          {
+            "name": "규제심사",
+            "applicability": "규제 해당 여부 확인",
+            "owner_role": "규제업무부서",
+            "check": "권리제한·의무 신설/강화 여부와 심사 절차 확인",
+            "completed": false
+          }
+        ],
+        "sequencing_rules": [
+          "규칙 전체를 의회 의결 대상으로 취급하지 않습니다. 현행 법령 또는 조례 범위의 규칙인지 확인합니다.",
+          "입법예고·초안·내부 협의는 병행 가능하나 개정안 통과를 전제로 한 공포·집행과 구분합니다.",
+          "상임위 통과·결재 완료·예정 의결일은 본회의 의결 또는 조례 공포·시행의 증거가 아닙니다.",
+          "공포일과 시행일은 다릅니다. 지방자치법 제32조 제8항과 해당 부칙·조문별 시행일을 확인합니다."
+        ],
+        "needed_evidence": [
+          "현행 상위법·조례 원문과 위임 조문",
+          "의안번호·본회의 의결 최종문",
+          "이송·재의 여부",
+          "공보 공포번호·공포일"
+        ],
+        "source_links": [
+          {
+            "url": "https://www.law.go.kr/lsInfoP.do?lsId=001656",
+            "label": "지방자치법 제28·29·32조",
+            "kind": "OFFICIAL_REFERENCE",
+            "status": "REFERENCE_PROVIDED",
+            "direct_document": false,
+            "markdown": "[지방자치법 제28·29·32조](https://www.law.go.kr/lsInfoP.do?lsId=001656)"
+          },
+          {
+            "url": "https://www.law.go.kr/법령/지방자치법시행령",
+            "label": "지방자치법 시행령(심의·공포·보고 절차 확인)",
+            "kind": "OFFICIAL_REFERENCE",
+            "status": "REFERENCE_PROVIDED",
+            "direct_document": false,
+            "markdown": "[지방자치법 시행령(심의·공포·보고 절차 확인)](https://www.law.go.kr/법령/지방자치법시행령)"
+          },
+          {
+            "url": "https://www.law.go.kr/법령/행정절차법",
+            "label": "행정절차법(입법예고·예외·기간 확인)",
+            "kind": "OFFICIAL_REFERENCE",
+            "status": "REFERENCE_PROVIDED",
+            "direct_document": false,
+            "markdown": "[행정절차법(입법예고·예외·기간 확인)](https://www.law.go.kr/법령/행정절차법)"
+          },
+          {
+            "url": "https://www.moleg.go.kr/board.es?act=view&bid=0007&list_no=138536&mid=a10404000000",
+            "label": "법제처 2022 자치법규 입안 길라잡이(현행법 재대조)",
+            "kind": "OFFICIAL_REFERENCE",
+            "status": "REFERENCE_PROVIDED",
+            "direct_document": false,
+            "markdown": "[법제처 2022 자치법규 입안 길라잡이(현행법 재대조)](https://www.moleg.go.kr/board.es?act=view&bid=0007&list_no=138536&mid=a10404000000)"
+          }
+        ],
+        "budget_template": {
+          "beneficiaries": null,
+          "unit_cost": null,
+          "frequency": null,
+          "operating_cost": null,
+          "formula": "지원대상 수 × 단가 × 지원횟수 + 운영비 (사업에 맞게 수정)",
+          "amounts_are_estimates": true
+        },
+        "warning": "법정 기간·임계금액·부서명·연락처는 추정하지 않습니다. 실제 법령/우리 조례/조직도에서 확인하세요."
+      },
+      "draft": {
+        "status": "working_outline_not_submission_ready",
+        "legislative_options": {
+          "recommended_review_order": [
+            "기존 법령·조례에 따른 집행",
+            "기존 조례 일부개정",
+            "별도 조례 제정",
+            "규칙·지침 정비"
+          ],
+          "baseline_identified": true,
+          "provisional_path": "기존 조례의 적용범위·개정 필요성 우선 검토",
+          "options": [
+            {
+              "path": "existing_authority",
+              "condition": "소관사무·대상·지원방식이 현행 근거에 포함되고 예산·절차 요건을 충족하는지 확인",
+              "benefit": "불필요한 중복 입법 방지"
+            },
+            {
+              "path": "amend",
+              "condition": "기존 조례 목적에 부합하지만 대상·사업·절차·위임사항 정비가 필요한지 확인",
+              "benefit": "기존 집행체계와 연속성 유지"
+            },
+            {
+              "path": "enact",
+              "condition": "별도 입법의 필요성·권한·독립적 규율대상·기존 조례와의 관계가 확인되는지 검토",
+              "benefit": "새로운 제도의 체계적 근거 마련"
+            },
+            {
+              "path": "rule_or_guideline",
+              "condition": "법률·조례가 허용한 집행 세부사항인지 확인; 권리제한·본질적 사항을 지침으로 신설하지 않음",
+              "benefit": "입법형식과 규율 수준의 적정화"
+            }
+          ],
+          "decision": "human_confirmation_required",
+          "topic": "소규모 공동주택",
+          "warning": "다른 지자체의 제정 사실이나 검색 0건만으로 우리 기관의 제정 필요성을 확정하지 않습니다."
+        },
+        "suggested_title": "경기도 수원시 소규모 공동주택 조례안",
+        "enactment_outline": "경기도 수원시 소규모 공동주택 조례안\n※ 검토용 골격: 대괄호를 모두 해소하고 법무·사업·예산 검토를 거쳐야 합니다.\n제1조(목적) 이 조례는 [소관사무·정책목표]에 관한 사항을 정함으로써 [주민 편익·공익]에 이바지함을 목적으로 한다.\n제2조(정의) 이 조례에서 사용하는 용어의 뜻은 [상위법 정의와의 일치 및 별도 정의 필요성 확인]과 같다.\n제3조(적용범위) [적용대상·지역·다른 법령 또는 조례와의 관계를 확인하여 규정한다].\n제4조(추진주체 및 사업) [권한 있는 기관·사업범위·기존 사업과의 중복 여부를 확인하여 규정한다].\n제5조(신청 및 결정) [신청이 필요한 사업인 경우에만 대상·선정기준·처리절차·결과통지를 규정한다].\n제6조(재정지원) [지원근거가 확인된 경우에만 범위·재원·중복방지·정산 등 필요한 사항을 규정한다].\n제7조(사업관리) [사업 특성에 맞는 점검·성과평가·기록관리 및 공개범위를 규정한다].\n제8조(권익보호) [개인정보·불복·환수 등의 적용 법령을 확인하고 필요한 사항만 규정한다].\n부칙\n제1조(시행일) 이 조례는 [상위법 시행일·공포·예산·시스템 준비를 반영한 날짜]부터 시행한다.\n제2조(경과조치) [종전 신청·지원·위탁·위원 등의 보호가 필요한 경우 구체적으로 규정한다].",
+        "amendment_candidates": [],
+        "amendment_draft_status": "원문과 변경문구를 확정한 후 jachi_draft_amendment로 신구대비·일부개정문 생성",
+        "proposal_reason_template": {
+          "problem": "[기능검증용 예시] 수원시 소규모 공동주택 공동 관리소의 설치·운영 근거를 검토한다. 실제 신규사업·개정안·지출 승인 요청이 아니다.",
+          "why_existing_framework_insufficient": "[현행 규정으로 해결되지 않는 이유와 근거]",
+          "expected_effect": "[검증 가능한 성과지표]",
+          "evidence": "[공식 조문·비교사례·업무자료]"
+        },
+        "submission_ready": false,
+        "auto_published": false,
+        "warning": "모든 예시 조항이 필수라는 뜻이 아닙니다. 불필요한 조항·위원회·위탁·지원 근거를 신설하지 마세요.",
+        "constraints_from_team": {
+          "authority_and_rights_checks": [
+            {
+              "id": "R01",
+              "topic": "권리제한·의무부과",
+              "status": "review_required",
+              "priority": "high",
+              "trigger_evidence_ids": [
+                "E-5be247007c8cda2c126a",
+                "E-e21376d21c8a295b95b2"
+              ],
+              "triggered_by_project": false,
+              "action": "소관사무 및 법률 유보·위임 범위를 확인",
+              "rule_basis_type": "screening_checklist_not_legal_determination",
+              "method_reference": "https://opinion.lawmaking.go.kr/lmKnlg/loPlanGud"
+            },
+            {
+              "id": "R03",
+              "topic": "지원금·보조금",
+              "status": "review_required",
+              "priority": "normal",
+              "trigger_evidence_ids": [
+                "E-e70b3bea2dad02cd6095",
+                "E-15054bee9576426973b5",
+                "E-6aba01bf5e42d170915e",
+                "E-1a6a83ba551731d168d9"
+              ],
+              "triggered_by_project": false,
+              "action": "지방재정·지방보조금 법령, 공익성·지원근거·중복지원·집행절차 확인",
+              "rule_basis_type": "screening_checklist_not_legal_determination",
+              "method_reference": "https://opinion.lawmaking.go.kr/lmKnlg/loPlanGud"
+            },
+            {
+              "id": "R04",
+              "topic": "사회보장 신설·변경",
+              "status": "review_required",
+              "priority": "normal",
+              "trigger_evidence_ids": [
+                "E-823adb1b85468d0e5d6d"
+              ],
+              "triggered_by_project": false,
+              "action": "사회보장제도 신설·변경 협의 대상 여부 및 협의 진행상태 확인",
+              "rule_basis_type": "screening_checklist_not_legal_determination",
+              "method_reference": "https://opinion.lawmaking.go.kr/lmKnlg/loPlanGud"
+            },
+            {
+              "id": "R08",
+              "topic": "위원회·이해충돌",
+              "status": "review_required",
+              "priority": "normal",
+              "trigger_evidence_ids": [
+                "E-5be247007c8cda2c126a",
+                "E-1a6a83ba551731d168d9",
+                "E-072ca09e1094d74f8b34",
+                "E-6c75c3514f9b093a0985"
+              ],
+              "triggered_by_project": false,
+              "action": "기존 위원회 활용 가능성·구성·임기·제척기피회피·수당·권한 침해 확인",
+              "rule_basis_type": "screening_checklist_not_legal_determination",
+              "method_reference": "https://opinion.lawmaking.go.kr/lmKnlg/loPlanGud"
+            }
+          ],
+          "citations_to_verify": [
+            {
+              "law_title": "건축법",
+              "article": "제11조",
+              "paragraph": "",
+              "item": "",
+              "quote": "「건축법」 제11조",
+              "status": "source_missing",
+              "message": "공식 원문 미확보. 해당 법령을 검색·조회하세요."
+            },
+            {
+              "law_title": "집합건물의 소유 및 관리에 관한 법률",
+              "article": "제24조",
+              "paragraph": "",
+              "item": "",
+              "quote": "「집합건물의 소유 및 관리에 관한 법률」제24조",
+              "status": "source_missing",
+              "message": "공식 원문 미확보. 해당 법령을 검색·조회하세요."
+            },
+            {
+              "law_title": "수원시 건축 조례",
+              "article": "제9조",
+              "paragraph": "제1항",
+              "item": "제5호",
+              "quote": "「수원시 건축 조례」제9조제1항제5호",
+              "status": "source_missing",
+              "message": "공식 원문 미확보. 해당 법령을 검색·조회하세요."
+            },
+            {
+              "law_title": "수원시 공동주택 관리 지원 조례",
+              "article": "",
+              "paragraph": "",
+              "item": "",
+              "quote": "「수원시 공동주택 관리 지원 조례」",
+              "status": "source_missing",
+              "message": "공식 원문 미확보. 해당 법령을 검색·조회하세요."
+            }
+          ],
+          "amendment_impact": {
+            "status": "version_pair_missing",
+            "impacts": [],
+            "warning": "구·신 상위법의 식별자·시행일이 필요합니다."
+          },
+          "procedural_dependencies": [
+            {
+              "name": "소관사무·입법형식",
+              "applicability": "항상",
+              "owner_role": "사업부서+법무부서",
+              "check": "조례가 필요한지, 기존 조례·규칙·지침·예산 집행으로 가능한지 비교",
+              "completed": false
+            },
+            {
+              "name": "입법예고",
+              "applicability": "적용·예외 확인",
+              "owner_role": "입안부서",
+              "check": "행정절차법·지방자치법·우리 입법절차 조례상 기간/예외·제출주체 확인",
+              "completed": false
+            },
+            {
+              "name": "비용추계·예산협의",
+              "applicability": "재정수반 여부 확인",
+              "owner_role": "예산부서",
+              "check": "우리 비용추계 조례의 대상·기준금액·면제사유; 재원·연도별 수요 확인",
+              "completed": false
+            },
+            {
+              "name": "규제심사",
+              "applicability": "규제 해당 여부 확인",
+              "owner_role": "규제업무부서",
+              "check": "권리제한·의무 신설/강화 여부와 심사 절차 확인",
+              "completed": false
+            }
+          ],
+          "source_errors": [],
+          "draft_block_policy": "미확인 위임·법적 근거·기한은 확정 조문으로 자동 삽입하지 않음"
+        },
+        "model_proposed_clauses": {
+          "accepted": [],
+          "rejected": []
+        }
+      },
+      "quality_gate": {
+        "status": "human_review_required",
+        "legal_approval": false,
+        "submission_ready": false,
+        "blocking_or_pending_items": [
+          "상위법 원문 미확보: 권한·위임·최신성 검토가 완료되지 않았습니다.",
+          "수원시 소규모 공동주택관리 지원 조례: 해당 기준일 적용 버전·조문별 시행일 확인 필요(effective_on_or_before_as_of).",
+          "수원시 소규모 공동주택관리 지원 조례: 식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "수원시 소규모 공동주택관리 지원 조례: 자치법규 별표 API 제공범위 제한: 별표·별지·서식은 소관기관 원문과 별도 대조 필요"
+        ],
+        "rejected_model_claims": 0,
+        "no_majority_vote_on_law": true,
+        "decision_policy": "근거 없는 주장·상충 근거·미확인 적용시점은 다수결로 통과시키지 않습니다."
+      },
+      "errors": [],
+      "agents": [
+        {
+          "id": "A1",
+          "name": "사업·입법기획",
+          "method": "deterministic_rules",
+          "status": "completed"
+        },
+        {
+          "id": "A2",
+          "name": "공식자료·버전관리",
+          "method": "deterministic_rules",
+          "status": "completed"
+        },
+        {
+          "id": "A3",
+          "name": "상위법·권한검토",
+          "method": "deterministic_rules",
+          "status": "completed"
+        },
+        {
+          "id": "A4",
+          "name": "지자체 비교·차이분석",
+          "method": "deterministic_rules",
+          "status": "completed"
+        }
+      ],
+      "evidence": {
+        "E-e12a338a1fb050352851": {
+          "id": "E-e12a338a1fb050352851",
+          "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+          "document_title": "수원시 소규모 공동주택관리 지원 조례",
+          "document_id": "2209592",
+          "version": "2102111",
+          "article": "제1조",
+          "article_key": "main:제1조",
+          "text": "제1조(목적) 이 조례는 소규모 공동주택의 관리에 필요한 사항을 지원하여 쾌적한 주거환경을 조성하고 수원시민의 삶의 질 향상에 기여하는 것을 목적으로 한다. (개정 2025.05.16.)",
+          "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+          "retrieved_at": "2026-10-05T14:18:37.519350+00:00",
+          "effective_date": "20251231",
+          "source_state": "cache",
+          "version_scope": "version",
+          "content_hash": "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210",
+          "jurisdiction": "경기도 수원시",
+          "kind": "ordinance"
+        }
+      },
+      "usage": {
+        "official_api_calls": 0,
+        "official_cache_hits": 1,
+        "llm_calls": 0
+      },
+      "coverage": {
+        "national_exhaustive": false,
+        "baseline_confirmed": true,
+        "source_documents": 1,
+        "modeled_indirect_impacts_exhaustive": false,
+        "baseline_selected": true
+      },
+      "privacy": {
+        "user_documents_persisted_by_server": false,
+        "external_llm_requested": false
+      },
+      "warning": "역할별 보조 검토이며 법률전문가 8명의 독립 심사·완벽한 검증을 뜻하지 않습니다.",
+      "status": "review_completed",
+      "detail_level": "summary",
+      "response_budget": {
+        "lists_omitted": 144,
+        "strings_truncated": 0,
+        "evidence_omitted": 21,
+        "max_evidence": 1,
+        "note": "응답 크기만 줄였으며 생략된 근거를 검토 완료로 간주하지 않습니다. 필요한 공식 원문은 ordinance_get_document로 별도 조회하세요."
+      },
+      "source_links": [
+        {
+          "url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+          "label": "수원시 소규모 공동주택관리 지원 조례",
+          "markdown": "[수원시 소규모 공동주택관리 지원 조례](https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111)",
+          "kind": "DOCUMENT_REFERENCE",
+          "status": "REFERENCE_PROVIDED",
+          "direct_document": true
+        }
+      ],
+      "link_guidance": {
+        "display": "각 핵심 사실·수치 뒤에 해당 source_links.markdown을 붙이고 자료별로 연결하세요.",
+        "scope": "DOCUMENT_REFERENCE=원문 주소, OFFICIAL_DATASET=데이터셋 안내, CATALOG_METADATA=자료 설명, OFFICIAL_SEARCH=검색 화면.",
+        "verification": "링크 제공과 페이지 본문 조회·대조는 다릅니다. status와 열람 범위를 유지하세요.",
+        "links_omitted": false
+      },
+      "mcp_receipt": {
+        "tool": "ordinance_review_project",
+        "server_version": "4.1.5-public.2",
+        "request_id": "67f771906cc440128a2f",
+        "elapsed_ms": 597,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      }
+    },
+    "isError": false
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "checks": {
+    "final_version": true,
+    "final_commit": true,
+    "manifest": true,
+    "article_identity": true,
+    "jurisdiction_alias": true,
+    "business_topic": true,
+    "calendar_scope": true,
+    "empty_not_verified": true,
+    "budget_stage_guard": true,
+    "nonoverlapping_pages": true,
+    "search_fetch": true,
+    "missing_direct_url_honest": true,
+    "integrated_output_survives": true,
+    "requeried_candidates": true,
+    "complete_candidate_identity_index": true,
+    "relevant_ordinance_identity": true,
+    "relevant_fiscal_identity": true,
+    "unverified_relationship_preserved": true,
+    "zero_base": true,
+    "metadata_not_fact_verified": true,
+    "same_40_tools": true,
+    "schema_read_range": true,
+    "schema_ordinance_range": true,
+    "sdk_reconnects": true
+  },
+  "pass_count": 24,
+  "total": 24,
+  "status": "PASS",
+  "candidates": {
+    "budget": {
+      "status": "EMPTY",
+      "initial_candidates": 0,
+      "discovered_candidates": 3,
+      "amounts_verified": false
+    },
+    "ordinance": {
+      "status": "EMPTY",
+      "initial_candidates": 0,
+      "discovered_candidates": 3,
+      "applicability_verified": false
+    }
+  }
+}

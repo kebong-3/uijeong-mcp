@@ -1,0 +1,12 @@
+{
+  "status": "fulfilled",
+  "value": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"hasMore\":false,\"logs\":[],\"nextEndTime\":\"2026-10-05T14:21:29.791652811Z\",\"nextStartTime\":\"2026-10-05T14:16:11Z\"}"
+      }
+    ],
+    "isError": false
+  }
+}

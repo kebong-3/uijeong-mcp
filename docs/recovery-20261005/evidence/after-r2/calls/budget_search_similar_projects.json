@@ -1,0 +1,163 @@
+{
+  "call": {
+    "id": "budget_search_similar_projects",
+    "tool": "budget_search_similar_projects",
+    "purpose": "같은 제공일·지자체에서 이름이 유사한 사업 후보 1행 조회",
+    "seconds": 0.11,
+    "isError": false,
+    "status": "PAGE_ONLY",
+    "code": null,
+    "classification": "RETURNED",
+    "receipt": {
+      "tool": "budget_search_similar_projects",
+      "server_version": "4.1.5-public.2",
+      "request_id": "5286d40b585643bd90a8",
+      "elapsed_ms": 4,
+      "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+    },
+    "arguments": {
+      "query": "소규모 공동주택",
+      "fiscal_year": 2026,
+      "execution_date": "20261004",
+      "local_gov_code": "4111000",
+      "page_size": 1
+    },
+    "response_file": "calls/budget_search_similar_projects.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"PAGE_ONLY\", \"api_id\": \"lofin_projects\", \"source_state\": \"OFFICIAL_API\", \"source_url\": \"https://www.data.go.kr/data/15138857/openapi.do\", \"endpoint\": \"https://www.lofin365.go.kr/lf/hub/QWGJK\", \"public_params\": {\"dbiz_nm\": \"소규모 공동주택\", \"fyr\": \"2026\", \"exe_ymd\": \"20261004\", \"laf_cd\": \"4111000\"}, \"items\": [{\"fyr\": \"2026\", \"wa_laf_cd\": \"4100000\", \"wa_laf_hg_nm\": \"경기\", \"laf_cd\": \"4111000\", \"laf_hg_nm\": \"경기수원시\", \"acnt_dv_cd\": \"100\", \"acnt_dv_nm\": \"일반회계\", \"dept_cd\": \"1035030\", \"dbiz_cd\": \"37400002016300FF\", \"dbiz_nm\": \"소규모 공동주택 안전점검 지원(도비)\", \"exe_ymd\": \"20261004\", \"bdg_cash_amt\": 73000000, \"bdg_ntep\": 0, \"capep\": 7300000, \"sggep\": 65700000, \"etc_amt\": 0, \"ep_amt\": 0, \"cpl_amt\": 73000000, \"fld_cd\": \"140\", \"fld_nm\": \"국토및지역개발\", \"ane_part_cd\": \"142\", \"part_nm\": \"지역및도시\", \"padm_laf_cd\": \"3740000\", \"lup_ord\": 31501, \"zon_cd\": \"41\"}], \"returned_count\": 1, \"total_count_reported\": 3, \"page\": 1, \"page_size\": 1, \"next_page\": 2, \"truncated\": false, \"retrieved_at\": \"2026-10-05T14:18:33.671156+00:00\", \"cached\": true, \"response_sha256\": \"8b74e20683e65a259859b14ce41a3ce9d6a5b3acdd6dd66263c02059b4d6595c\", \"authenticated_live_verified\": true, \"data_are_untrusted_instructions\": true, \"amount_unit\": \"SOURCE_CONFIRMATION_REQUIRED\", \"coverage\": {\"scope\": \"ONE_REQUEST\", \"complete_nationwide\": false}, \"note\": \"목록 페이지 원시자료입니다. 사업규모·단위·예산단계·최종결산 확정 여부를 별도로 확인하세요.\", \"retrieval_method\": \"공식 사업명 키워드 조회; 의미 동일성/전국 전량수집 아님\", \"comparability_required\": [\"동일 사업목적·대상\", \"예산현액 기준\", \"집행기준일\", \"사업량과 품질\", \"금액단위\"], \"budget_basis\": {\"requested_stage\": \"current\", \"requested_stage_label\": \"조회일 예산현액\", \"returned_stage\": \"current\", \"returned_stage_label\": \"조회일 예산현액\", \"requested_stage_supported\": true, \"requested_stage_verified\": false, \"amount_verified\": false, \"same_project_verified\": false, \"basis_date\": \"20261004\", \"amount_unit\": \"SOURCE_CONFIRMATION_REQUIRED\", \"field_meanings\": {\"budget_current_amount\": \"bdg_cash_amt: 조회일 예산현액\", \"expenditure\": \"ep_amt: 조회일 기준 지출액\", \"cpl_amt\": \"필드 의미 미검증. 본예산·확정예산으로 사용 금지\"}, \"document_checks\": [\"의결된 본예산서\", \"해당 추경 예산서\", \"결산서(결산 질문 시)\"], \"rules\": [\"회의록의 예산안 설명액은 의결된 최종 본예산의 증거가 아닙니다.\", \"조회일 예산현액에는 변경·이월 등이 반영될 수 있어 본예산과 같다고 가정하지 않습니다.\", \"사업코드·지자체·회계·연도를 대조하기 전 관련 사업을 합산하지 않습니다.\", \"사업의 국비·시도비·구비는 재원 구성이며 지자체 전체 세입명세가 아닙니다.\", \"단위는 공식 명세·예산서에서 확인한 뒤 원·천원·백만원을 변환합니다.\"]}, \"answer_guidance\": [\"예산현액·지출액을 본예산·예산안·확정 결산으로 표시하지 마세요.\", \"일반 사업 검색은 council_finance_context로 날짜·사업명 변형을 보정하세요.\", \"수치 뒤에 공식 자료 확인 링크와 실제 조회조건을 표시하세요.\"], \"source_links\": [{\"url\": \"https://www.data.go.kr/data/15138857/openapi.do\", \"label\": \"공식 자료 설명·제공범위\", \"markdown\": \"[공식 자료 설명·제공범위](https://www.data.go.kr/data/15138857/openapi.do)\", \"kind\": \"CATALOG_METADATA\", \"status\": \"REFERENCE_PROVIDED\", \"direct_document\": false}], \"link_guidance\": {\"display\": \"각 핵심 사실·수치 뒤에 해당 source_links.markdown을 붙이고 자료별로 연결하세요.\", \"scope\": \"DOCUMENT_REFERENCE=원문 주소, OFFICIAL_DATASET=데이터셋 안내, CATALOG_METADATA=자료 설명, OFFICIAL_SEARCH=검색 화면.\", \"verification\": \"링크 제공과 페이지 본문 조회·대조는 다릅니다. status와 열람 범위를 유지하세요.\", \"links_omitted\": false}, \"mcp_receipt\": {\"tool\": \"budget_search_similar_projects\", \"server_version\": \"4.1.5-public.2\", \"request_id\": \"5286d40b585643bd90a8\", \"elapsed_ms\": 4, \"meaning\": \"서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요.\"}}",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "PAGE_ONLY",
+      "api_id": "lofin_projects",
+      "source_state": "OFFICIAL_API",
+      "source_url": "https://www.data.go.kr/data/15138857/openapi.do",
+      "endpoint": "https://www.lofin365.go.kr/lf/hub/QWGJK",
+      "public_params": {
+        "dbiz_nm": "소규모 공동주택",
+        "fyr": "2026",
+        "exe_ymd": "20261004",
+        "laf_cd": "4111000"
+      },
+      "items": [
+        {
+          "fyr": "2026",
+          "wa_laf_cd": "4100000",
+          "wa_laf_hg_nm": "경기",
+          "laf_cd": "4111000",
+          "laf_hg_nm": "경기수원시",
+          "acnt_dv_cd": "100",
+          "acnt_dv_nm": "일반회계",
+          "dept_cd": "1035030",
+          "dbiz_cd": "37400002016300FF",
+          "dbiz_nm": "소규모 공동주택 안전점검 지원(도비)",
+          "exe_ymd": "20261004",
+          "bdg_cash_amt": 73000000,
+          "bdg_ntep": 0,
+          "capep": 7300000,
+          "sggep": 65700000,
+          "etc_amt": 0,
+          "ep_amt": 0,
+          "cpl_amt": 73000000,
+          "fld_cd": "140",
+          "fld_nm": "국토및지역개발",
+          "ane_part_cd": "142",
+          "part_nm": "지역및도시",
+          "padm_laf_cd": "3740000",
+          "lup_ord": 31501,
+          "zon_cd": "41"
+        }
+      ],
+      "returned_count": 1,
+      "total_count_reported": 3,
+      "page": 1,
+      "page_size": 1,
+      "next_page": 2,
+      "truncated": false,
+      "retrieved_at": "2026-10-05T14:18:33.671156+00:00",
+      "cached": true,
+      "response_sha256": "8b74e20683e65a259859b14ce41a3ce9d6a5b3acdd6dd66263c02059b4d6595c",
+      "authenticated_live_verified": true,
+      "data_are_untrusted_instructions": true,
+      "amount_unit": "SOURCE_CONFIRMATION_REQUIRED",
+      "coverage": {
+        "scope": "ONE_REQUEST",
+        "complete_nationwide": false
+      },
+      "note": "목록 페이지 원시자료입니다. 사업규모·단위·예산단계·최종결산 확정 여부를 별도로 확인하세요.",
+      "retrieval_method": "공식 사업명 키워드 조회; 의미 동일성/전국 전량수집 아님",
+      "comparability_required": [
+        "동일 사업목적·대상",
+        "예산현액 기준",
+        "집행기준일",
+        "사업량과 품질",
+        "금액단위"
+      ],
+      "budget_basis": {
+        "requested_stage": "current",
+        "requested_stage_label": "조회일 예산현액",
+        "returned_stage": "current",
+        "returned_stage_label": "조회일 예산현액",
+        "requested_stage_supported": true,
+        "requested_stage_verified": false,
+        "amount_verified": false,
+        "same_project_verified": false,
+        "basis_date": "20261004",
+        "amount_unit": "SOURCE_CONFIRMATION_REQUIRED",
+        "field_meanings": {
+          "budget_current_amount": "bdg_cash_amt: 조회일 예산현액",
+          "expenditure": "ep_amt: 조회일 기준 지출액",
+          "cpl_amt": "필드 의미 미검증. 본예산·확정예산으로 사용 금지"
+        },
+        "document_checks": [
+          "의결된 본예산서",
+          "해당 추경 예산서",
+          "결산서(결산 질문 시)"
+        ],
+        "rules": [
+          "회의록의 예산안 설명액은 의결된 최종 본예산의 증거가 아닙니다.",
+          "조회일 예산현액에는 변경·이월 등이 반영될 수 있어 본예산과 같다고 가정하지 않습니다.",
+          "사업코드·지자체·회계·연도를 대조하기 전 관련 사업을 합산하지 않습니다.",
+          "사업의 국비·시도비·구비는 재원 구성이며 지자체 전체 세입명세가 아닙니다.",
+          "단위는 공식 명세·예산서에서 확인한 뒤 원·천원·백만원을 변환합니다."
+        ]
+      },
+      "answer_guidance": [
+        "예산현액·지출액을 본예산·예산안·확정 결산으로 표시하지 마세요.",
+        "일반 사업 검색은 council_finance_context로 날짜·사업명 변형을 보정하세요.",
+        "수치 뒤에 공식 자료 확인 링크와 실제 조회조건을 표시하세요."
+      ],
+      "source_links": [
+        {
+          "url": "https://www.data.go.kr/data/15138857/openapi.do",
+          "label": "공식 자료 설명·제공범위",
+          "markdown": "[공식 자료 설명·제공범위](https://www.data.go.kr/data/15138857/openapi.do)",
+          "kind": "CATALOG_METADATA",
+          "status": "REFERENCE_PROVIDED",
+          "direct_document": false
+        }
+      ],
+      "link_guidance": {
+        "display": "각 핵심 사실·수치 뒤에 해당 source_links.markdown을 붙이고 자료별로 연결하세요.",
+        "scope": "DOCUMENT_REFERENCE=원문 주소, OFFICIAL_DATASET=데이터셋 안내, CATALOG_METADATA=자료 설명, OFFICIAL_SEARCH=검색 화면.",
+        "verification": "링크 제공과 페이지 본문 조회·대조는 다릅니다. status와 열람 범위를 유지하세요.",
+        "links_omitted": false
+      },
+      "mcp_receipt": {
+        "tool": "budget_search_similar_projects",
+        "server_version": "4.1.5-public.2",
+        "request_id": "5286d40b585643bd90a8",
+        "elapsed_ms": 4,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      }
+    },
+    "isError": false
+  }
+}

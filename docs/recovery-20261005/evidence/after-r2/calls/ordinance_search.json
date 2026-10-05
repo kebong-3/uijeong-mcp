@@ -1,0 +1,197 @@
+{
+  "call": {
+    "id": "ordinance_search",
+    "tool": "ordinance_search",
+    "purpose": "수원시 소규모 공동주택 조례의 공식 식별자 확보",
+    "seconds": 1.57,
+    "isError": false,
+    "status": "complete",
+    "code": null,
+    "classification": "RETURNED",
+    "receipt": {
+      "tool": "ordinance_search",
+      "server_version": "4.1.5-public.2",
+      "request_id": "fa1bb19e07404f109369",
+      "elapsed_ms": 1455,
+      "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+    },
+    "arguments": {
+      "query": "소규모 공동주택",
+      "kind": "ordinance",
+      "jurisdiction": "경기도 수원시",
+      "limit": 1,
+      "max_pages": 1
+    },
+    "response_file": "calls/ordinance_search.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"query\": \"소규모 공동주택\", \"kind\": \"ordinance\", \"status\": \"complete\", \"api_total\": 66, \"scanned_rows\": 66, \"matched_in_scanned_rows\": 1, \"results\": [{\"kind\": \"ordinance\", \"document_id\": \"2209592\", \"mst\": \"2102111\", \"title\": \"수원시 소규모 공동주택관리 지원 조례\", \"jurisdiction\": \"경기도 수원시\", \"effective_date\": \"20251231\", \"promulgation_date\": \"20251231\", \"amendment_type\": \"일부개정\", \"status_code\": \"\", \"ordinance_type\": \"조례\", \"source_url\": \"https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111\", \"parent_article\": \"\", \"ordinance_article\": \"\"}], \"coverage\": {\"pages\": [{\"page\": 1, \"received\": 66, \"source_state\": \"live\", \"retrieved_at\": \"2026-10-05T14:18:36.230394+00:00\"}], \"next_page\": null, \"query_exhausted\": true, \"query_fully_scanned\": true, \"first_scanned_page\": 1, \"national_exhaustive\": false, \"scope\": \"이 검색어·필터에 한정한 결과이며 전국 모든 관련 법규의 완전성을 보증하지 않음\"}, \"observed_jurisdictions\": [\"경기도 고양시\", \"경기도 광명시\", \"경기도 광주시\", \"경기도 구리시\", \"경기도 군포시\", \"경기도 김포시\", \"경기도 남양주시\", \"경기도 부천시\", \"경기도 성남시\", \"경기도 수원시\", \"경기도 시흥시\", \"경기도 양주시\", \"경기도 연천군\", \"경기도 의왕시\", \"경기도 이천시\", \"경기도 파주시\", \"경기도 평택시\", \"경기도 포천시\", \"경기도 화성시\", \"경상남도 거제시\", \"경상남도 김해시\", \"경상남도 밀양시\", \"경상남도 진주시\", \"경상남도 창원시\", \"경상북도 고령군\", \"경상북도 구미시\", \"경상북도 봉화군\", \"경상북도 안동시\", \"경상북도 영주시\", \"경상북도 울진군\", \"대구광역시 달서구\", \"부산광역시 금정구\", \"부산광역시 기장군\", \"부산광역시 남구\", \"부산광역시 동구\", \"부산광역시 부산진구\", \"부산광역시 북구\", \"부산광역시 중구\", \"부산광역시 해운대구\", \"서울특별시 광진구\", \"서울특별시 구로구\", \"서울특별시 금천구\", \"서울특별시 동작구\", \"서울특별시 마포구\", \"서울특별시 서대문구\", \"서울특별시 서초구\", \"서울특별시 양천구\", \"서울특별시 은평구\", \"서울특별시 중구\", \"인천광역시 미추홀구\", \"전남광주통합특별시 광양시\", \"전남광주통합특별시 남구\", \"전남광주통합특별시 순천시\", \"전남광주통합특별시 영암군\", \"전남광주통합특별시 해남군\", \"전북특별자치도\", \"전북특별자치도 완주군\", \"전북특별자치도 전주시\", \"충청남도 논산시\", \"충청남도 보령시\", \"충청남도 서산시\", \"충청남도 서천군\", \"충청남도 아산시\", \"충청남도 천안시\", \"충청남도 청양군\", \"충청북도 음성군\"], \"jurisdiction_resolution\": {\"input\": \"경기도 수원시\", \"institution_type\": \"local_government\", \"state\": \"resolved\", \"normalized\": \"경기도 수원시\", \"council_id\": \"031014\", \"candidates\": [{\"council_id\": \"031014\", \"name\": \"경기도 수원시\", \"registry_status\": \"current_code_table\", \"match_basis\": \"EXACT_REGISTRY_NAME_OR_ALIAS\"}], \"source\": \"https://clik.nanet.go.kr/potal/guide/resourceCenter.do\", \"checked_at\": \"2026-09-17\", \"validity\": \"dated_source_registry_not_legal_administrative_boundary_verification\"}, \"failures\": [], \"warning\": \"검색 0건을 미제정/법적 근거 없음으로 확정하지 마세요. 정식 제명·본문·동의어·기관코드로 재확인하세요.\", \"output_truncated\": false, \"output_offset\": 0, \"next_offset\": null, \"continuation\": \"next_offset가 있으면 동일 query/page/max_pages에 offset만 바꿔 재조회; 없으면 coverage.next_page로 진행\", \"selection_required\": true, \"law_view\": null, \"source_links\": [{\"url\": \"https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111\", \"label\": \"수원시 소규모 공동주택관리 지원 조례\", \"markdown\": \"[수원시 소규모 공동주택관리 지원 조례](https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111)\", \"kind\": \"DOCUMENT_REFERENCE\", \"status\": \"REFERENCE_PROVIDED\", \"direct_document\": true}], \"link_guidance\": {\"display\": \"각 핵심 사실·수치 뒤에 해당 source_links.markdown을 붙이고 자료별로 연결하세요.\", \"scope\": \"DOCUMENT_REFERENCE=원문 주소, OFFICIAL_DATASET=데이터셋 안내, CATALOG_METADATA=자료 설명, OFFICIAL_SEARCH=검색 화면.\", \"verification\": \"링크 제공과 페이지 본문 조회·대조는 다릅니다. status와 열람 범위를 유지하세요.\", \"links_omitted\": false}, \"mcp_receipt\": {\"tool\": \"ordinance_search\", \"server_version\": \"4.1.5-public.2\", \"request_id\": \"fa1bb19e07404f109369\", \"elapsed_ms\": 1455, \"meaning\": \"서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요.\"}}",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "query": "소규모 공동주택",
+      "kind": "ordinance",
+      "status": "complete",
+      "api_total": 66,
+      "scanned_rows": 66,
+      "matched_in_scanned_rows": 1,
+      "results": [
+        {
+          "kind": "ordinance",
+          "document_id": "2209592",
+          "mst": "2102111",
+          "title": "수원시 소규모 공동주택관리 지원 조례",
+          "jurisdiction": "경기도 수원시",
+          "effective_date": "20251231",
+          "promulgation_date": "20251231",
+          "amendment_type": "일부개정",
+          "status_code": "",
+          "ordinance_type": "조례",
+          "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+          "parent_article": "",
+          "ordinance_article": ""
+        }
+      ],
+      "coverage": {
+        "pages": [
+          {
+            "page": 1,
+            "received": 66,
+            "source_state": "live",
+            "retrieved_at": "2026-10-05T14:18:36.230394+00:00"
+          }
+        ],
+        "next_page": null,
+        "query_exhausted": true,
+        "query_fully_scanned": true,
+        "first_scanned_page": 1,
+        "national_exhaustive": false,
+        "scope": "이 검색어·필터에 한정한 결과이며 전국 모든 관련 법규의 완전성을 보증하지 않음"
+      },
+      "observed_jurisdictions": [
+        "경기도 고양시",
+        "경기도 광명시",
+        "경기도 광주시",
+        "경기도 구리시",
+        "경기도 군포시",
+        "경기도 김포시",
+        "경기도 남양주시",
+        "경기도 부천시",
+        "경기도 성남시",
+        "경기도 수원시",
+        "경기도 시흥시",
+        "경기도 양주시",
+        "경기도 연천군",
+        "경기도 의왕시",
+        "경기도 이천시",
+        "경기도 파주시",
+        "경기도 평택시",
+        "경기도 포천시",
+        "경기도 화성시",
+        "경상남도 거제시",
+        "경상남도 김해시",
+        "경상남도 밀양시",
+        "경상남도 진주시",
+        "경상남도 창원시",
+        "경상북도 고령군",
+        "경상북도 구미시",
+        "경상북도 봉화군",
+        "경상북도 안동시",
+        "경상북도 영주시",
+        "경상북도 울진군",
+        "대구광역시 달서구",
+        "부산광역시 금정구",
+        "부산광역시 기장군",
+        "부산광역시 남구",
+        "부산광역시 동구",
+        "부산광역시 부산진구",
+        "부산광역시 북구",
+        "부산광역시 중구",
+        "부산광역시 해운대구",
+        "서울특별시 광진구",
+        "서울특별시 구로구",
+        "서울특별시 금천구",
+        "서울특별시 동작구",
+        "서울특별시 마포구",
+        "서울특별시 서대문구",
+        "서울특별시 서초구",
+        "서울특별시 양천구",
+        "서울특별시 은평구",
+        "서울특별시 중구",
+        "인천광역시 미추홀구",
+        "전남광주통합특별시 광양시",
+        "전남광주통합특별시 남구",
+        "전남광주통합특별시 순천시",
+        "전남광주통합특별시 영암군",
+        "전남광주통합특별시 해남군",
+        "전북특별자치도",
+        "전북특별자치도 완주군",
+        "전북특별자치도 전주시",
+        "충청남도 논산시",
+        "충청남도 보령시",
+        "충청남도 서산시",
+        "충청남도 서천군",
+        "충청남도 아산시",
+        "충청남도 천안시",
+        "충청남도 청양군",
+        "충청북도 음성군"
+      ],
+      "jurisdiction_resolution": {
+        "input": "경기도 수원시",
+        "institution_type": "local_government",
+        "state": "resolved",
+        "normalized": "경기도 수원시",
+        "council_id": "031014",
+        "candidates": [
+          {
+            "council_id": "031014",
+            "name": "경기도 수원시",
+            "registry_status": "current_code_table",
+            "match_basis": "EXACT_REGISTRY_NAME_OR_ALIAS"
+          }
+        ],
+        "source": "https://clik.nanet.go.kr/potal/guide/resourceCenter.do",
+        "checked_at": "2026-09-17",
+        "validity": "dated_source_registry_not_legal_administrative_boundary_verification"
+      },
+      "failures": [],
+      "warning": "검색 0건을 미제정/법적 근거 없음으로 확정하지 마세요. 정식 제명·본문·동의어·기관코드로 재확인하세요.",
+      "output_truncated": false,
+      "output_offset": 0,
+      "next_offset": null,
+      "continuation": "next_offset가 있으면 동일 query/page/max_pages에 offset만 바꿔 재조회; 없으면 coverage.next_page로 진행",
+      "selection_required": true,
+      "law_view": null,
+      "source_links": [
+        {
+          "url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+          "label": "수원시 소규모 공동주택관리 지원 조례",
+          "markdown": "[수원시 소규모 공동주택관리 지원 조례](https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111)",
+          "kind": "DOCUMENT_REFERENCE",
+          "status": "REFERENCE_PROVIDED",
+          "direct_document": true
+        }
+      ],
+      "link_guidance": {
+        "display": "각 핵심 사실·수치 뒤에 해당 source_links.markdown을 붙이고 자료별로 연결하세요.",
+        "scope": "DOCUMENT_REFERENCE=원문 주소, OFFICIAL_DATASET=데이터셋 안내, CATALOG_METADATA=자료 설명, OFFICIAL_SEARCH=검색 화면.",
+        "verification": "링크 제공과 페이지 본문 조회·대조는 다릅니다. status와 열람 범위를 유지하세요.",
+        "links_omitted": false
+      },
+      "mcp_receipt": {
+        "tool": "ordinance_search",
+        "server_version": "4.1.5-public.2",
+        "request_id": "fa1bb19e07404f109369",
+        "elapsed_ms": 1455,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      }
+    },
+    "isError": false
+  }
+}

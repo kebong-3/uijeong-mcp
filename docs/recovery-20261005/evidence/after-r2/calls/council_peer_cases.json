@@ -1,0 +1,169 @@
+{
+  "call": {
+    "id": "council_peer_cases",
+    "tool": "council_peer_cases",
+    "purpose": "서로 다른 지방의회 실제 질문 사례 중 최소 1건을 제한적으로 조회",
+    "seconds": 5.59,
+    "isError": false,
+    "status": "PARTIAL",
+    "code": null,
+    "classification": "RETURNED_WITH_SCOPE",
+    "receipt": {
+      "request_id": "52b2c89430c24745bae7",
+      "tool": "council_peer_cases",
+      "server_version": "4.1.5-public.2",
+      "returned_at": "2026-10-05T23:18:17.456277+09:00",
+      "elapsed_ms": 5435,
+      "result_reuse": "fresh",
+      "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+    },
+    "arguments": {
+      "topic": "소규모 공동주택",
+      "years": 1,
+      "case_count": 1,
+      "max_details": 3
+    },
+    "response_file": "calls/council_peer_cases.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"PARTIAL\", \"workflow\": \"PEER_COUNCIL_CASES\", \"topic\": \"소규모 공동주택\", \"cases\": [], \"coverage_card\": {\"date_from\": \"20251005\", \"date_to\": \"20261005\", \"search_terms\": [\"소규모 공동주택\"], \"list_calls\": [{\"term\": \"소규모 공동주택\", \"upstream_total\": 106032, \"rows_received\": 100, \"rows_in_period\": 100, \"query_recovery\": {\"reason\": \"CLIK_MINTS_HTML_WHITESPACE_ERROR11\", \"original_keyword\": \"소규모 공동주택\", \"fallback_keyword\": \"소규모공동주택\", \"transformation\": \"REMOVE_WHITESPACE\", \"same_result_set_verified\": false, \"scope\": {\"endpoint\": \"minutes.do\", \"display_type\": \"list\", \"search_type\": \"MINTS_HTML\", \"council_id\": null, \"offset\": 0, \"list_count\": 100, \"sort\": \"MTG_DE/DESC\"}, \"attempts\": [{\"query\": \"소규모 공동주택\", \"code\": \"ERROR11\"}, {\"query\": \"소규모공동주택\", \"code\": \"SUCCESS\"}], \"recovered\": true, \"limitation\": \"원문구 조회는 실패했습니다. 공백 제거 검색의 결과가 원문구 검색과 같은 범위인지는 확인하지 않았습니다.\", \"local_filters\": {\"date_from\": \"20251005\", \"date_to\": \"20261005\"}}}], \"unique_list_candidates\": 100, \"details_checked\": 3, \"details_with_actual_question\": 0, \"distinct_councils_returned\": 0, \"requested_case_count\": 1, \"max_details\": 3, \"limited\": true, \"is_exhaustive_national_archive\": false, \"clik_coverage_note\": \"CLIK Open API 연계 범위와 상세확인 상한 내 사례 검색이며 전국 모든 의회의 전수 결과가 아닙니다.\"}, \"errors\": [{\"source\": \"CLIK\", \"stage\": \"nationwide_list_query_recovery\", \"term\": \"소규모 공동주택\", \"code\": \"ERROR11\", \"query_recovery\": {\"reason\": \"CLIK_MINTS_HTML_WHITESPACE_ERROR11\", \"original_keyword\": \"소규모 공동주택\", \"fallback_keyword\": \"소규모공동주택\", \"transformation\": \"REMOVE_WHITESPACE\", \"same_result_set_verified\": false, \"scope\": {\"endpoint\": \"minutes.do\", \"display_type\": \"list\", \"search_type\": \"MINTS_HTML\", \"council_id\": null, \"offset\": 0, \"list_count\": 100, \"sort\": \"MTG_DE/DESC\"}, \"attempts\": [{\"query\": \"소규모 공동주택\", \"code\": \"ERROR11\"}, {\"query\": \"소규모공동주택\", \"code\": \"SUCCESS\"}], \"recovered\": true, \"limitation\": \"원문구 조회는 실패했습니다. 공백 제거 검색의 결과가 원문구 검색과 같은 범위인지는 확인하지 않았습니다.\", \"local_filters\": {\"date_from\": \"20251005\", \"date_to\": \"20261005\"}}, \"message\": \"원문구 내용검색 실패 후 공백 제거 검색을 확인했습니다. 원문구 조회 실패 범위는 미확인입니다.\"}], \"execution_trace\": {\"mcp_tool\": \"council_peer_cases\", \"mcp_first\": true, \"source\": \"CLIK minutes\", \"supplemental_web_search_policy\": \"공식 원문 링크가 없거나 CLIK 미연계 가능성이 있을 때만 해당 의회 공식 홈페이지 검색으로 보완\"}, \"interpretation\": [\"반환 순서는 우수성·대표성 순위가 아니라 최근 검색결과 기준입니다.\", \"의원 개인의 성향·관심도·성과를 평가하지 않습니다.\", \"미발견은 확인 범위의 미발견이며 전국에 사례가 없다는 뜻이 아닙니다.\"], \"mcp_receipt\": {\"request_id\": \"52b2c89430c24745bae7\", \"tool\": \"council_peer_cases\", \"server_version\": \"4.1.5-public.2\", \"returned_at\": \"2026-10-05T23:18:17.456277+09:00\", \"elapsed_ms\": 5435, \"result_reuse\": \"fresh\", \"meaning\": \"서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요.\"}, \"response_budget\": {\"max_chars\": 30000, \"original_chars\": 2509, \"response_chars\": 2509, \"truncated\": false}}",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "PARTIAL",
+      "workflow": "PEER_COUNCIL_CASES",
+      "topic": "소규모 공동주택",
+      "cases": [],
+      "coverage_card": {
+        "date_from": "20251005",
+        "date_to": "20261005",
+        "search_terms": [
+          "소규모 공동주택"
+        ],
+        "list_calls": [
+          {
+            "term": "소규모 공동주택",
+            "upstream_total": 106032,
+            "rows_received": 100,
+            "rows_in_period": 100,
+            "query_recovery": {
+              "reason": "CLIK_MINTS_HTML_WHITESPACE_ERROR11",
+              "original_keyword": "소규모 공동주택",
+              "fallback_keyword": "소규모공동주택",
+              "transformation": "REMOVE_WHITESPACE",
+              "same_result_set_verified": false,
+              "scope": {
+                "endpoint": "minutes.do",
+                "display_type": "list",
+                "search_type": "MINTS_HTML",
+                "council_id": null,
+                "offset": 0,
+                "list_count": 100,
+                "sort": "MTG_DE/DESC"
+              },
+              "attempts": [
+                {
+                  "query": "소규모 공동주택",
+                  "code": "ERROR11"
+                },
+                {
+                  "query": "소규모공동주택",
+                  "code": "SUCCESS"
+                }
+              ],
+              "recovered": true,
+              "limitation": "원문구 조회는 실패했습니다. 공백 제거 검색의 결과가 원문구 검색과 같은 범위인지는 확인하지 않았습니다.",
+              "local_filters": {
+                "date_from": "20251005",
+                "date_to": "20261005"
+              }
+            }
+          }
+        ],
+        "unique_list_candidates": 100,
+        "details_checked": 3,
+        "details_with_actual_question": 0,
+        "distinct_councils_returned": 0,
+        "requested_case_count": 1,
+        "max_details": 3,
+        "limited": true,
+        "is_exhaustive_national_archive": false,
+        "clik_coverage_note": "CLIK Open API 연계 범위와 상세확인 상한 내 사례 검색이며 전국 모든 의회의 전수 결과가 아닙니다."
+      },
+      "errors": [
+        {
+          "source": "CLIK",
+          "stage": "nationwide_list_query_recovery",
+          "term": "소규모 공동주택",
+          "code": "ERROR11",
+          "query_recovery": {
+            "reason": "CLIK_MINTS_HTML_WHITESPACE_ERROR11",
+            "original_keyword": "소규모 공동주택",
+            "fallback_keyword": "소규모공동주택",
+            "transformation": "REMOVE_WHITESPACE",
+            "same_result_set_verified": false,
+            "scope": {
+              "endpoint": "minutes.do",
+              "display_type": "list",
+              "search_type": "MINTS_HTML",
+              "council_id": null,
+              "offset": 0,
+              "list_count": 100,
+              "sort": "MTG_DE/DESC"
+            },
+            "attempts": [
+              {
+                "query": "소규모 공동주택",
+                "code": "ERROR11"
+              },
+              {
+                "query": "소규모공동주택",
+                "code": "SUCCESS"
+              }
+            ],
+            "recovered": true,
+            "limitation": "원문구 조회는 실패했습니다. 공백 제거 검색의 결과가 원문구 검색과 같은 범위인지는 확인하지 않았습니다.",
+            "local_filters": {
+              "date_from": "20251005",
+              "date_to": "20261005"
+            }
+          },
+          "message": "원문구 내용검색 실패 후 공백 제거 검색을 확인했습니다. 원문구 조회 실패 범위는 미확인입니다."
+        }
+      ],
+      "execution_trace": {
+        "mcp_tool": "council_peer_cases",
+        "mcp_first": true,
+        "source": "CLIK minutes",
+        "supplemental_web_search_policy": "공식 원문 링크가 없거나 CLIK 미연계 가능성이 있을 때만 해당 의회 공식 홈페이지 검색으로 보완"
+      },
+      "interpretation": [
+        "반환 순서는 우수성·대표성 순위가 아니라 최근 검색결과 기준입니다.",
+        "의원 개인의 성향·관심도·성과를 평가하지 않습니다.",
+        "미발견은 확인 범위의 미발견이며 전국에 사례가 없다는 뜻이 아닙니다."
+      ],
+      "mcp_receipt": {
+        "request_id": "52b2c89430c24745bae7",
+        "tool": "council_peer_cases",
+        "server_version": "4.1.5-public.2",
+        "returned_at": "2026-10-05T23:18:17.456277+09:00",
+        "elapsed_ms": 5435,
+        "result_reuse": "fresh",
+        "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+      },
+      "response_budget": {
+        "max_chars": 30000,
+        "original_chars": 2509,
+        "response_chars": 2509,
+        "truncated": false
+      }
+    },
+    "isError": false
+  }
+}

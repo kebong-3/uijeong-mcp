@@ -1,0 +1,129 @@
+{
+  "call": {
+    "id": "budget_calculation_schema",
+    "tool": "budget_calculation_schema",
+    "purpose": "산출 계산에 필요한 실제 내부 스키마 확인",
+    "seconds": 0.12,
+    "isError": false,
+    "status": null,
+    "code": null,
+    "classification": "RETURNED",
+    "receipt": {
+      "tool": "budget_calculation_schema",
+      "server_version": "4.1.5-public.2",
+      "request_id": "b077eef73b8b429984e6",
+      "elapsed_ms": 1,
+      "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+    },
+    "arguments": {
+      "operation": "cost"
+    },
+    "response_file": "calls/budget_calculation_schema.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"operation\": \"cost\", \"description\": \"단가×물량×횟수×기간 계산. 단가 근거·가정 필수; 법정부담은 자동 포함하지 않음.\", \"arguments_schema\": {\"type\": \"object\", \"properties\": {\"components\": {\"type\": \"array\", \"maxItems\": 100, \"items\": {\"type\": \"object\", \"maxProperties\": 1000, \"properties\": {\"name\": {\"type\": \"string\", \"maxLength\": 2000, \"description\": \"\"}, \"basis\": {\"type\": \"string\", \"maxLength\": 2000, \"description\": \"\"}, \"unit_price\": {\"type\": [\"string\", \"integer\", \"null\"], \"description\": \"숫자 문자열 권장; 공란은 미확인. 부동소수 JSON 숫자는 허용하지 않음\", \"maxLength\": 70}, \"quantity\": {\"type\": [\"string\", \"integer\", \"null\"], \"description\": \"숫자 문자열 권장; 공란은 미확인. 부동소수 JSON 숫자는 허용하지 않음\", \"maxLength\": 70}, \"count\": {\"type\": [\"string\", \"integer\", \"null\"], \"description\": \"숫자 문자열 권장; 공란은 미확인. 부동소수 JSON 숫자는 허용하지 않음\", \"maxLength\": 70}, \"periods\": {\"type\": [\"string\", \"integer\", \"null\"], \"description\": \"숫자 문자열 권장; 공란은 미확인. 부동소수 JSON 숫자는 허용하지 않음\", \"maxLength\": 70}}, \"required\": [\"name\", \"basis\", \"unit_price\", \"quantity\"], \"additionalProperties\": false}}, \"unit\": {\"type\": \"string\", \"maxLength\": 2000, \"description\": \"\", \"enum\": [\"원\", \"천원\", \"백만원\", \"억원\"]}}, \"required\": [\"components\"], \"additionalProperties\": false}, \"mcp_receipt\": {\"tool\": \"budget_calculation_schema\", \"server_version\": \"4.1.5-public.2\", \"request_id\": \"b077eef73b8b429984e6\", \"elapsed_ms\": 1, \"meaning\": \"서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요.\"}}",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "operation": "cost",
+      "description": "단가×물량×횟수×기간 계산. 단가 근거·가정 필수; 법정부담은 자동 포함하지 않음.",
+      "arguments_schema": {
+        "type": "object",
+        "properties": {
+          "components": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "maxProperties": 1000,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 2000,
+                  "description": ""
+                },
+                "basis": {
+                  "type": "string",
+                  "maxLength": 2000,
+                  "description": ""
+                },
+                "unit_price": {
+                  "type": [
+                    "string",
+                    "integer",
+                    "null"
+                  ],
+                  "description": "숫자 문자열 권장; 공란은 미확인. 부동소수 JSON 숫자는 허용하지 않음",
+                  "maxLength": 70
+                },
+                "quantity": {
+                  "type": [
+                    "string",
+                    "integer",
+                    "null"
+                  ],
+                  "description": "숫자 문자열 권장; 공란은 미확인. 부동소수 JSON 숫자는 허용하지 않음",
+                  "maxLength": 70
+                },
+                "count": {
+                  "type": [
+                    "string",
+                    "integer",
+                    "null"
+                  ],
+                  "description": "숫자 문자열 권장; 공란은 미확인. 부동소수 JSON 숫자는 허용하지 않음",
+                  "maxLength": 70
+                },
+                "periods": {
+                  "type": [
+                    "string",
+                    "integer",
+                    "null"
+                  ],
+                  "description": "숫자 문자열 권장; 공란은 미확인. 부동소수 JSON 숫자는 허용하지 않음",
+                  "maxLength": 70
+                }
+              },
+              "required": [
+                "name",
+                "basis",
+                "unit_price",
+                "quantity"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "unit": {
+            "type": "string",
+            "maxLength": 2000,
+            "description": "",
+            "enum": [
+              "원",
+              "천원",
+              "백만원",
+              "억원"
+            ]
+          }
+        },
+        "required": [
+          "components"
+        ],
+        "additionalProperties": false
+      },
+      "mcp_receipt": {
+        "tool": "budget_calculation_schema",
+        "server_version": "4.1.5-public.2",
+        "request_id": "b077eef73b8b429984e6",
+        "elapsed_ms": 1,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      }
+    },
+    "isError": false
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "call": {
+    "id": "ordinance_linked",
+    "tool": "ordinance_linked",
+    "purpose": "실제 상위법 ID·조번호로 공식 연결 조례 조회 경로 확인",
+    "seconds": 0.94,
+    "isError": false,
+    "status": "complete",
+    "code": null,
+    "classification": "RETURNED",
+    "receipt": {
+      "tool": "ordinance_linked",
+      "server_version": "4.1.5-public.2",
+      "request_id": "6051f7d3fea141f58b39",
+      "elapsed_ms": 817,
+      "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+    },
+    "arguments": {
+      "law_id": "012345",
+      "article": "제1조",
+      "max_pages": 1
+    },
+    "response_file": "calls/ordinance_linked.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"query\": \"*\", \"kind\": \"ordinance\", \"status\": \"complete\", \"api_total\": 0, \"scanned_rows\": 0, \"matched_in_scanned_rows\": 0, \"results\": [], \"coverage\": {\"pages\": [{\"page\": 1, \"received\": 0, \"source_state\": \"live\", \"retrieved_at\": \"2026-10-05T14:18:38.477381+00:00\"}], \"next_page\": null, \"query_exhausted\": true, \"query_fully_scanned\": true, \"first_scanned_page\": 1, \"national_exhaustive\": false, \"scope\": \"이 검색어·필터에 한정한 결과이며 전국 모든 관련 법규의 완전성을 보증하지 않음\"}, \"observed_jurisdictions\": [], \"jurisdiction_resolution\": {\"input\": \"\", \"institution_type\": \"local_government\", \"state\": \"unresolved\", \"normalized\": \"\", \"council_id\": \"\", \"candidates\": [], \"source\": \"https://clik.nanet.go.kr/potal/guide/resourceCenter.do\", \"checked_at\": \"2026-09-17\", \"validity\": \"dated_source_registry_not_legal_administrative_boundary_verification\"}, \"failures\": [], \"warning\": \"검색 0건을 미제정/법적 근거 없음으로 확정하지 마세요. 정식 제명·본문·동의어·기관코드로 재확인하세요.\", \"mcp_receipt\": {\"tool\": \"ordinance_linked\", \"server_version\": \"4.1.5-public.2\", \"request_id\": \"6051f7d3fea141f58b39\", \"elapsed_ms\": 817, \"meaning\": \"서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요.\"}}",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "query": "*",
+      "kind": "ordinance",
+      "status": "complete",
+      "api_total": 0,
+      "scanned_rows": 0,
+      "matched_in_scanned_rows": 0,
+      "results": [],
+      "coverage": {
+        "pages": [
+          {
+            "page": 1,
+            "received": 0,
+            "source_state": "live",
+            "retrieved_at": "2026-10-05T14:18:38.477381+00:00"
+          }
+        ],
+        "next_page": null,
+        "query_exhausted": true,
+        "query_fully_scanned": true,
+        "first_scanned_page": 1,
+        "national_exhaustive": false,
+        "scope": "이 검색어·필터에 한정한 결과이며 전국 모든 관련 법규의 완전성을 보증하지 않음"
+      },
+      "observed_jurisdictions": [],
+      "jurisdiction_resolution": {
+        "input": "",
+        "institution_type": "local_government",
+        "state": "unresolved",
+        "normalized": "",
+        "council_id": "",
+        "candidates": [],
+        "source": "https://clik.nanet.go.kr/potal/guide/resourceCenter.do",
+        "checked_at": "2026-09-17",
+        "validity": "dated_source_registry_not_legal_administrative_boundary_verification"
+      },
+      "failures": [],
+      "warning": "검색 0건을 미제정/법적 근거 없음으로 확정하지 마세요. 정식 제명·본문·동의어·기관코드로 재확인하세요.",
+      "mcp_receipt": {
+        "tool": "ordinance_linked",
+        "server_version": "4.1.5-public.2",
+        "request_id": "6051f7d3fea141f58b39",
+        "elapsed_ms": 817,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      }
+    },
+    "isError": false
+  }
+}

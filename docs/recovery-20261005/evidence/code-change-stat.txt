@@ -1,0 +1,27 @@
+ README.md                                         |   25 +-
+ budget_evidence.py                                |   21 +-
+ council_extensions.py                             |   29 +-
+ council_v29.py                                    |   28 +-
+ docs/public-call-contracts.md                     |   24 +-
+ docs/source-tool-contracts.json                   |  256 ++++-
+ evidence_core.py                                  |   22 +-
+ integrated_ordinance.py                           |  157 ++-
+ public_server.py                                  |    5 +-
+ release_info.py                                   |    2 +-
+ release_manifest.json                             |  142 ++-
+ scripts/recovery_minimum_calls.json               | 1280 +++++++++++++++++++++
+ scripts/source_contracts.py                       |   11 +-
+ scripts/verify_recovery.py                        |  269 +++++
+ service_v2.py                                     |    2 +
+ tests/test_finance_public_search_terms.py         |  104 ++
+ tests/test_legislation_jurisdiction_boundaries.py |   45 +
+ tests/test_recovery_clik_query.py                 |  215 ++++
+ tests/test_recovery_context_summary.py            |   95 ++
+ tests/test_recovery_contract_edges.py             |  143 +++
+ tests/test_recovery_fiscal_search_scope.py        |   29 +
+ tests/test_recovery_ordinance_compare.py          |  177 +++
+ tests/test_recovery_speech_boundaries.py          |   64 ++
+ tests/test_recovery_verifier_preconditions.py     |   37 +
+ uijeong_mcp.py                                    |   93 +-
+ v3_reliability.py                                 |   90 +-
+ 26 files changed, 3272 insertions(+), 93 deletions(-)

@@ -1,0 +1,69 @@
+{
+  "call": {
+    "id": "local_evidence_review",
+    "tool": "local_evidence_review",
+    "purpose": "실제 조회한 조례 원문의 제한된 열람범위를 메타데이터로 점검",
+    "seconds": 0.11,
+    "isError": false,
+    "status": "METADATA_REVIEW_ONLY",
+    "code": null,
+    "classification": "RETURNED_WITH_SCOPE",
+    "receipt": {
+      "tool": "local_evidence_review",
+      "server_version": "4.1.5-public.2",
+      "request_id": "089a551533f243bc8824",
+      "elapsed_ms": 0,
+      "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+    },
+    "arguments": {
+      "evidence": [
+        {
+          "domain": "ordinance",
+          "source_ref": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+          "jurisdiction": "경기도 수원시",
+          "as_of": "2026-10-05",
+          "state": "partial",
+          "claim": "공식 조례의 공동 관리소 설치 조문 1개를 조회함. 전체 조문·적법성·동일사업은 확정하지 않음."
+        }
+      ],
+      "jurisdiction": "경기도 수원시",
+      "required_domains": [
+        "ordinance"
+      ]
+    },
+    "response_file": "calls/local_evidence_review.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"METADATA_REVIEW_ONLY\", \"verified_facts\": false, \"issues\": [{\"index\": 0, \"issues\": [\"일부 범위만 확인; 전체 결론 금지\"]}], \"missing_evidence_domains\": [], \"limits\": \"제공된 메타데이터만 점검했습니다. 실제 조회 여부·원문 내용·적법성은 이 도구로 검증하지 않습니다.\", \"mcp_receipt\": {\"tool\": \"local_evidence_review\", \"server_version\": \"4.1.5-public.2\", \"request_id\": \"089a551533f243bc8824\", \"elapsed_ms\": 0, \"meaning\": \"서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요.\"}}",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "METADATA_REVIEW_ONLY",
+      "verified_facts": false,
+      "issues": [
+        {
+          "index": 0,
+          "issues": [
+            "일부 범위만 확인; 전체 결론 금지"
+          ]
+        }
+      ],
+      "missing_evidence_domains": [],
+      "limits": "제공된 메타데이터만 점검했습니다. 실제 조회 여부·원문 내용·적법성은 이 도구로 검증하지 않습니다.",
+      "mcp_receipt": {
+        "tool": "local_evidence_review",
+        "server_version": "4.1.5-public.2",
+        "request_id": "089a551533f243bc8824",
+        "elapsed_ms": 0,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      }
+    },
+    "isError": false
+  }
+}

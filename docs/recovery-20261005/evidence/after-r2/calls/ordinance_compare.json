@@ -1,0 +1,960 @@
+{
+  "call": {
+    "id": "ordinance_compare",
+    "tool": "ordinance_compare",
+    "purpose": "실제 검색에서 확보한 수원·성남 조례 각 1개의 기능 차이 비교",
+    "seconds": 2.85,
+    "isError": false,
+    "status": "PARTIAL",
+    "code": null,
+    "classification": "RETURNED_WITH_SCOPE",
+    "receipt": {
+      "tool": "ordinance_compare",
+      "server_version": "4.1.5-public.2",
+      "request_id": "e60c0fb41b2741a4b275",
+      "elapsed_ms": 2733,
+      "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+    },
+    "arguments": {
+      "baseline": {
+        "kind": "ordinance",
+        "document_id": "2209592",
+        "mst": "2102111",
+        "title_hint": "수원시 소규모 공동주택관리 지원 조례"
+      },
+      "comparisons": [
+        {
+          "kind": "ordinance",
+          "document_id": "2182991",
+          "mst": "2092005",
+          "title_hint": "성남시 소규모 공동주택관리에 관한 지원 조례"
+        }
+      ],
+      "as_of": "2026-10-05"
+    },
+    "response_file": "calls/ordinance_compare.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "ordinance_compare: PARTIAL. 전체 결과와 출처는 structuredContent에 있습니다.",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "PARTIAL",
+      "baseline": {
+        "kind": "ordinance",
+        "document_id": "2209592",
+        "title": "수원시 소규모 공동주택관리 지원 조례",
+        "jurisdiction": "경기도 수원시",
+        "version": "2102111",
+        "effective_date": "20251231",
+        "promulgation_date": "20251231",
+        "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+        "source_state": "cache",
+        "version_scope": "version",
+        "retrieved_at": "2026-10-05T14:18:37.519350+00:00",
+        "identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+        "content_hash": "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210",
+        "article_count": 22,
+        "supplement_count": 1,
+        "annex_count": 2,
+        "warnings": [
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "자치법규 별표 API 제공범위 제한: 별표·별지·서식은 소관기관 원문과 별도 대조 필요",
+          "별표 첨부파일의 본문 미수집: 메타데이터 비교만 가능하며 원본 표·서식 확인 필요"
+        ],
+        "warning_coverage": {
+          "unique_warnings": 3,
+          "returned_warnings": 3,
+          "truncated": false,
+          "recovery": "해당 문서의 ordinance_get_document summary에서 전체 경고를 확인하세요."
+        }
+      },
+      "comparisons": [
+        {
+          "temporal": {
+            "state": "effective_on_or_before_as_of",
+            "as_of": "2026-10-05",
+            "version_current_verified": false,
+            "caveat": "시행일이 과거라는 사실만으로 해당 기준일의 현행본임이 증명되지 않습니다. 후속개정·조문별 시행일·부칙을 확인하세요."
+          },
+          "same_jurisdiction_level": "미판정: 광역·기초·교육기관의 권한 차이를 별도 확인",
+          "peer_document": {
+            "kind": "ordinance",
+            "document_id": "2182991",
+            "title": "성남시 소규모 공동주택관리에 관한 지원 조례",
+            "jurisdiction": "경기도 성남시",
+            "version": "2092005",
+            "effective_date": "20260101",
+            "promulgation_date": "20251215",
+            "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2092005",
+            "source_state": "live",
+            "version_scope": "version",
+            "retrieved_at": "2026-10-05T14:18:40.673635+00:00",
+            "identity": "ordinance:2182991:2092005:version:9455684861eeb94c",
+            "content_hash": "9455684861eeb94c4d6ddda006acf75634ece3fbf3ec9898364ffa7837515a59",
+            "article_count": 12,
+            "supplement_count": 1,
+            "annex_count": 2,
+            "warnings": [
+              "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+              "자치법규 별표 API 제공범위 제한: 별표·별지·서식은 소관기관 원문과 별도 대조 필요",
+              "별표 첨부파일의 본문 미수집: 메타데이터 비교만 가능하며 원본 표·서식 확인 필요"
+            ],
+            "warning_coverage": {
+              "unique_warnings": 3,
+              "returned_warnings": 3,
+              "truncated": false,
+              "recovery": "해당 문서의 ordinance_get_document summary에서 전체 경고를 확인하세요."
+            }
+          },
+          "alignments": [
+            {
+              "category": "correspondence_candidate",
+              "peer": {
+                "id": "E-fec5fa4313552a059227",
+                "document_identity": "ordinance:2182991:2092005:version:9455684861eeb94c",
+                "document_title": "성남시 소규모 공동주택관리에 관한 지원 조례",
+                "document_id": "2182991",
+                "version": "2092005",
+                "article": "제1조",
+                "article_key": "main:제1조",
+                "text": "제1조(목적) 이 조례는 소규모 공동주택의 관리업무에 필요한 비용의 일부를 지원하여 쾌적한 주거환경 조성과 삶의 질 향상에 이바지함을 목적으로 한다.",
+                "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2092005",
+                "retrieved_at": "2026-10-05T14:18:40.673635+00:00",
+                "effective_date": "20260101",
+                "source_state": "live",
+                "version_scope": "version",
+                "content_hash": "9455684861eeb94c4d6ddda006acf75634ece3fbf3ec9898364ffa7837515a59",
+                "jurisdiction": "경기도 성남시",
+                "kind": "ordinance",
+                "excerpt_location": {
+                  "item_offset": 0,
+                  "char_start": 0,
+                  "char_end": 83,
+                  "total_chars": 83,
+                  "excerpt_only": false,
+                  "offset_basis": "ARTICLE_TEXT"
+                },
+                "recovery": {
+                  "tool": "ordinance_get_document",
+                  "arguments": {
+                    "reference": {
+                      "kind": "ordinance",
+                      "document_id": "2182991",
+                      "mst": "2092005",
+                      "title_hint": "성남시 소규모 공동주택관리에 관한 지원 조례"
+                    },
+                    "section": "articles",
+                    "offset": 0,
+                    "limit": 1,
+                    "max_chars": 2000
+                  },
+                  "expected_content_hash": "9455684861eeb94c4d6ddda006acf75634ece3fbf3ec9898364ffa7837515a59"
+                }
+              },
+              "baseline_candidates": [
+                {
+                  "retrieval_score": 0.5615,
+                  "evidence": {
+                    "id": "E-e12a338a1fb050352851",
+                    "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+                    "document_title": "수원시 소규모 공동주택관리 지원 조례",
+                    "document_id": "2209592",
+                    "version": "2102111",
+                    "article": "제1조",
+                    "article_key": "main:제1조",
+                    "text": "제1조(목적) 이 조례는 소규모 공동주택의 관리에 필요한 사항을 지원하여 쾌적한 주거환경을 조성하고 수원시민의 삶의 질 향상에 기여하는 것을 목적으로 한다. (개정 2025.05.16.)",
+                    "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+                    "retrieved_at": "2026-10-05T14:18:37.519350+00:00",
+                    "effective_date": "20251231",
+                    "source_state": "cache",
+                    "version_scope": "version",
+                    "content_hash": "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210",
+                    "jurisdiction": "경기도 수원시",
+                    "kind": "ordinance",
+                    "excerpt_location": {
+                      "item_offset": 0,
+                      "char_start": 0,
+                      "char_end": 104,
+                      "total_chars": 104,
+                      "excerpt_only": false,
+                      "offset_basis": "ARTICLE_TEXT"
+                    },
+                    "recovery": {
+                      "tool": "ordinance_get_document",
+                      "arguments": {
+                        "reference": {
+                          "kind": "ordinance",
+                          "document_id": "2209592",
+                          "mst": "2102111",
+                          "title_hint": "수원시 소규모 공동주택관리 지원 조례"
+                        },
+                        "section": "articles",
+                        "offset": 0,
+                        "limit": 1,
+                        "max_chars": 2000
+                      },
+                      "expected_content_hash": "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210"
+                    }
+                  },
+                  "semantic_flags": [],
+                  "paragraphs_only_in_peer_candidate": [
+                    "이 조례는 소규모 공동주택의 관리업무에 필요한 비용의 일부를 지원하여 쾌적한 주거환경 조성과 삶의 질 향상에 이바지함을 목적으로 한다."
+                  ],
+                  "paragraph_coverage": {
+                    "candidate_paragraphs": 1,
+                    "returned_paragraphs": 1,
+                    "excerpt_only": false,
+                    "recovery": "같은 행의 peer.recovery로 조문 전체를 확인하세요."
+                  }
+                },
+                {
+                  "retrieval_score": 0.1865,
+                  "evidence": {
+                    "id": "E-e21376d21c8a295b95b2",
+                    "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+                    "document_title": "수원시 소규모 공동주택관리 지원 조례",
+                    "document_id": "2209592",
+                    "version": "2102111",
+                    "article": "제11조",
+                    "article_key": "main:제11조",
+                    "text": "제11조(보조금의 목적 외 사용 금지)① 관리주체는 보조금의 교부결정 내용과 조건에 따라 지원사업을 성실히 수행하여야 하며, 교부금을 다른 용도로 사용하여서는 아니 된다.② 시장은 관리주체가 다음 각 호의 어느 하나에 해당되는 행위를 한 경우에는 보조금의 교부를 중지하거나 이미 교부한 보조금의 전부 또는 일부의 반환을 명하여야 한다.1. 법령을 위반하였거나 보조금을 교부 목적 외로 사용한 경우2. 지원사업의 전부 또는 일부를 중지한 때3. 지원사업의 목적을 달성할 수 없다고 인정한 때4. 거짓 또는 부정한 방법으로 보조금을 받았을 때5. 이 조례에 따른 명령 또는 처분을 위반하거나 검사거부 또는 허위보고를 하였을 때③ 시장은 제2항에 해당하는 소규모 공동주택 단지에는 보조금을 5년 이내에 다시 지원하지 아니",
+                    "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+                    "retrieved_at": "2026-10-05T14:18:37.519350+00:00",
+                    "effective_date": "20251231",
+                    "source_state": "cache",
+                    "version_scope": "version",
+                    "content_hash": "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210",
+                    "jurisdiction": "경기도 수원시",
+                    "kind": "ordinance",
+                    "excerpt_location": {
+                      "item_offset": 11,
+                      "char_start": 0,
+                      "char_end": 400,
+                      "total_chars": 403,
+                      "excerpt_only": true,
+                      "offset_basis": "ARTICLE_TEXT"
+                    },
+                    "recovery": {
+                      "tool": "ordinance_get_document",
+                      "arguments": {
+                        "reference": {
+                          "kind": "ordinance",
+                          "document_id": "2209592",
+                          "mst": "2102111",
+                          "title_hint": "수원시 소규모 공동주택관리 지원 조례"
+                        },
+                        "section": "articles",
+                        "offset": 11,
+                        "limit": 1,
+                        "max_chars": 2000
+                      },
+                      "expected_content_hash": "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210"
+                    }
+                  },
+                  "semantic_flags": [
+                    "금액·연령·기간·인원 등 수치 차이",
+                    "재량·의무·금지 표현 차이",
+                    "범위·예외·상하한 표현 차이"
+                  ],
+                  "paragraphs_only_in_peer_candidate": [
+                    "이 조례는 소규모 공동주택의 관리업무에 필요한 비용의 일부를 지원하여 쾌적한 주거환경 조성과 삶의 질 향상에 이바지함을 목적으로 한다."
+                  ],
+                  "paragraph_coverage": {
+                    "candidate_paragraphs": 1,
+                    "returned_paragraphs": 1,
+                    "excerpt_only": false,
+                    "recovery": "같은 행의 peer.recovery로 조문 전체를 확인하세요."
+                  }
+                }
+              ],
+              "finding": "문자·기능 단서에 따른 대응 후보이며 법적 동등성 판단 아님"
+            },
+            {
+              "category": "correspondence_candidate",
+              "peer": {
+                "id": "E-c354866a46b672ba0270",
+                "document_identity": "ordinance:2182991:2092005:version:9455684861eeb94c",
+                "document_title": "성남시 소규모 공동주택관리에 관한 지원 조례",
+                "document_id": "2182991",
+                "version": "2092005",
+                "article": "제2조",
+                "article_key": "main:제2조",
+                "text": "제2조(정의) 이 조례에서 사용하는 용어의 뜻은 다음과 같다. 1. “소규모 공동주택”이란 「건축법」제11조에 따라 건축허가를 받은 공동주택(아파트, 주상복합아파트, 연립주택, 다세대주택) 중 150세대 이상의 주상복합아파트를 제외한「성남시 공동주택관리 조례」상 지원대상에 포함되지 않는 것을 말한다.2. “관리주체”란 공동주택을 관리하는 다음 각 목의 어느 하나에 해당하는 자를 말한다.가.「공동주택관리법」제14조에 따른 입주자대표회의나.「집합건물의 소유 및 관리에 관한 법률」 제24조에 따른 관리단다. 입주자 3분의 2 이상 동의를 받은 대표3. “입주자”란 다음 각 목의 어느 하나에 해당하는 사람을 말한다.가. 주택의 소유자나. 주택의 소유자를 대리하는 배우자 및 직계존비속",
+                "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2092005",
+                "retrieved_at": "2026-10-05T14:18:40.673635+00:00",
+                "effective_date": "20260101",
+                "source_state": "live",
+                "version_scope": "version",
+                "content_hash": "9455684861eeb94c4d6ddda006acf75634ece3fbf3ec9898364ffa7837515a59",
+                "jurisdiction": "경기도 성남시",
+                "kind": "ordinance",
+                "excerpt_location": {
+                  "item_offset": 1,
+                  "char_start": 0,
+                  "char_end": 382,
+                  "total_chars": 382,
+                  "excerpt_only": false,
+                  "offset_basis": "ARTICLE_TEXT"
+                },
+                "recovery": {
+                  "tool": "ordinance_get_document",
+                  "arguments": {
+                    "reference": {
+                      "kind": "ordinance",
+                      "document_id": "2182991",
+                      "mst": "2092005",
+                      "title_hint": "성남시 소규모 공동주택관리에 관한 지원 조례"
+                    },
+                    "section": "articles",
+                    "offset": 1,
+                    "limit": 1,
+                    "max_chars": 2000
+                  },
+                  "expected_content_hash": "9455684861eeb94c4d6ddda006acf75634ece3fbf3ec9898364ffa7837515a59"
+                }
+              },
+              "baseline_candidates": [
+                {
+                  "retrieval_score": 0.5987,
+                  "evidence": {
+                    "id": "E-5be247007c8cda2c126a",
+                    "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+                    "document_title": "수원시 소규모 공동주택관리 지원 조례",
+                    "document_id": "2209592",
+                    "version": "2102111",
+                    "article": "제2조",
+                    "article_key": "main:제2조",
+                    "text": "제2조(정의) 이 조례에서 사용하는 용어의 뜻은 다음 각 호와 같다.1. “소규모 공동주택”이란 「건축법」 제11조에 따라 건축허가를 받아 사용승인 된 30세대 미만의 공동주택(아파트, 연립주택, 다세대주택)을 말한다.2. “관리주체”란 공동주택을 관리하는 다음 각 목의 어느 하나에 해당하는 자를 말한다.가. 「집합건물의 소유 및 관리에 관한 법률」제24조에 따른 관리단나. 주택 구분소유자 3분의 2이상의 동의를 받은 2인 이상의 공동대표3. “수원시 소규모 공동주택지원심의위원회”란 「수원시 건축 조례」제9조제1항제5호에 따라 구성·운영되는 전문위원회를 말한다.",
+                    "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+                    "retrieved_at": "2026-10-05T14:18:37.519350+00:00",
+                    "effective_date": "20251231",
+                    "source_state": "cache",
+                    "version_scope": "version",
+                    "content_hash": "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210",
+                    "jurisdiction": "경기도 수원시",
+                    "kind": "ordinance",
+                    "excerpt_location": {
+                      "item_offset": 1,
+                      "char_start": 0,
+                      "char_end": 317,
+                      "total_chars": 317,
+                      "excerpt_only": false,
+                      "offset_basis": "ARTICLE_TEXT"
+                    },
+                    "recovery": {
+                      "tool": "ordinance_get_document",
+                      "arguments": {
+                        "reference": {
+                          "kind": "ordinance",
+                          "document_id": "2209592",
+                          "mst": "2102111",
+                          "title_hint": "수원시 소규모 공동주택관리 지원 조례"
+                        },
+                        "section": "articles",
+                        "offset": 1,
+                        "limit": 1,
+                        "max_chars": 2000
+                      },
+                      "expected_content_hash": "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210"
+                    }
+                  },
+                  "semantic_flags": [
+                    "금액·연령·기간·인원 등 수치 차이",
+                    "범위·예외·상하한 표현 차이"
+                  ],
+                  "paragraphs_only_in_peer_candidate": [],
+                  "paragraph_coverage": {
+                    "candidate_paragraphs": 0,
+                    "returned_paragraphs": 0,
+                    "excerpt_only": false,
+                    "recovery": "같은 행의 peer.recovery로 조문 전체를 확인하세요."
+                  }
+                },
+                {
+                  "retrieval_score": 0.1403,
+                  "evidence": {
+                    "id": "E-dbd62491a4c76e645f80",
+                    "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+                    "document_title": "수원시 소규모 공동주택관리 지원 조례",
+                    "document_id": "2209592",
+                    "version": "2102111",
+                    "article": "제14조",
+                    "article_key": "main:제14조",
+                    "text": "제14조(위원의 임기)① 위원의 임기는 2년으로 하되 한 차례만 연임할 수 있다. 다만, 공무원과 단체 구성원 자격으로 지명된 위원은 그 직에 재임하는 기간으로 한다.② 위원의 사임 등으로 인하여 새로 위촉된 위원의 임기는 전임위원의 남은 기간으로 한다. (개정 2025.05.16.)",
+                    "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+                    "retrieved_at": "2026-10-05T14:18:37.519350+00:00",
+                    "effective_date": "20251231",
+                    "source_state": "cache",
+                    "version_scope": "version",
+                    "content_hash": "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210",
+                    "jurisdiction": "경기도 수원시",
+                    "kind": "ordinance",
+                    "excerpt_location": {
+                      "item_offset": 14,
+                      "char_start": 0,
+                      "char_end": 159,
+                      "total_chars": 159,
+                      "excerpt_only": false,
+                      "offset_basis": "ARTICLE_TEXT"
+                    },
+                    "recovery": {
+                      "tool": "ordinance_get_document",
+                      "arguments": {
+                        "reference": {
+                          "kind": "ordinance",
+                          "document_id": "2209592",
+                          "mst": "2102111",
+                          "title_hint": "수원시 소규모 공동주택관리 지원 조례"
+                        },
+                        "section": "articles",
+                        "offset": 14,
+                        "limit": 1,
+                        "max_chars": 2000
+                      },
+                      "expected_content_hash": "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210"
+                    }
+                  },
+                  "semantic_flags": [
+                    "금액·연령·기간·인원 등 수치 차이",
+                    "재량·의무·금지 표현 차이",
+                    "범위·예외·상하한 표현 차이"
+                  ],
+                  "paragraphs_only_in_peer_candidate": [
+                    "이 조례에서 사용하는 용어의 뜻은 다음과 같다. 1. “소규모 공동주택”이란 「건축법」제11조에 따라 건축허가를 받은 공동주택(아파트, 주상복합아파트, 연립주택, 다세대주택) 중 150세대 이상의 주상복합아파트를 제외한「성남시 공동주택관리 조례」상 지원대상에 포함되지 않는 것을 말한다.2. “관리주체”란 공동주택을 관리하는 다음 각 목의 어느 하나에 해당하는 자를 말한다.가.「공동주택관리법」제14조에 따른 입주자대표회의나.「집합건물의 소유 및 관리에 관한 법률」 제24조에 따른 관리단다. 입주자 3분의 2 이상 동의를 받은 대표3. “입주자”란 다음 각 목의 어느 하나에 해당하는 사람을 말한다.가. 주택의 소유자나. 주택의 소유자를 대리하는 배우자 및 직계존비속"
+                  ],
+                  "paragraph_coverage": {
+                    "candidate_paragraphs": 1,
+                    "returned_paragraphs": 1,
+                    "excerpt_only": false,
+                    "recovery": "같은 행의 peer.recovery로 조문 전체를 확인하세요."
+                  }
+                }
+              ],
+              "finding": "문자·기능 단서에 따른 대응 후보이며 법적 동등성 판단 아님"
+            }
+          ]
+        }
+      ],
+      "dimension_matrix": [
+        {
+          "dimension": "목적·정의",
+          "cells": [
+            {
+              "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+              "observed": true,
+              "evidence_ids": [
+                "E-e12a338a1fb050352851"
+              ],
+              "evidence_count": 3,
+              "evidence_ids_omitted": 2,
+              "sample_article": {
+                "article": "제1조",
+                "article_offset": 0
+              },
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            },
+            {
+              "document_identity": "ordinance:2182991:2092005:version:9455684861eeb94c",
+              "observed": true,
+              "evidence_ids": [
+                "E-fec5fa4313552a059227"
+              ],
+              "evidence_count": 3,
+              "evidence_ids_omitted": 2,
+              "sample_article": {
+                "article": "제1조",
+                "article_offset": 0
+              },
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            }
+          ]
+        },
+        {
+          "dimension": "소관사무·책무",
+          "cells": [
+            {
+              "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+              "observed": true,
+              "evidence_ids": [
+                "E-6c0330942b3aa0f99044"
+              ],
+              "evidence_count": 12,
+              "evidence_ids_omitted": 11,
+              "sample_article": {
+                "article": "제4조",
+                "article_offset": 3
+              },
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            },
+            {
+              "document_identity": "ordinance:2182991:2092005:version:9455684861eeb94c",
+              "observed": true,
+              "evidence_ids": [
+                "E-beb36aaee14d12c87cf5"
+              ],
+              "evidence_count": 7,
+              "evidence_ids_omitted": 6,
+              "sample_article": {
+                "article": "제5조",
+                "article_offset": 4
+              },
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            }
+          ]
+        },
+        {
+          "dimension": "지원대상·제외",
+          "cells": [
+            {
+              "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+              "observed": true,
+              "evidence_ids": [
+                "E-1a3d1743e60b2d5fa5f3"
+              ],
+              "evidence_count": 4,
+              "evidence_ids_omitted": 3,
+              "sample_article": {
+                "article": "제3조",
+                "article_offset": 2
+              },
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            },
+            {
+              "document_identity": "ordinance:2182991:2092005:version:9455684861eeb94c",
+              "observed": true,
+              "evidence_ids": [
+                "E-c354866a46b672ba0270"
+              ],
+              "evidence_count": 4,
+              "evidence_ids_omitted": 3,
+              "sample_article": {
+                "article": "제2조",
+                "article_offset": 1
+              },
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            }
+          ]
+        },
+        {
+          "dimension": "지원내용·금액",
+          "cells": [
+            {
+              "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+              "observed": true,
+              "evidence_ids": [
+                "E-e70b3bea2dad02cd6095"
+              ],
+              "evidence_count": 9,
+              "evidence_ids_omitted": 8,
+              "sample_article": {
+                "article": "제5조",
+                "article_offset": 4
+              },
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            },
+            {
+              "document_identity": "ordinance:2182991:2092005:version:9455684861eeb94c",
+              "observed": true,
+              "evidence_ids": [
+                "E-fec5fa4313552a059227"
+              ],
+              "evidence_count": 10,
+              "evidence_ids_omitted": 9,
+              "sample_article": {
+                "article": "제1조",
+                "article_offset": 0
+              },
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            }
+          ]
+        },
+        {
+          "dimension": "신청·선정",
+          "cells": [
+            {
+              "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+              "observed": true,
+              "evidence_ids": [
+                "E-6aba01bf5e42d170915e"
+              ],
+              "evidence_count": 4,
+              "evidence_ids_omitted": 3,
+              "sample_article": {
+                "article": "제7조",
+                "article_offset": 7
+              },
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            },
+            {
+              "document_identity": "ordinance:2182991:2092005:version:9455684861eeb94c",
+              "observed": true,
+              "evidence_ids": [
+                "E-beb36aaee14d12c87cf5"
+              ],
+              "evidence_count": 4,
+              "evidence_ids_omitted": 3,
+              "sample_article": {
+                "article": "제5조",
+                "article_offset": 4
+              },
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            }
+          ]
+        },
+        {
+          "dimension": "지급·중복방지",
+          "cells": [
+            {
+              "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+              "observed": true,
+              "evidence_ids": [
+                "E-823adb1b85468d0e5d6d"
+              ],
+              "evidence_count": 1,
+              "evidence_ids_omitted": 0,
+              "sample_article": {
+                "article": "제19조",
+                "article_offset": 19
+              },
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            },
+            {
+              "document_identity": "ordinance:2182991:2092005:version:9455684861eeb94c",
+              "observed": true,
+              "evidence_ids": [
+                "E-35b2771d92eb210b3602"
+              ],
+              "evidence_count": 1,
+              "evidence_ids_omitted": 0,
+              "sample_article": {
+                "article": "제11조",
+                "article_offset": 10
+              },
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            }
+          ]
+        },
+        {
+          "dimension": "중지·환수·이의",
+          "cells": [
+            {
+              "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+              "observed": true,
+              "evidence_ids": [
+                "E-67a3fe200b9fa887682b"
+              ],
+              "evidence_count": 2,
+              "evidence_ids_omitted": 1,
+              "sample_article": {
+                "article": "제9조",
+                "article_offset": 9
+              },
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            },
+            {
+              "document_identity": "ordinance:2182991:2092005:version:9455684861eeb94c",
+              "observed": true,
+              "evidence_ids": [
+                "E-c5de78f19fe838efc59c"
+              ],
+              "evidence_count": 2,
+              "evidence_ids_omitted": 1,
+              "sample_article": {
+                "article": "제9조",
+                "article_offset": 8
+              },
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            }
+          ]
+        },
+        {
+          "dimension": "위원회·제척회피",
+          "cells": [
+            {
+              "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+              "observed": true,
+              "evidence_ids": [
+                "E-5be247007c8cda2c126a"
+              ],
+              "evidence_count": 11,
+              "evidence_ids_omitted": 10,
+              "sample_article": {
+                "article": "제2조",
+                "article_offset": 1
+              },
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            },
+            {
+              "document_identity": "ordinance:2182991:2092005:version:9455684861eeb94c",
+              "observed": true,
+              "evidence_ids": [
+                "E-27a63d52a773aba34e1c"
+              ],
+              "evidence_count": 2,
+              "evidence_ids_omitted": 1,
+              "sample_article": {
+                "article": "제4조",
+                "article_offset": 3
+              },
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            }
+          ]
+        },
+        {
+          "dimension": "위탁·공유재산",
+          "cells": [
+            {
+              "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+              "observed": false,
+              "evidence_ids": [],
+              "evidence_count": 0,
+              "evidence_ids_omitted": 0,
+              "sample_article": null,
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            },
+            {
+              "document_identity": "ordinance:2182991:2092005:version:9455684861eeb94c",
+              "observed": false,
+              "evidence_ids": [],
+              "evidence_count": 0,
+              "evidence_ids_omitted": 0,
+              "sample_article": null,
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            }
+          ]
+        },
+        {
+          "dimension": "개인정보·기록",
+          "cells": [
+            {
+              "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+              "observed": false,
+              "evidence_ids": [],
+              "evidence_count": 0,
+              "evidence_ids_omitted": 0,
+              "sample_article": null,
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            },
+            {
+              "document_identity": "ordinance:2182991:2092005:version:9455684861eeb94c",
+              "observed": false,
+              "evidence_ids": [],
+              "evidence_count": 0,
+              "evidence_ids_omitted": 0,
+              "sample_article": null,
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            }
+          ]
+        },
+        {
+          "dimension": "점검·평가·공개",
+          "cells": [
+            {
+              "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+              "observed": true,
+              "evidence_ids": [
+                "E-1a6a83ba551731d168d9"
+              ],
+              "evidence_count": 3,
+              "evidence_ids_omitted": 2,
+              "sample_article": {
+                "article": "제8조",
+                "article_offset": 8
+              },
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            },
+            {
+              "document_identity": "ordinance:2182991:2092005:version:9455684861eeb94c",
+              "observed": true,
+              "evidence_ids": [
+                "E-fec5fa4313552a059227"
+              ],
+              "evidence_count": 4,
+              "evidence_ids_omitted": 3,
+              "sample_article": {
+                "article": "제1조",
+                "article_offset": 0
+              },
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            }
+          ]
+        },
+        {
+          "dimension": "시행·경과·서식",
+          "cells": [
+            {
+              "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+              "observed": true,
+              "evidence_ids": [
+                "E-e70b3bea2dad02cd6095"
+              ],
+              "evidence_count": 3,
+              "evidence_ids_omitted": 2,
+              "sample_article": {
+                "article": "제5조",
+                "article_offset": 4
+              },
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            },
+            {
+              "document_identity": "ordinance:2182991:2092005:version:9455684861eeb94c",
+              "observed": true,
+              "evidence_ids": [
+                "E-27a63d52a773aba34e1c"
+              ],
+              "evidence_count": 3,
+              "evidence_ids_omitted": 2,
+              "sample_article": {
+                "article": "제4조",
+                "article_offset": 3
+              },
+              "recovery_basis": "document_identity로 document_recovery를 찾고 sample_article.article_offset을 사용"
+            }
+          ]
+        }
+      ],
+      "method": "제목 0.30 + 본문 3글자 집합 0.55 + 기능단서 0.15. 법적 적합성 점수 아님",
+      "guardrails": [
+        "조항 수가 많거나 여러 지자체가 채택했다고 우수·적법한 것은 아닙니다.",
+        "possible_gap은 기능이 다른 조문·다른 조례·상위법에 있을 수 있는 검토 후보입니다.",
+        "대상·사무·재정·광역/기초 권한·시행시점을 확인한 후 적용하세요."
+      ],
+      "legal_approval": false,
+      "equivalence_verified": false,
+      "ready_for_submission": false,
+      "alignment_counts": {
+        "correspondence_candidate": 8,
+        "possible_gap": 4
+      },
+      "coverage": {
+        "pairs_compared": 264,
+        "unprocessed_articles": 0,
+        "comparison_complete": false,
+        "analysis_comparison_complete": true,
+        "total_alignments": 12,
+        "offset": 0,
+        "requested_limit": 3,
+        "returned_alignments": 2,
+        "next_offset": 2,
+        "output_complete": false,
+        "quote_excerpt_count": 1,
+        "paragraph_candidates_omitted": 0,
+        "matrix_evidence_ids_omitted": 72,
+        "order": "입력 comparisons 순서, 각 비교 문서의 원문 조문 순서",
+        "source_content_hashes": [
+          "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210",
+          "9455684861eeb94c4d6ddda006acf75634ece3fbf3ec9898364ffa7837515a59"
+        ],
+        "effective_max_chars": 400,
+        "scope": "계산한 대응 후보와 현재 반환한 구간은 다릅니다. 법적 동등성·미비 조항·현행 효력 승인 아님."
+      },
+      "continuation": {
+        "tool": "ordinance_compare",
+        "arguments": {
+          "baseline": {
+            "kind": "ordinance",
+            "document_id": "2209592",
+            "mst": "2102111",
+            "title_hint": "수원시 소규모 공동주택관리 지원 조례"
+          },
+          "comparisons": [
+            {
+              "kind": "ordinance",
+              "document_id": "2182991",
+              "mst": "2092005",
+              "title_hint": "성남시 소규모 공동주택관리에 관한 지원 조례"
+            }
+          ],
+          "as_of": "2026-10-05",
+          "offset": 2,
+          "limit": 3,
+          "max_chars": 400,
+          "expected_hashes": [
+            "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210",
+            "9455684861eeb94c4d6ddda006acf75634ece3fbf3ec9898364ffa7837515a59"
+          ]
+        }
+      },
+      "document_recovery": [
+        {
+          "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+          "expected_content_hash": "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210",
+          "tool": "ordinance_get_document",
+          "arguments": {
+            "reference": {
+              "kind": "ordinance",
+              "document_id": "2209592",
+              "mst": "2102111",
+              "title_hint": "수원시 소규모 공동주택관리 지원 조례"
+            },
+            "section": "articles",
+            "offset": 0,
+            "limit": 1,
+            "max_chars": 2000
+          }
+        },
+        {
+          "document_identity": "ordinance:2182991:2092005:version:9455684861eeb94c",
+          "expected_content_hash": "9455684861eeb94c4d6ddda006acf75634ece3fbf3ec9898364ffa7837515a59",
+          "tool": "ordinance_get_document",
+          "arguments": {
+            "reference": {
+              "kind": "ordinance",
+              "document_id": "2182991",
+              "mst": "2092005",
+              "title_hint": "성남시 소규모 공동주택관리에 관한 지원 조례"
+            },
+            "section": "articles",
+            "offset": 0,
+            "limit": 1,
+            "max_chars": 2000
+          }
+        }
+      ],
+      "response_budget": {
+        "max_chars": 25000,
+        "note": "조문 대응 행과 인용을 나누어 반환합니다. 생략된 원문은 각 recovery, 다음 대응 행은 continuation으로 확인하세요.",
+        "response_chars": 23887
+      },
+      "source_links": [
+        {
+          "url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+          "label": "수원시 소규모 공동주택관리 지원 조례",
+          "markdown": "[수원시 소규모 공동주택관리 지원 조례](https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111)",
+          "kind": "DOCUMENT_REFERENCE",
+          "status": "REFERENCE_PROVIDED",
+          "direct_document": true
+        },
+        {
+          "url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2092005",
+          "label": "성남시 소규모 공동주택관리에 관한 지원 조례",
+          "markdown": "[성남시 소규모 공동주택관리에 관한 지원 조례](https://www.law.go.kr/ordinInfoP.do?ordinSeq=2092005)",
+          "kind": "DOCUMENT_REFERENCE",
+          "status": "REFERENCE_PROVIDED",
+          "direct_document": true
+        }
+      ],
+      "link_guidance": {
+        "display": "각 핵심 사실·수치 뒤에 해당 source_links.markdown을 붙이고 자료별로 연결하세요.",
+        "scope": "DOCUMENT_REFERENCE=원문 주소, OFFICIAL_DATASET=데이터셋 안내, CATALOG_METADATA=자료 설명, OFFICIAL_SEARCH=검색 화면.",
+        "verification": "링크 제공과 페이지 본문 조회·대조는 다릅니다. status와 열람 범위를 유지하세요.",
+        "links_omitted": false
+      },
+      "mcp_receipt": {
+        "tool": "ordinance_compare",
+        "server_version": "4.1.5-public.2",
+        "request_id": "e60c0fb41b2741a4b275",
+        "elapsed_ms": 2733,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      }
+    },
+    "isError": false
+  }
+}

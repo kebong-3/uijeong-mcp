@@ -1,0 +1,168 @@
+{
+  "record_type": "COMMITTED_SOURCE_DIFF",
+  "base_commit": "305c0468374b44377966870b5cb6b34132de648f",
+  "target_commit": "541cd09b95fa233d5bed003045a5b49a28dd5c31",
+  "target_tree": "767c5c97f851763bae91fc78cbf71eb58c247c94",
+  "scope": "All changed paths except docs/recovery-20261005; reports and raw evidence are supplied separately in that directory.",
+  "changed_file_count": 26,
+  "patch_file": "code-changes.patch",
+  "patch_sha256": "8759e8007bf5b1c1d0af35b30a68495726cf9d10157bef739935bf2e4cf08b37",
+  "files": [
+    {
+      "path": "README.md",
+      "added_lines": 23,
+      "removed_lines": 2,
+      "final_content_sha256": "25fcf6870b91f25812e585ae5f452ff2f111449ebdf86cbf33529475c7054bfa"
+    },
+    {
+      "path": "budget_evidence.py",
+      "added_lines": 17,
+      "removed_lines": 4,
+      "final_content_sha256": "83f83600b72c75c09dc89dfe891af104348267874584b3ebbf9bf34c657b8ad2"
+    },
+    {
+      "path": "council_extensions.py",
+      "added_lines": 26,
+      "removed_lines": 3,
+      "final_content_sha256": "2ad898c13da19c113fb061b30221308c01e19dccabd3605d648111bf544eff0e"
+    },
+    {
+      "path": "council_v29.py",
+      "added_lines": 24,
+      "removed_lines": 4,
+      "final_content_sha256": "f420a426aca2a75e602625e09f1634b63b3bb297670a2f189927b34246f6e93e"
+    },
+    {
+      "path": "docs/public-call-contracts.md",
+      "added_lines": 23,
+      "removed_lines": 1,
+      "final_content_sha256": "33dd54a017fbda63960ce7cb51e75f11fc0e606bfd8e799528cc972566e549b0"
+    },
+    {
+      "path": "docs/source-tool-contracts.json",
+      "added_lines": 254,
+      "removed_lines": 2,
+      "final_content_sha256": "33ced747830b98edbc962805156d2289b5a8f666aca15fea826e6042b386d27c"
+    },
+    {
+      "path": "evidence_core.py",
+      "added_lines": 19,
+      "removed_lines": 3,
+      "final_content_sha256": "4d09e15467ebfb46368f607c75715f8ac609e65ed46cbd0ae724982f02bf59ab"
+    },
+    {
+      "path": "integrated_ordinance.py",
+      "added_lines": 154,
+      "removed_lines": 3,
+      "final_content_sha256": "3a04f29d0c7b6485e8fa5874ded5abe74b9f6bd915c85c93d1c51ba7ca3d972d"
+    },
+    {
+      "path": "public_server.py",
+      "added_lines": 4,
+      "removed_lines": 1,
+      "final_content_sha256": "27e13ed77377c4181ca8c15b175c0a167ea9528f96a3cd55cab3a4177a2c479d"
+    },
+    {
+      "path": "release_info.py",
+      "added_lines": 1,
+      "removed_lines": 1,
+      "final_content_sha256": "99ece5989243c69cdf3149f1f8cf5a8bf7e1e3179b27cb6c60bbcc9ba1092abb"
+    },
+    {
+      "path": "release_manifest.json",
+      "added_lines": 104,
+      "removed_lines": 38,
+      "final_content_sha256": "c63ffdf12b628bc42fce5fcbdcdd423c55599278595332db34716b8c1f4ce302"
+    },
+    {
+      "path": "scripts/recovery_minimum_calls.json",
+      "added_lines": 1280,
+      "removed_lines": 0,
+      "final_content_sha256": "899d2e154cfc04a7d6263336dd714a3fba6b80f74faab77ca4a3ad4873cbee4e"
+    },
+    {
+      "path": "scripts/source_contracts.py",
+      "added_lines": 7,
+      "removed_lines": 4,
+      "final_content_sha256": "ba7457cf12a46420a412e30ec894cd1cc824be00eb7906073ee913fdb7c085b6"
+    },
+    {
+      "path": "scripts/verify_recovery.py",
+      "added_lines": 269,
+      "removed_lines": 0,
+      "final_content_sha256": "2ddde7b5b1651e199916cf63dc3502ecda51f475a67ce7dbb69a9ce7b670223b"
+    },
+    {
+      "path": "service_v2.py",
+      "added_lines": 2,
+      "removed_lines": 0,
+      "final_content_sha256": "3ce06af9b8a7c4158ff02695dd7c7f73acfa7c6f8ba5aae538aacde268b94c79"
+    },
+    {
+      "path": "tests/test_finance_public_search_terms.py",
+      "added_lines": 104,
+      "removed_lines": 0,
+      "final_content_sha256": "22a7c7c7189a9a344391e1bae4cce26e165065b45101ca4cf8f897b69eddf416"
+    },
+    {
+      "path": "tests/test_legislation_jurisdiction_boundaries.py",
+      "added_lines": 45,
+      "removed_lines": 0,
+      "final_content_sha256": "96a4a55873e1ab1c86cd142a20477bc42d9c57a599f130c85c9d3199bb641d41"
+    },
+    {
+      "path": "tests/test_recovery_clik_query.py",
+      "added_lines": 215,
+      "removed_lines": 0,
+      "final_content_sha256": "5c5788990547b7f27b529769ba75211b751a6dbe6da7cdd3bcbeb8c3977fece2"
+    },
+    {
+      "path": "tests/test_recovery_context_summary.py",
+      "added_lines": 95,
+      "removed_lines": 0,
+      "final_content_sha256": "1e4a42052cf2cb55d63bb7150d992a3c34d03441344b635e80f02219980ec1aa"
+    },
+    {
+      "path": "tests/test_recovery_contract_edges.py",
+      "added_lines": 143,
+      "removed_lines": 0,
+      "final_content_sha256": "ed0ad4fb402d5e6efc2c6ad0ef510131887afc283c73f4bdea08824c5016a9cf"
+    },
+    {
+      "path": "tests/test_recovery_fiscal_search_scope.py",
+      "added_lines": 29,
+      "removed_lines": 0,
+      "final_content_sha256": "ed77e08d5bbba66b5a4484551e25dfd5f04218b1c27d7c91f9eb2822911c3421"
+    },
+    {
+      "path": "tests/test_recovery_ordinance_compare.py",
+      "added_lines": 177,
+      "removed_lines": 0,
+      "final_content_sha256": "e01da0983dbbfff280c08ff533ca8f6cd8f88b42a60bacec5c580ab54e3d9d27"
+    },
+    {
+      "path": "tests/test_recovery_speech_boundaries.py",
+      "added_lines": 64,
+      "removed_lines": 0,
+      "final_content_sha256": "df4a5cefc56f3eea7f84f8134f5c758e9a72cb5d344257dc83ce4fb13de83a2a"
+    },
+    {
+      "path": "tests/test_recovery_verifier_preconditions.py",
+      "added_lines": 37,
+      "removed_lines": 0,
+      "final_content_sha256": "fde3582ffb518c7b25de8ffc98ee6f2911f5f37e053341289171495b6b4d09df"
+    },
+    {
+      "path": "uijeong_mcp.py",
+      "added_lines": 87,
+      "removed_lines": 6,
+      "final_content_sha256": "5b3efce98d344b87dc79639d55e20323386bb0e0aaa2fab0c4e7edcce89c39ee"
+    },
+    {
+      "path": "v3_reliability.py",
+      "added_lines": 69,
+      "removed_lines": 21,
+      "final_content_sha256": "56d957e759f612d9f4944b92962584ed3bb36b1fbd580d95bc00625ac7739812"
+    }
+  ]
+}

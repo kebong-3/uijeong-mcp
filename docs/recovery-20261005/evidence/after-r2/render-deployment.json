@@ -1,0 +1,12 @@
+{
+  "status": "fulfilled",
+  "value": {
+    "content": [
+      {
+        "type": "text",
+        "text": "[{\"commit\":{\"createdAt\":\"2026-10-05T14:16:08Z\",\"id\":\"541cd09b95fa233d5bed003045a5b49a28dd5c31\",\"message\":\"Fix live CLIK query recovery and paginated ordinance comparison (4.1.5-public.2)\\n\\nComplete defects found during the real 40-tool verification. Recover only the observed public-profile CLIK ERROR11 spaced-content-query case, preserving the failed original query and bounded fallback trace. Keep legacy profiles on their prior error behavior. Return ordinance comparison rows and exact source recovery in bounded pages with version and hash continuity.\\n\\nCorrect the verifier's optional excerpt-field interpretation without weakening article, source identity, or hash prerequisites. Verify actual comparison continuation in addition to all 40 public tools. Preserve the first live failures as evidence.\\n\\nValidation: 833 isolated regression tests passed in 33.78 seconds. The GitHub tree exactly matches the tested source. Runtime dependencies, credentials, auth, plan, and Sites are unchanged. Final live acceptance is recorded after deployment.\"},\"createdAt\":\"2026-10-05T14:16:11.136758Z\",\"finishedAt\":\"2026-10-05T14:17:13.618002Z\",\"id\":\"dep-db1r2ao473hc739e97e0\",\"startedAt\":\"2026-10-05T14:16:11.109137Z\",\"status\":\"live\",\"trigger\":\"new_commit\",\"updatedAt\":\"2026-10-05T14:17:41.849888Z\"}]\n\n cursor: RqxQI0Fi86YyYW80NzNoYzczOWU5N2Uw"
+      }
+    ],
+    "isError": false
+  }
+}

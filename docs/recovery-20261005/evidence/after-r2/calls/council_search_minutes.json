@@ -1,0 +1,36 @@
+{
+  "call": {
+    "id": "council_search_minutes",
+    "tool": "council_search_minutes",
+    "purpose": "원문 목록의 실제 공식 문서번호와 기간 설명 확인",
+    "seconds": 0.46,
+    "isError": false,
+    "status": null,
+    "code": null,
+    "classification": "RETURNED",
+    "receipt": null,
+    "arguments": {
+      "keyword": "빌라가꿈관리소",
+      "council": "수원시",
+      "date_from": "2025-01-01",
+      "date_to": "2026-10-05",
+      "limit": 1
+    },
+    "response_file": "calls/council_search_minutes.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "상태: PARTIAL\n경기도 수원시의회 회의록 '빌라가꿈관리소' 검색 · 기간 2025.01.01.~2026.10.05.\n상류(CLIK) 검색건수 5건 — 검색어·의회 기준 건수이며 기간·회의유형 조건 충족 건수나 질의 건수가 아닙니다.\n이번 조회: 상류 위치 0부터 1건 검토 → 조건 충족 1건 표시\n- 경기도 수원시의회 제13대 제403회 도시미래위원회 제2차 (2026.07.15.) [상임위원회] docid=CLIKC2479358086714915\n\n다음 결과: cursor=e2.eyJwIjoxLCJxIjoiMzU5M2M2ZmI1ODc4MzNlYTQ4YjExZGYyY2QyYjliMDczMjVjN2FmNmM1M2M0OWU3ZDZhY2M0YzE3ODI4ODQwOSIsInMiOm51bGwsInYiOjJ9 (방금 표시한 결과 바로 다음부터 이어집니다)\n\n—\n출처: 국회도서관 지방의정포털(CLIK) Open API · 같은 저장소 기준 KST 잔여 추정 993회(공식 잔여량 아님)",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "result": "상태: PARTIAL\n경기도 수원시의회 회의록 '빌라가꿈관리소' 검색 · 기간 2025.01.01.~2026.10.05.\n상류(CLIK) 검색건수 5건 — 검색어·의회 기준 건수이며 기간·회의유형 조건 충족 건수나 질의 건수가 아닙니다.\n이번 조회: 상류 위치 0부터 1건 검토 → 조건 충족 1건 표시\n- 경기도 수원시의회 제13대 제403회 도시미래위원회 제2차 (2026.07.15.) [상임위원회] docid=CLIKC2479358086714915\n\n다음 결과: cursor=e2.eyJwIjoxLCJxIjoiMzU5M2M2ZmI1ODc4MzNlYTQ4YjExZGYyY2QyYjliMDczMjVjN2FmNmM1M2M0OWU3ZDZhY2M0YzE3ODI4ODQwOSIsInMiOm51bGwsInYiOjJ9 (방금 표시한 결과 바로 다음부터 이어집니다)\n\n—\n출처: 국회도서관 지방의정포털(CLIK) Open API · 같은 저장소 기준 KST 잔여 추정 993회(공식 잔여량 아님)"
+    },
+    "isError": false
+  }
+}

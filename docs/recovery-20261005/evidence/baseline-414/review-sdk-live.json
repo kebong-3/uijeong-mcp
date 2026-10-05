@@ -1,0 +1,50 @@
+{
+  "sdk": "1.30.0",
+  "transport": "REAL_DEPLOYED_STREAMABLE_HTTP",
+  "checks": [
+    {
+      "connection": 1,
+      "protocol": "2025-11-25",
+      "tool_count": 40,
+      "isError": false,
+      "calculation": {
+        "unit": "원",
+        "input_unit": "천원",
+        "before_won": 0,
+        "after_won": 120000,
+        "delta_won": 120000,
+        "rate_pct": null,
+        "rate_status": "ZERO_BASE_NOT_COMPUTABLE",
+        "mcp_receipt": {
+          "tool": "budget_calculate",
+          "server_version": "4.1.4-public.4",
+          "request_id": "3cf1228837224ff18d36",
+          "elapsed_ms": 3,
+          "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+        }
+      }
+    },
+    {
+      "connection": 2,
+      "protocol": "2025-11-25",
+      "tool_count": 40,
+      "isError": false,
+      "calculation": {
+        "unit": "원",
+        "input_unit": "천원",
+        "before_won": 0,
+        "after_won": 120000,
+        "delta_won": 120000,
+        "rate_pct": null,
+        "rate_status": "ZERO_BASE_NOT_COMPUTABLE",
+        "mcp_receipt": {
+          "tool": "budget_calculate",
+          "server_version": "4.1.4-public.4",
+          "request_id": "4bba33cde03c40f6a619",
+          "elapsed_ms": 360,
+          "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+        }
+      }
+    }
+  ]
+}

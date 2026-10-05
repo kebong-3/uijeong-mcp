@@ -1,0 +1,369 @@
+{
+  "call": {
+    "id": "council_session_ready_pack",
+    "tool": "council_session_ready_pack",
+    "purpose": "실제 회기 목적에서 의회·예산·조례 근거와 담당자 확인사항 연결",
+    "seconds": 1.64,
+    "isError": false,
+    "status": "PARTIAL",
+    "code": null,
+    "classification": "RETURNED_WITH_SCOPE",
+    "receipt": null,
+    "arguments": {
+      "topic": "빌라가꿈관리소",
+      "council": "수원시",
+      "purpose": "행정사무감사",
+      "date_from": "2025-01-01",
+      "date_to": "2026-10-05",
+      "fiscal_year": 2026,
+      "max_docs": 1,
+      "need_public_data": false
+    },
+    "response_file": "calls/council_session_ready_pack.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"PARTIAL\", \"council\": {\"id\": \"031014\", \"name\": \"경기도 수원시의회\"}, \"topic\": \"빌라가꿈관리소\", \"source_links\": [{\"url\": \"https://clik.nanet.go.kr/\", \"label\": \"CLIK 공식 검색(개별 원문 링크 미확인)\", \"markdown\": \"[CLIK 공식 검색(개별 원문 링크 미확인)](https://clik.nanet.go.kr/)\", \"kind\": \"OFFICIAL_SEARCH\", \"status\": \"SEARCH_REFERENCE\", \"direct_document\": false}], \"link_guidance\": {\"display\": \"각 핵심 사실·수치 뒤에 해당 source_links.markdown을 붙이고 자료별로 연결하세요.\", \"scope\": \"DOCUMENT_REFERENCE=원문 주소, OFFICIAL_DATASET=데이터셋 안내, CATALOG_METADATA=자료 설명, OFFICIAL_SEARCH=검색 화면.\", \"verification\": \"링크 제공과 페이지 본문 조회·대조는 다릅니다. status와 열람 범위를 유지하세요.\", \"links_omitted\": true}, \"readiness\": {\"source_status\": {\"council_evidence\": \"PARTIAL\", \"bills\": \"EMPTY\", \"legal\": \"EMPTY\", \"finance\": \"EMPTY\", \"public_data_discovery\": \"SKIPPED\", \"response_pack\": \"SKIPPED\"}, \"gaps\": [{\"area\": \"council_evidence\", \"status\": \"PARTIAL\"}], \"human_checklist\": [\"현재 사업현황·최근 실적이 최신 내부자료와 일치하는지 확인\", \"의회에 과거 답변한 후속조치의 실제 이행상태 확인\", \"예산·추경·결산 수치는 공식 예산서와 담당부서 자료로 최종 대조\", \"법령·조례 후보는 시행일·부칙·위임범위까지 원문으로 최종 확인\", \"답변 초안의 수치·고유명사·기한은 담당자가 최종 검증\"], \"recommended_followup_tools\": [{\"tool\": \"council_recurring_issues\", \"why\": \"여러 회의연도의 반복 쟁점 후보를 별도로 확인\"}], \"audit_readiness_checklist\": [{\"item\": \"과거 의회 질의·답변\", \"status\": \"CONFIRMED\", \"basis\": \"공식 근거 6건 확인\"}, {\"item\": \"관련 의안\", \"status\": \"NOT_OBSERVED_IN_SEARCH\", \"basis\": \"이번 검색범위에서 관련 의안 미확인\"}, {\"item\": \"법령·조례 근거\", \"status\": \"NEEDS_CONFIRMATION\", \"basis\": \"법적 근거 후보 추가 확인 필요\", \"action\": \"시행일·부칙·위임범위 원문 확인\"}, {\"item\": \"예산·집행 근거\", \"status\": \"NEEDS_CONFIRMATION\", \"basis\": \"세부사업명 불일치 가능성 포함 추가 확인 필요\", \"action\": \"공식 예산서·추경서·결산서와 최종 대조\"}, {\"item\": \"과거 후속조치 후보\", \"status\": \"NOT_OBSERVED_IN_SEARCH\", \"basis\": \"이번 확인 범위에서 후속조치 후보 미확인\", \"action\": \"실제 이행상태는 담당부서 증빙 확인\"}, {\"item\": \"현재 사업현황·최근 실적\", \"status\": \"DEPARTMENT_CONFIRMATION_REQUIRED\", \"basis\": \"공개 의회·법령·재정 데이터만으로 현재 내부 실적을 확정할 수 없음\", \"action\": \"최신 내부 업무자료 확인\"}, {\"item\": \"이용률·참여율·대상자 현황\", \"status\": \"DEPARTMENT_CONFIRMATION_REQUIRED\", \"basis\": \"사업별 운영실적은 별도 행정자료가 필요할 수 있음\", \"action\": \"월별·연도별 실적표 준비\"}, {\"item\": \"만족도·민원·개선요구\", \"status\": \"DEPARTMENT_CONFIRMATION_REQUIRED\", \"basis\": \"공개 회의록 검색만으로 현재 만족도·민원현황을 확정할 수 없음\", \"action\": \"설문·민원·개선조치 자료 확인\"}, {\"item\": \"본청·현장·부서 간 접근 형평성\", \"status\": \"DEPARTMENT_CONFIRMATION_REQUIRED\", \"basis\": \"사업 대상·접근성의 현재 운영상태 확인 필요\", \"action\": \"대상별 이용조건·대체지원 확인\"}, {\"item\": \"향후계획·답변수치\", \"status\": \"DEPARTMENT_CONFIRMATION_REQUIRED\", \"basis\": \"향후계획과 최신 수치는 정책결정·담당부서 확인사항\", \"action\": \"결재자료와 수치 최종 검증\"}]}, \"ready_for_submission\": false, \"execution_trace\": {\"mcp_tool\": \"council_session_ready_pack\", \"mcp_first\": true, \"sources_used\": [\"council_evidence\", \"bills\", \"legal\", \"finance\"], \"supplemental_web_search_policy\": \"MCP 근거 우선. 부족한 범위만 공식 웹검색으로 보완하고 보완검색임을 표시.\"}, \"items\": [], \"budget_fallback\": {\"reason\": \"축약 후에도 응답 한도를 넘어 본문을 싣지 못했습니다.\", \"retrieval\": \"max_docs·limit·max_evidence를 줄여 다시 조회하거나, snapshot_id와 item_offset으로 나눠 받고 원문은 council_read_source로 확인하세요.\", \"cap_chars\": 30000}, \"response_budget\": {\"max_chars\": 30000, \"original_chars\": 82794, \"response_chars\": 2779, \"truncated\": true, \"reduced\": [{\"path\": \"context.council_evidence.items\", \"kind\": \"array\", \"original\": 6, \"kept\": 2, \"omitted\": 4, \"retrieval\": \"같은 snapshot_id로 item_offset을 늘려 이어봅니다.\"}, {\"path\": \"context.report_mentions.items\", \"kind\": \"array\", \"original\": 7, \"kept\": 2, \"omitted\": 5, \"retrieval\": \"같은 snapshot_id로 item_offset을 늘려 이어봅니다.\"}, {\"path\": \"context.linked_review.relationships[].result.items\", \"kind\": \"array\", \"original\": 3, \"kept\": 2, \"omitted\": 1, \"retrieval\": \"같은 snapshot_id로 item_offset을 늘려 이어봅니다.\"}, {\"path\": \"context.council_evidence.items[].answers[].text\", \"kind\": \"text\", \"original\": 250, \"kept\": 140, \"omitted\": 110, \"retrieval\": \"council_read_source로 원문 전체를 확인합니다.\"}, {\"path\": \"context.council_evidence.items[].question.text\", \"kind\": \"text\", \"original\": 152, \"kept\": 140, \"omitted\": 12, \"retrieval\": \"council_read_source로 원문 전체를 확인합니다.\"}, {\"path\": \"context.report_mentions.items[].speech.text\", \"kind\": \"text\", \"original\": 1754, \"kept\": 140, \"omitted\": 1614, \"retrieval\": \"council_read_source로 원문 전체를 확인합니다.\"}, {\"path\": \"context.discovery_candidates.budget[].quote\", \"kind\": \"text\", \"original\": 154, \"kept\": 140, \"omitted\": 14, \"retrieval\": \"council_read_source로 원문 전체를 확인합니다.\"}, {\"path\": \"context.discovery_candidates.budget[].evidence[].quote\", \"kind\": \"text\", \"original\": 154, \"kept\": 140, \"omitted\": 14, \"retrieval\": \"council_read_source로 원문 전체를 확인합니다.\"}, {\"path\": \"context.discovery_candidates.budget[].evidence[].quote\", \"kind\": \"text\", \"original\": 154, \"kept\": 140, \"omitted\": 14, \"retrieval\": \"council_read_source로 원문 전체를 확인합니다.\"}, {\"path\": \"context.linked_review.relationships[].candidate[].quote\", \"kind\": \"text\", \"original\": 154, \"kept\": 140, \"omitted\": 14, \"retrieval\": \"council_read_source로 원문 전체를 확인합니다.\"}, {\"path\": \"context.council_evidence.items\", \"kind\": \"array_dropped\", \"original\": 2, \"kept\": 1, \"omitted\": 1, \"retrieval\": \"같은 snapshot_id로 item_offset을 늘려 이어봅니다.\"}, {\"path\": \"context.report_mentions.items\", \"kind\": \"array_dropped\", \"original\": 2, \"kept\": 1, \"omitted\": 1, \"retrieval\": \"같은 snapshot_id로 item_offset을 늘려 이어봅니다.\"}, {\"path\": \"context.linked_review.relationships[].result.items\", \"kind\": \"array_dropped\", \"original\": 2, \"kept\": 1, \"omitted\": 1, \"retrieval\": \"같은 snapshot_id로 item_offset을 늘려 이어봅니다.\"}, {\"path\": \"context.linked_review.relationships[].result.items\", \"kind\": \"array_dropped\", \"original\": 2, \"kept\": 1, \"omitted\": 1, \"retrieval\": \"같은 snapshot_id로 item_offset을 늘려 이어봅니다.\"}, {\"path\": \"context.council_evidence.items[].answers[].text\", \"kind\": \"text\", \"original\": 141, \"kept\": 100, \"omitted\": 41, \"retrieval\": \"council_read_source로 원문을 확인합니다.\"}, {\"path\": \"context.report_mentions.items[].speech.text\", \"kind\": \"text\", \"original\": 141, \"kept\": 100, \"omitted\": 41, \"retrieval\": \"council_read_source로 원문을 확인합니다.\"}, {\"path\": \"context.discovery_candidates.ordinance[].quote\", \"kind\": \"text\", \"original\": 105, \"kept\": 100, \"omitted\": 5, \"retrieval\": \"council_read_source로 원문을 확인합니다.\"}, {\"path\": \"context.discovery_candidates.ordinance[].evidence[].quote\", \"kind\": \"text\", \"original\": 105, \"kept\": 100, \"omitted\": 5, \"retrieval\": \"council_read_source로 원문을 확인합니다.\"}, {\"path\": \"context.discovery_candidates.budget[].quote\", \"kind\": \"text\", \"original\": 141, \"kept\": 100, \"omitted\": 41, \"retrieval\": \"council_read_source로 원문을 확인합니다.\"}, {\"path\": \"context.discovery_candidates.budget[].evidence[].quote\", \"kind\": \"text\", \"original\": 141, \"kept\": 100, \"omitted\": 41, \"retrieval\": \"council_read_source로 원문을 확인합니다.\"}, {\"path\": \"context.discovery_candidates.budget[].evidence[].quote\", \"kind\": \"text\", \"original\": 141, \"kept\": 100, \"omitted\": 41, \"retrieval\": \"council_read_source로 원문을 확인합니다.\"}, {\"path\": \"context.linked_review.relationships[].candidate[].quote\", \"kind\": \"text\", \"original\": 105, \"kept\": 100, \"omitted\": 5, \"retrieval\": \"council_read_source로 원문을 확인합니다.\"}, {\"path\": \"context.linked_review.relationships[].candidate[].quote\", \"kind\": \"text\", \"original\": 141, \"kept\": 100, \"omitted\": 41, \"retrieval\": \"council_read_source로 원문을 확인합니다.\"}, {\"path\": \"(root)\", \"kind\": \"envelope_reduced\", \"original\": 43949, \"kept\": 2779, \"omitted\": 41170, \"retrieval\": \"max_docs·limit·max_evidence를 줄여 다시 조회하거나, snapshot_id와 item_offset으로 나눠 받고 원문은 council_read_source로 확인하세요.\"}], \"reduced_count\": 24, \"note\": \"응답 한도를 지키기 위해 목록·인용을 축약했습니다. 생략된 항목은 존재하지 않는 것이 아니며 각 retrieval 경로로 확인합니다.\"}}",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "PARTIAL",
+      "council": {
+        "id": "031014",
+        "name": "경기도 수원시의회"
+      },
+      "topic": "빌라가꿈관리소",
+      "source_links": [
+        {
+          "url": "https://clik.nanet.go.kr/",
+          "label": "CLIK 공식 검색(개별 원문 링크 미확인)",
+          "markdown": "[CLIK 공식 검색(개별 원문 링크 미확인)](https://clik.nanet.go.kr/)",
+          "kind": "OFFICIAL_SEARCH",
+          "status": "SEARCH_REFERENCE",
+          "direct_document": false
+        }
+      ],
+      "link_guidance": {
+        "display": "각 핵심 사실·수치 뒤에 해당 source_links.markdown을 붙이고 자료별로 연결하세요.",
+        "scope": "DOCUMENT_REFERENCE=원문 주소, OFFICIAL_DATASET=데이터셋 안내, CATALOG_METADATA=자료 설명, OFFICIAL_SEARCH=검색 화면.",
+        "verification": "링크 제공과 페이지 본문 조회·대조는 다릅니다. status와 열람 범위를 유지하세요.",
+        "links_omitted": true
+      },
+      "readiness": {
+        "source_status": {
+          "council_evidence": "PARTIAL",
+          "bills": "EMPTY",
+          "legal": "EMPTY",
+          "finance": "EMPTY",
+          "public_data_discovery": "SKIPPED",
+          "response_pack": "SKIPPED"
+        },
+        "gaps": [
+          {
+            "area": "council_evidence",
+            "status": "PARTIAL"
+          }
+        ],
+        "human_checklist": [
+          "현재 사업현황·최근 실적이 최신 내부자료와 일치하는지 확인",
+          "의회에 과거 답변한 후속조치의 실제 이행상태 확인",
+          "예산·추경·결산 수치는 공식 예산서와 담당부서 자료로 최종 대조",
+          "법령·조례 후보는 시행일·부칙·위임범위까지 원문으로 최종 확인",
+          "답변 초안의 수치·고유명사·기한은 담당자가 최종 검증"
+        ],
+        "recommended_followup_tools": [
+          {
+            "tool": "council_recurring_issues",
+            "why": "여러 회의연도의 반복 쟁점 후보를 별도로 확인"
+          }
+        ],
+        "audit_readiness_checklist": [
+          {
+            "item": "과거 의회 질의·답변",
+            "status": "CONFIRMED",
+            "basis": "공식 근거 6건 확인"
+          },
+          {
+            "item": "관련 의안",
+            "status": "NOT_OBSERVED_IN_SEARCH",
+            "basis": "이번 검색범위에서 관련 의안 미확인"
+          },
+          {
+            "item": "법령·조례 근거",
+            "status": "NEEDS_CONFIRMATION",
+            "basis": "법적 근거 후보 추가 확인 필요",
+            "action": "시행일·부칙·위임범위 원문 확인"
+          },
+          {
+            "item": "예산·집행 근거",
+            "status": "NEEDS_CONFIRMATION",
+            "basis": "세부사업명 불일치 가능성 포함 추가 확인 필요",
+            "action": "공식 예산서·추경서·결산서와 최종 대조"
+          },
+          {
+            "item": "과거 후속조치 후보",
+            "status": "NOT_OBSERVED_IN_SEARCH",
+            "basis": "이번 확인 범위에서 후속조치 후보 미확인",
+            "action": "실제 이행상태는 담당부서 증빙 확인"
+          },
+          {
+            "item": "현재 사업현황·최근 실적",
+            "status": "DEPARTMENT_CONFIRMATION_REQUIRED",
+            "basis": "공개 의회·법령·재정 데이터만으로 현재 내부 실적을 확정할 수 없음",
+            "action": "최신 내부 업무자료 확인"
+          },
+          {
+            "item": "이용률·참여율·대상자 현황",
+            "status": "DEPARTMENT_CONFIRMATION_REQUIRED",
+            "basis": "사업별 운영실적은 별도 행정자료가 필요할 수 있음",
+            "action": "월별·연도별 실적표 준비"
+          },
+          {
+            "item": "만족도·민원·개선요구",
+            "status": "DEPARTMENT_CONFIRMATION_REQUIRED",
+            "basis": "공개 회의록 검색만으로 현재 만족도·민원현황을 확정할 수 없음",
+            "action": "설문·민원·개선조치 자료 확인"
+          },
+          {
+            "item": "본청·현장·부서 간 접근 형평성",
+            "status": "DEPARTMENT_CONFIRMATION_REQUIRED",
+            "basis": "사업 대상·접근성의 현재 운영상태 확인 필요",
+            "action": "대상별 이용조건·대체지원 확인"
+          },
+          {
+            "item": "향후계획·답변수치",
+            "status": "DEPARTMENT_CONFIRMATION_REQUIRED",
+            "basis": "향후계획과 최신 수치는 정책결정·담당부서 확인사항",
+            "action": "결재자료와 수치 최종 검증"
+          }
+        ]
+      },
+      "ready_for_submission": false,
+      "execution_trace": {
+        "mcp_tool": "council_session_ready_pack",
+        "mcp_first": true,
+        "sources_used": [
+          "council_evidence",
+          "bills",
+          "legal",
+          "finance"
+        ],
+        "supplemental_web_search_policy": "MCP 근거 우선. 부족한 범위만 공식 웹검색으로 보완하고 보완검색임을 표시."
+      },
+      "items": [],
+      "budget_fallback": {
+        "reason": "축약 후에도 응답 한도를 넘어 본문을 싣지 못했습니다.",
+        "retrieval": "max_docs·limit·max_evidence를 줄여 다시 조회하거나, snapshot_id와 item_offset으로 나눠 받고 원문은 council_read_source로 확인하세요.",
+        "cap_chars": 30000
+      },
+      "response_budget": {
+        "max_chars": 30000,
+        "original_chars": 82794,
+        "response_chars": 2779,
+        "truncated": true,
+        "reduced": [
+          {
+            "path": "context.council_evidence.items",
+            "kind": "array",
+            "original": 6,
+            "kept": 2,
+            "omitted": 4,
+            "retrieval": "같은 snapshot_id로 item_offset을 늘려 이어봅니다."
+          },
+          {
+            "path": "context.report_mentions.items",
+            "kind": "array",
+            "original": 7,
+            "kept": 2,
+            "omitted": 5,
+            "retrieval": "같은 snapshot_id로 item_offset을 늘려 이어봅니다."
+          },
+          {
+            "path": "context.linked_review.relationships[].result.items",
+            "kind": "array",
+            "original": 3,
+            "kept": 2,
+            "omitted": 1,
+            "retrieval": "같은 snapshot_id로 item_offset을 늘려 이어봅니다."
+          },
+          {
+            "path": "context.council_evidence.items[].answers[].text",
+            "kind": "text",
+            "original": 250,
+            "kept": 140,
+            "omitted": 110,
+            "retrieval": "council_read_source로 원문 전체를 확인합니다."
+          },
+          {
+            "path": "context.council_evidence.items[].question.text",
+            "kind": "text",
+            "original": 152,
+            "kept": 140,
+            "omitted": 12,
+            "retrieval": "council_read_source로 원문 전체를 확인합니다."
+          },
+          {
+            "path": "context.report_mentions.items[].speech.text",
+            "kind": "text",
+            "original": 1754,
+            "kept": 140,
+            "omitted": 1614,
+            "retrieval": "council_read_source로 원문 전체를 확인합니다."
+          },
+          {
+            "path": "context.discovery_candidates.budget[].quote",
+            "kind": "text",
+            "original": 154,
+            "kept": 140,
+            "omitted": 14,
+            "retrieval": "council_read_source로 원문 전체를 확인합니다."
+          },
+          {
+            "path": "context.discovery_candidates.budget[].evidence[].quote",
+            "kind": "text",
+            "original": 154,
+            "kept": 140,
+            "omitted": 14,
+            "retrieval": "council_read_source로 원문 전체를 확인합니다."
+          },
+          {
+            "path": "context.discovery_candidates.budget[].evidence[].quote",
+            "kind": "text",
+            "original": 154,
+            "kept": 140,
+            "omitted": 14,
+            "retrieval": "council_read_source로 원문 전체를 확인합니다."
+          },
+          {
+            "path": "context.linked_review.relationships[].candidate[].quote",
+            "kind": "text",
+            "original": 154,
+            "kept": 140,
+            "omitted": 14,
+            "retrieval": "council_read_source로 원문 전체를 확인합니다."
+          },
+          {
+            "path": "context.council_evidence.items",
+            "kind": "array_dropped",
+            "original": 2,
+            "kept": 1,
+            "omitted": 1,
+            "retrieval": "같은 snapshot_id로 item_offset을 늘려 이어봅니다."
+          },
+          {
+            "path": "context.report_mentions.items",
+            "kind": "array_dropped",
+            "original": 2,
+            "kept": 1,
+            "omitted": 1,
+            "retrieval": "같은 snapshot_id로 item_offset을 늘려 이어봅니다."
+          },
+          {
+            "path": "context.linked_review.relationships[].result.items",
+            "kind": "array_dropped",
+            "original": 2,
+            "kept": 1,
+            "omitted": 1,
+            "retrieval": "같은 snapshot_id로 item_offset을 늘려 이어봅니다."
+          },
+          {
+            "path": "context.linked_review.relationships[].result.items",
+            "kind": "array_dropped",
+            "original": 2,
+            "kept": 1,
+            "omitted": 1,
+            "retrieval": "같은 snapshot_id로 item_offset을 늘려 이어봅니다."
+          },
+          {
+            "path": "context.council_evidence.items[].answers[].text",
+            "kind": "text",
+            "original": 141,
+            "kept": 100,
+            "omitted": 41,
+            "retrieval": "council_read_source로 원문을 확인합니다."
+          },
+          {
+            "path": "context.report_mentions.items[].speech.text",
+            "kind": "text",
+            "original": 141,
+            "kept": 100,
+            "omitted": 41,
+            "retrieval": "council_read_source로 원문을 확인합니다."
+          },
+          {
+            "path": "context.discovery_candidates.ordinance[].quote",
+            "kind": "text",
+            "original": 105,
+            "kept": 100,
+            "omitted": 5,
+            "retrieval": "council_read_source로 원문을 확인합니다."
+          },
+          {
+            "path": "context.discovery_candidates.ordinance[].evidence[].quote",
+            "kind": "text",
+            "original": 105,
+            "kept": 100,
+            "omitted": 5,
+            "retrieval": "council_read_source로 원문을 확인합니다."
+          },
+          {
+            "path": "context.discovery_candidates.budget[].quote",
+            "kind": "text",
+            "original": 141,
+            "kept": 100,
+            "omitted": 41,
+            "retrieval": "council_read_source로 원문을 확인합니다."
+          },
+          {
+            "path": "context.discovery_candidates.budget[].evidence[].quote",
+            "kind": "text",
+            "original": 141,
+            "kept": 100,
+            "omitted": 41,
+            "retrieval": "council_read_source로 원문을 확인합니다."
+          },
+          {
+            "path": "context.discovery_candidates.budget[].evidence[].quote",
+            "kind": "text",
+            "original": 141,
+            "kept": 100,
+            "omitted": 41,
+            "retrieval": "council_read_source로 원문을 확인합니다."
+          },
+          {
+            "path": "context.linked_review.relationships[].candidate[].quote",
+            "kind": "text",
+            "original": 105,
+            "kept": 100,
+            "omitted": 5,
+            "retrieval": "council_read_source로 원문을 확인합니다."
+          },
+          {
+            "path": "context.linked_review.relationships[].candidate[].quote",
+            "kind": "text",
+            "original": 141,
+            "kept": 100,
+            "omitted": 41,
+            "retrieval": "council_read_source로 원문을 확인합니다."
+          },
+          {
+            "path": "(root)",
+            "kind": "envelope_reduced",
+            "original": 43949,
+            "kept": 2779,
+            "omitted": 41170,
+            "retrieval": "max_docs·limit·max_evidence를 줄여 다시 조회하거나, snapshot_id와 item_offset으로 나눠 받고 원문은 council_read_source로 확인하세요."
+          }
+        ],
+        "reduced_count": 24,
+        "note": "응답 한도를 지키기 위해 목록·인용을 축약했습니다. 생략된 항목은 존재하지 않는 것이 아니며 각 retrieval 경로로 확인합니다."
+      }
+    },
+    "isError": false
+  }
+}

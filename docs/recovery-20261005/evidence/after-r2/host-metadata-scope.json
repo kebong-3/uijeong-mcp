@@ -1,0 +1,43 @@
+{
+  "observed_date": "2026-10-05",
+  "observation_scope": "Tools exposed to this running conversation, not a new client tools/list response.",
+  "host_connection_label": "서구의회",
+  "visible_tools": [
+    "council_context_pack",
+    "council_data_sources",
+    "council_department_brief",
+    "council_department_session_brief",
+    "council_evidence_bundle",
+    "council_evidence_search",
+    "council_finance_context",
+    "council_find_council",
+    "council_get_evidence",
+    "council_legislation_context",
+    "council_open_record",
+    "council_peer_cases",
+    "council_period_review",
+    "council_prepare_pack",
+    "council_read_source",
+    "council_recurring_issues",
+    "council_search_minutes",
+    "council_session_ready_pack",
+    "council_status",
+    "fetch",
+    "search"
+  ],
+  "visible_tool_count": 21,
+  "older_input_metadata_observed": {
+    "council_finance_context_search_terms_exposed": false,
+    "council_context_pack_optional_background_fields_exposed": false
+  },
+  "live_server_verified_separately": {
+    "tool_count": 40,
+    "version": "4.1.5-public.2",
+    "commit": "541cd09b95fa233d5bed003045a5b49a28dd5c31",
+    "new_input_schema_verified": true
+  },
+  "host_connection_refresh_performed": false,
+  "refresh_capability_available_in_session": false,
+  "official_guidance_url": "https://developers.openai.com/plugins/deploy/connect-chatgpt",
+  "guidance_scope": "Developer-mode MCP connections: open the connection in ChatGPT Plugins, select Refresh, verify metadata, then start a new conversation. Published plugins use continuous review; this session did not verify the connection's distribution type or other accounts."
+}

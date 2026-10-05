@@ -1,0 +1,175 @@
+{
+  "call": {
+    "id": "ordinance_get_document",
+    "tool": "ordinance_get_document",
+    "purpose": "실제 검색 식별자로 공동 관리소 조문·버전 해시·원문 링크 확인",
+    "seconds": 1.08,
+    "isError": false,
+    "status": "retrieved",
+    "code": null,
+    "classification": "RETURNED",
+    "receipt": {
+      "tool": "ordinance_get_document",
+      "server_version": "4.1.5-public.2",
+      "request_id": "5a04fd7147c8419c8756",
+      "elapsed_ms": 965,
+      "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+    },
+    "arguments": {
+      "reference": {
+        "kind": "ordinance",
+        "document_id": "2209592",
+        "mst": "2102111",
+        "title_hint": "수원시 소규모 공동주택관리 지원 조례"
+      },
+      "keyword": "공동 관리소",
+      "section": "articles",
+      "limit": 1,
+      "max_chars": 2000
+    },
+    "response_file": "calls/ordinance_get_document.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"retrieved\", \"summary\": {\"kind\": \"ordinance\", \"document_id\": \"2209592\", \"title\": \"수원시 소규모 공동주택관리 지원 조례\", \"jurisdiction\": \"경기도 수원시\", \"version\": \"2102111\", \"effective_date\": \"20251231\", \"promulgation_date\": \"20251231\", \"source_url\": \"https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111\", \"retrieved_at\": \"2026-10-05T14:18:37.519554+00:00\", \"source_state\": \"live\", \"version_scope\": \"version\", \"warnings\": [\"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용\", \"자치법규 별표 API 제공범위 제한: 별표·별지·서식은 소관기관 원문과 별도 대조 필요\", \"별표 첨부파일의 본문 미수집: 메타데이터 비교만 가능하며 원본 표·서식 확인 필요\"], \"department\": \"녹색건축팀\", \"phone\": \"031-5191-3373\", \"upstream_hash\": \"e8d7f89f5b78484d6fb89312299483ea670bba43a63a322ecefc02ef76c56040\", \"identity\": \"ordinance:2209592:2102111:version:87998bc47f967361\", \"content_hash\": \"87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210\", \"article_count\": 22, \"supplement_count\": 1, \"annex_count\": 2}, \"temporal_status\": {\"state\": \"effective_on_or_before_as_of\", \"as_of\": \"2026-10-05\", \"version_current_verified\": false, \"caveat\": \"시행일이 과거라는 사실만으로 해당 기준일의 현행본임이 증명되지 않습니다. 후속개정·조문별 시행일·부칙을 확인하세요.\"}, \"articles\": [{\"key\": \"main:제5조의2\", \"label\": \"제5조의2\", \"title\": \"공동 관리소 설치 등\", \"text\": \"제5조의2(공동 관리소 설치 등) 시장은 소규모 공동주택을 대상으로 청소, 안전 등 주거환경 개선을 위한 공동 관리소를 설치 및 운영할 수 있다.\", \"raw_number\": \"000502\\n000502\", \"source_heading\": \"제5조의2\", \"number_source\": \"source_heading\", \"deleted\": false, \"effective_date\": \"\"}], \"evidence\": {\"E-deb742ddf2f1ee38af95\": {\"id\": \"E-deb742ddf2f1ee38af95\", \"document_identity\": \"ordinance:2209592:2102111:version:87998bc47f967361\", \"document_title\": \"수원시 소규모 공동주택관리 지원 조례\", \"document_id\": \"2209592\", \"version\": \"2102111\", \"article\": \"제5조의2\", \"article_key\": \"main:제5조의2\", \"text\": \"제5조의2(공동 관리소 설치 등) 시장은 소규모 공동주택을 대상으로 청소, 안전 등 주거환경 개선을 위한 공동 관리소를 설치 및 운영할 수 있다.\", \"source_url\": \"https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111\", \"retrieved_at\": \"2026-10-05T14:18:37.519554+00:00\", \"effective_date\": \"20251231\", \"source_state\": \"live\", \"version_scope\": \"version\", \"content_hash\": \"87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210\", \"jurisdiction\": \"경기도 수원시\", \"kind\": \"ordinance\"}}, \"coverage\": {\"section\": \"articles\", \"matched_items\": 1, \"offset\": 0, \"filtered\": true, \"section_counts\": {\"articles\": 22, \"supplementary\": 1, \"annexes\": 2}, \"annex_body_collected\": false, \"returned_items\": 1, \"next_offset\": null, \"next_start_char\": null, \"continuation\": \"동일 reference/section/keyword에서 next_offset과 next_start_char를 offset/start_char로 사용하세요.\", \"matched_articles\": 1, \"returned_articles\": 1}, \"warning\": \"선택 section의 반환 구간만 열람했습니다. 다른 조문·부칙과 별표 첨부 본문을 확인한 것으로 보고하지 마세요.\", \"source_links\": [{\"url\": \"https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111\", \"label\": \"수원시 소규모 공동주택관리 지원 조례\", \"markdown\": \"[수원시 소규모 공동주택관리 지원 조례](https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111)\", \"kind\": \"DOCUMENT_REFERENCE\", \"status\": \"REFERENCE_PROVIDED\", \"direct_document\": true}], \"link_guidance\": {\"display\": \"각 핵심 사실·수치 뒤에 해당 source_links.markdown을 붙이고 자료별로 연결하세요.\", \"scope\": \"DOCUMENT_REFERENCE=원문 주소, OFFICIAL_DATASET=데이터셋 안내, CATALOG_METADATA=자료 설명, OFFICIAL_SEARCH=검색 화면.\", \"verification\": \"링크 제공과 페이지 본문 조회·대조는 다릅니다. status와 열람 범위를 유지하세요.\", \"links_omitted\": false}, \"mcp_receipt\": {\"tool\": \"ordinance_get_document\", \"server_version\": \"4.1.5-public.2\", \"request_id\": \"5a04fd7147c8419c8756\", \"elapsed_ms\": 965, \"meaning\": \"서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요.\"}}",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "retrieved",
+      "summary": {
+        "kind": "ordinance",
+        "document_id": "2209592",
+        "title": "수원시 소규모 공동주택관리 지원 조례",
+        "jurisdiction": "경기도 수원시",
+        "version": "2102111",
+        "effective_date": "20251231",
+        "promulgation_date": "20251231",
+        "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+        "retrieved_at": "2026-10-05T14:18:37.519554+00:00",
+        "source_state": "live",
+        "version_scope": "version",
+        "warnings": [
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "식별용 원시 조문번호를 조번호로 해석하지 않음: 원문 표제 사용",
+          "자치법규 별표 API 제공범위 제한: 별표·별지·서식은 소관기관 원문과 별도 대조 필요",
+          "별표 첨부파일의 본문 미수집: 메타데이터 비교만 가능하며 원본 표·서식 확인 필요"
+        ],
+        "department": "녹색건축팀",
+        "phone": "031-5191-3373",
+        "upstream_hash": "e8d7f89f5b78484d6fb89312299483ea670bba43a63a322ecefc02ef76c56040",
+        "identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+        "content_hash": "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210",
+        "article_count": 22,
+        "supplement_count": 1,
+        "annex_count": 2
+      },
+      "temporal_status": {
+        "state": "effective_on_or_before_as_of",
+        "as_of": "2026-10-05",
+        "version_current_verified": false,
+        "caveat": "시행일이 과거라는 사실만으로 해당 기준일의 현행본임이 증명되지 않습니다. 후속개정·조문별 시행일·부칙을 확인하세요."
+      },
+      "articles": [
+        {
+          "key": "main:제5조의2",
+          "label": "제5조의2",
+          "title": "공동 관리소 설치 등",
+          "text": "제5조의2(공동 관리소 설치 등) 시장은 소규모 공동주택을 대상으로 청소, 안전 등 주거환경 개선을 위한 공동 관리소를 설치 및 운영할 수 있다.",
+          "raw_number": "000502\n000502",
+          "source_heading": "제5조의2",
+          "number_source": "source_heading",
+          "deleted": false,
+          "effective_date": ""
+        }
+      ],
+      "evidence": {
+        "E-deb742ddf2f1ee38af95": {
+          "id": "E-deb742ddf2f1ee38af95",
+          "document_identity": "ordinance:2209592:2102111:version:87998bc47f967361",
+          "document_title": "수원시 소규모 공동주택관리 지원 조례",
+          "document_id": "2209592",
+          "version": "2102111",
+          "article": "제5조의2",
+          "article_key": "main:제5조의2",
+          "text": "제5조의2(공동 관리소 설치 등) 시장은 소규모 공동주택을 대상으로 청소, 안전 등 주거환경 개선을 위한 공동 관리소를 설치 및 운영할 수 있다.",
+          "source_url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+          "retrieved_at": "2026-10-05T14:18:37.519554+00:00",
+          "effective_date": "20251231",
+          "source_state": "live",
+          "version_scope": "version",
+          "content_hash": "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210",
+          "jurisdiction": "경기도 수원시",
+          "kind": "ordinance"
+        }
+      },
+      "coverage": {
+        "section": "articles",
+        "matched_items": 1,
+        "offset": 0,
+        "filtered": true,
+        "section_counts": {
+          "articles": 22,
+          "supplementary": 1,
+          "annexes": 2
+        },
+        "annex_body_collected": false,
+        "returned_items": 1,
+        "next_offset": null,
+        "next_start_char": null,
+        "continuation": "동일 reference/section/keyword에서 next_offset과 next_start_char를 offset/start_char로 사용하세요.",
+        "matched_articles": 1,
+        "returned_articles": 1
+      },
+      "warning": "선택 section의 반환 구간만 열람했습니다. 다른 조문·부칙과 별표 첨부 본문을 확인한 것으로 보고하지 마세요.",
+      "source_links": [
+        {
+          "url": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+          "label": "수원시 소규모 공동주택관리 지원 조례",
+          "markdown": "[수원시 소규모 공동주택관리 지원 조례](https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111)",
+          "kind": "DOCUMENT_REFERENCE",
+          "status": "REFERENCE_PROVIDED",
+          "direct_document": true
+        }
+      ],
+      "link_guidance": {
+        "display": "각 핵심 사실·수치 뒤에 해당 source_links.markdown을 붙이고 자료별로 연결하세요.",
+        "scope": "DOCUMENT_REFERENCE=원문 주소, OFFICIAL_DATASET=데이터셋 안내, CATALOG_METADATA=자료 설명, OFFICIAL_SEARCH=검색 화면.",
+        "verification": "링크 제공과 페이지 본문 조회·대조는 다릅니다. status와 열람 범위를 유지하세요.",
+        "links_omitted": false
+      },
+      "mcp_receipt": {
+        "tool": "ordinance_get_document",
+        "server_version": "4.1.5-public.2",
+        "request_id": "5a04fd7147c8419c8756",
+        "elapsed_ms": 965,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      }
+    },
+    "isError": false
+  }
+}

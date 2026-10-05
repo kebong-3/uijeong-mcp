@@ -1,0 +1,1213 @@
+{
+  "endpoint": "https://uijeong-mcp.onrender.com/mcp",
+  "authentication": "none",
+  "transport": "MCP_SDK_STREAMABLE_HTTP",
+  "checked_at": "2026-10-05T23:17:41.441334+09:00",
+  "scope": "One bounded minimum input per public tool, plus stated dependencies; no load test.",
+  "records": [
+    {
+      "id": "council_status",
+      "tool": "council_status",
+      "purpose": "배포 상태·실제 노출 도구·실행 버전을 읽기 전용으로 확인",
+      "seconds": 0.15,
+      "isError": false,
+      "status": "COMPLETE",
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": {
+        "request_id": "e93dedcfdff546e1867c",
+        "tool": "council_status",
+        "server_version": "4.1.5-public.2",
+        "returned_at": "2026-10-05T23:18:01.053091+09:00",
+        "elapsed_ms": 32,
+        "result_reuse": "fresh",
+        "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+      },
+      "arguments": {
+        "test_council": "수원시",
+        "live": false
+      },
+      "response_file": "calls/council_status.json"
+    },
+    {
+      "id": "council_find_council",
+      "tool": "council_find_council",
+      "purpose": "수원시의 공식 의회 식별자 확인",
+      "seconds": 0.12,
+      "isError": false,
+      "status": null,
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": null,
+      "arguments": {
+        "query": "수원시"
+      },
+      "response_file": "calls/council_find_council.json"
+    },
+    {
+      "id": "council_data_sources",
+      "tool": "council_data_sources",
+      "purpose": "공식 의회 자료 진입점 1건 확인",
+      "seconds": 0.12,
+      "isError": false,
+      "status": "COMPLETE",
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": {
+        "request_id": "9fef4a85f5cf4182b71f",
+        "tool": "council_data_sources",
+        "server_version": "4.1.5-public.2",
+        "returned_at": "2026-10-05T23:18:01.299131+09:00",
+        "elapsed_ms": 4,
+        "result_reuse": "fresh",
+        "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+      },
+      "arguments": {
+        "query": "수원",
+        "limit": 1
+      },
+      "response_file": "calls/council_data_sources.json"
+    },
+    {
+      "id": "budget_api_catalog",
+      "tool": "budget_api_catalog",
+      "purpose": "지방재정365 API ID·필수 조건·공식 명세 확인",
+      "seconds": 0.11,
+      "isError": false,
+      "status": "CATALOG",
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": {
+        "tool": "budget_api_catalog",
+        "server_version": "4.1.5-public.2",
+        "request_id": "4b7e641312584fe9a11c",
+        "elapsed_ms": 2,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "arguments": {
+        "query": "lofin_projects"
+      },
+      "response_file": "calls/budget_api_catalog.json"
+    },
+    {
+      "id": "budget_api_status",
+      "tool": "budget_api_status",
+      "purpose": "키 설정과 실제 출처 확인 상태를 구분",
+      "seconds": 0.12,
+      "isError": false,
+      "status": "CONFIGURATION_STATUS",
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": {
+        "tool": "budget_api_status",
+        "server_version": "4.1.5-public.2",
+        "request_id": "e12fd0d32845469a8f13",
+        "elapsed_ms": 1,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "arguments": {},
+      "response_file": "calls/budget_api_status.json"
+    },
+    {
+      "id": "budget_calculation_schema",
+      "tool": "budget_calculation_schema",
+      "purpose": "산출 계산에 필요한 실제 내부 스키마 확인",
+      "seconds": 0.12,
+      "isError": false,
+      "status": null,
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": {
+        "tool": "budget_calculation_schema",
+        "server_version": "4.1.5-public.2",
+        "request_id": "b077eef73b8b429984e6",
+        "elapsed_ms": 1,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "arguments": {
+        "operation": "cost"
+      },
+      "response_file": "calls/budget_calculation_schema.json"
+    },
+    {
+      "id": "budget_calculate",
+      "tool": "budget_calculate",
+      "purpose": "실제 사업과 분리된 예시 1,000원 × 1회 산출",
+      "seconds": 0.12,
+      "isError": false,
+      "status": null,
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": {
+        "tool": "budget_calculate",
+        "server_version": "4.1.5-public.2",
+        "request_id": "2acf1d428d57491e8ce2",
+        "elapsed_ms": 3,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "arguments": {
+        "operation": "cost",
+        "arguments": {
+          "components": [
+            {
+              "name": "[기능검증용 예시] 공동 관리소 운영비",
+              "basis": "기능검증을 위한 가상단가 1,000원과 물량 1회. 실제 사업비 또는 공인 단가가 아님.",
+              "unit_price": "1000",
+              "quantity": "1"
+            }
+          ],
+          "unit": "원"
+        }
+      },
+      "response_file": "calls/budget_calculate.json",
+      "expected_checks": {
+        "summary.total_won": true
+      }
+    },
+    {
+      "id": "budget_review_project",
+      "tool": "budget_review_project",
+      "purpose": "최소 산출안 검산과 승인 보류 상태 확인",
+      "seconds": 0.12,
+      "isError": false,
+      "status": "REVIEW_REQUIRED",
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": {
+        "tool": "budget_review_project",
+        "server_version": "4.1.5-public.2",
+        "request_id": "43d7489534c644b79000",
+        "elapsed_ms": 5,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "arguments": {
+        "title": "[기능검증용 예시] 소규모 공동주택 공동 관리소 산출안",
+        "year": 2026,
+        "components": [
+          {
+            "name": "[기능검증용 예시] 공동 관리소 운영비",
+            "basis": "기능검증을 위한 가상단가 1,000원과 물량 1회. 실제 사업비 또는 공인 단가가 아님.",
+            "unit_price": "1000",
+            "quantity": "1"
+          }
+        ],
+        "topic": "시설",
+        "unit": "원"
+      },
+      "response_file": "calls/budget_review_project.json",
+      "expected_checks": {
+        "status": true,
+        "amount_won": true
+      }
+    },
+    {
+      "id": "budget_checklist",
+      "tool": "budget_checklist",
+      "purpose": "시설사업 사전절차 확인질문 반환. 임의 사업명을 topic enum으로 전달하지 않음",
+      "seconds": 0.11,
+      "isError": false,
+      "status": null,
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": {
+        "tool": "budget_checklist",
+        "server_version": "4.1.5-public.2",
+        "request_id": "7ef4f2f1603f4e25aef3",
+        "elapsed_ms": 2,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "arguments": {
+        "topic": "시설",
+        "year": 2026
+      },
+      "response_file": "calls/budget_checklist.json"
+    },
+    {
+      "id": "ordinance_guide",
+      "tool": "ordinance_guide",
+      "purpose": "검증용 절차 입력의 미확인·보류 조건 확인",
+      "seconds": 0.14,
+      "isError": false,
+      "status": null,
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": {
+        "tool": "ordinance_guide",
+        "server_version": "4.1.5-public.2",
+        "request_id": "d2286c10be5a48ae8a45",
+        "elapsed_ms": 25,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "arguments": {
+        "procedure": {
+          "jurisdiction": "경기도 수원시",
+          "instrument": "ordinance",
+          "action": "prepare",
+          "basis_kind": "unknown",
+          "ordinance_stage": "unknown"
+        },
+        "as_of": "2026-10-05"
+      },
+      "response_file": "calls/ordinance_guide.json",
+      "expected_checks": {
+        "procedure_screening.legal_approval": true,
+        "procedure_screening.publication_ready": true,
+        "procedure_screening.implementation_ready": true
+      }
+    },
+    {
+      "id": "local_workflow_plan",
+      "tool": "local_workflow_plan",
+      "purpose": "실제 실행과 구분되는 통합 검색 계획·호출 인자 확인",
+      "seconds": 0.18,
+      "isError": false,
+      "status": "PLAN_ONLY",
+      "code": null,
+      "classification": "RETURNED_WITH_SCOPE",
+      "receipt": {
+        "tool": "local_workflow_plan",
+        "server_version": "4.1.5-public.2",
+        "request_id": "c603601a7e564cb997c6",
+        "elapsed_ms": 28,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "arguments": {
+        "question": "수원시 빌라가꿈관리소의 의회 질의, 2026년 예산현액과 관련 조례를 검토해줘",
+        "jurisdiction": "경기도 수원시",
+        "fiscal_year": 2026,
+        "as_of": "2026-10-05",
+        "domains": [
+          "council",
+          "budget",
+          "ordinance"
+        ]
+      },
+      "response_file": "calls/local_workflow_plan.json",
+      "expected_checks": {
+        "status": true
+      }
+    },
+    {
+      "id": "search",
+      "tool": "search",
+      "purpose": "표준 지식검색의 실제 반환 ID 확보",
+      "seconds": 4.04,
+      "isError": false,
+      "status": null,
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": null,
+      "arguments": {
+        "query": "수원시 빌라가꿈관리소"
+      },
+      "response_file": "calls/search.json"
+    },
+    {
+      "id": "fetch",
+      "tool": "fetch",
+      "purpose": "직전 search가 반환한 실제 ID로 공식 회의 문맥 조회",
+      "seconds": 0.18,
+      "isError": false,
+      "status": null,
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": null,
+      "arguments": {
+        "id": "uc1_eyJ2IjoxLCJyIjoiQ0xJS0MyNzk5MDQyNDY4MDQ0OTg0IiwidCI6MjE5LCJ1IjoiaHR0cHM6Ly9jbGlrLm5hbmV0LmdvLmtyLyJ9"
+      },
+      "response_file": "calls/fetch.json"
+    },
+    {
+      "id": "council_evidence_bundle",
+      "tool": "council_evidence_bundle",
+      "purpose": "명시 기간의 의원 질의·답변과 재사용 스냅샷 확보",
+      "seconds": 1.03,
+      "isError": false,
+      "status": "PARTIAL",
+      "code": null,
+      "classification": "RETURNED_WITH_SCOPE",
+      "receipt": {
+        "request_id": "c7958ab28794401b842a",
+        "tool": "council_evidence_bundle",
+        "server_version": "4.1.5-public.2",
+        "returned_at": "2026-10-05T23:18:07.564593+09:00",
+        "elapsed_ms": 909,
+        "result_reuse": "fresh",
+        "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+      },
+      "arguments": {
+        "keyword": "빌라가꿈관리소",
+        "council": "수원시",
+        "mode": "질의답변",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "max_docs": 1,
+        "source": "auto",
+        "limit": 1
+      },
+      "response_file": "calls/council_evidence_bundle.json"
+    },
+    {
+      "id": "council_get_evidence",
+      "tool": "council_get_evidence",
+      "purpose": "실제 bundle 스냅샷에서 근거 1건 재조회",
+      "seconds": 0.12,
+      "isError": false,
+      "status": "PARTIAL",
+      "code": null,
+      "classification": "RETURNED_WITH_SCOPE",
+      "receipt": {
+        "request_id": "657aa10ddf294b8bb78d",
+        "tool": "council_get_evidence",
+        "server_version": "4.1.5-public.2",
+        "returned_at": "2026-10-05T23:18:07.685238+09:00",
+        "elapsed_ms": 1,
+        "result_reuse": "fresh",
+        "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+      },
+      "arguments": {
+        "snapshot_id": "89210e837bf1cbb8a10fd0515b3e996644dcd5dc944d44c7efcfe4ad08306a3e",
+        "collection": "items",
+        "limit": 1
+      },
+      "response_file": "calls/council_get_evidence.json"
+    },
+    {
+      "id": "council_read_source",
+      "tool": "council_read_source",
+      "purpose": "bundle이 반환한 공식 문서 ID의 실제 발언·출처 확인",
+      "seconds": 0.25,
+      "isError": false,
+      "status": "PARTIAL",
+      "code": null,
+      "classification": "RETURNED_WITH_SCOPE",
+      "receipt": {
+        "request_id": "22bef2521744440f9e35",
+        "tool": "council_read_source",
+        "server_version": "4.1.5-public.2",
+        "returned_at": "2026-10-05T23:18:07.941575+09:00",
+        "elapsed_ms": 69,
+        "result_reuse": "fresh",
+        "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+      },
+      "arguments": {
+        "ref": "CLIKC2479358086714915",
+        "keyword": "빌라가꿈관리소",
+        "max_turns": 2,
+        "max_chars": 2000
+      },
+      "response_file": "calls/council_read_source.json"
+    },
+    {
+      "id": "council_open_record",
+      "tool": "council_open_record",
+      "purpose": "같은 공식 문서 ID의 열람용 반환 경로 확인",
+      "seconds": 0.21,
+      "isError": false,
+      "status": null,
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": null,
+      "arguments": {
+        "ref": "CLIKC2479358086714915",
+        "keyword": "빌라가꿈관리소",
+        "max_chars": 2000
+      },
+      "response_file": "calls/council_open_record.json"
+    },
+    {
+      "id": "council_prepare_pack",
+      "tool": "council_prepare_pack",
+      "purpose": "동일 질의답변 검색조건·source=auto 스냅샷을 재사용해 답변준비 초안 생성",
+      "seconds": 0.19,
+      "isError": false,
+      "status": "PARTIAL",
+      "code": null,
+      "classification": "RETURNED_WITH_SCOPE",
+      "receipt": {
+        "request_id": "b42fd42cb69c40fab360",
+        "tool": "council_prepare_pack",
+        "server_version": "4.1.5-public.2",
+        "returned_at": "2026-10-05T23:18:08.290720+09:00",
+        "elapsed_ms": 20,
+        "result_reuse": "fresh",
+        "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+      },
+      "arguments": {
+        "keyword": "빌라가꿈관리소",
+        "council": "수원시",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "max_docs": 1,
+        "snapshot_id": "89210e837bf1cbb8a10fd0515b3e996644dcd5dc944d44c7efcfe4ad08306a3e",
+        "max_evidence": 1
+      },
+      "response_file": "calls/council_prepare_pack.json",
+      "expected_checks": {
+        "briefing.human_review_required": true
+      }
+    },
+    {
+      "id": "council_evidence_search",
+      "tool": "council_evidence_search",
+      "purpose": "통합검색 호환 도구의 최소 유효 depth 확인",
+      "seconds": 0.54,
+      "isError": false,
+      "status": null,
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": null,
+      "arguments": {
+        "keyword": "빌라가꿈관리소",
+        "council": "수원시",
+        "mode": "질의답변",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "depth": "빠르게"
+      },
+      "response_file": "calls/council_evidence_search.json"
+    },
+    {
+      "id": "council_search_minutes",
+      "tool": "council_search_minutes",
+      "purpose": "원문 목록의 실제 공식 문서번호와 기간 설명 확인",
+      "seconds": 0.46,
+      "isError": false,
+      "status": null,
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": null,
+      "arguments": {
+        "keyword": "빌라가꿈관리소",
+        "council": "수원시",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "limit": 1
+      },
+      "response_file": "calls/council_search_minutes.json"
+    },
+    {
+      "id": "council_period_review",
+      "tool": "council_period_review",
+      "purpose": "명시 기간을 회의연도별로 나누어 각 연도 1건 한도 확인",
+      "seconds": 0.22,
+      "isError": false,
+      "status": "PARTIAL",
+      "code": null,
+      "classification": "RETURNED_WITH_SCOPE",
+      "receipt": {
+        "request_id": "dc53cc0cbaa3444b8e20",
+        "tool": "council_period_review",
+        "server_version": "4.1.5-public.2",
+        "returned_at": "2026-10-05T23:18:09.555907+09:00",
+        "elapsed_ms": 95,
+        "result_reuse": "fresh",
+        "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+      },
+      "arguments": {
+        "keyword": "빌라가꿈관리소",
+        "council": "수원시",
+        "years": 2,
+        "include_current_year": true,
+        "as_of": "2026-10-05",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "mode": "질의답변",
+        "max_docs_per_year": 1
+      },
+      "response_file": "calls/council_period_review.json"
+    },
+    {
+      "id": "council_department_brief",
+      "tool": "council_department_brief",
+      "purpose": "수원 건축과의 의원 질의·집행부 답변 역할 구분 확인",
+      "seconds": 0.52,
+      "isError": false,
+      "status": "PARTIAL",
+      "code": null,
+      "classification": "RETURNED_WITH_SCOPE",
+      "receipt": {
+        "request_id": "f2915de6e221448f955e",
+        "tool": "council_department_brief",
+        "server_version": "4.1.5-public.2",
+        "returned_at": "2026-10-05T23:18:10.082205+09:00",
+        "elapsed_ms": 408,
+        "result_reuse": "fresh",
+        "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+      },
+      "arguments": {
+        "department": "건축과",
+        "council": "수원시",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "max_docs": 1,
+        "limit": 1,
+        "source": "auto"
+      },
+      "response_file": "calls/council_department_brief.json"
+    },
+    {
+      "id": "council_recurring_issues",
+      "tool": "council_recurring_issues",
+      "purpose": "두 회의연도의 반복 쟁점 후보를 작은 범위로 조회하고 동일 요구 확정과 구분",
+      "seconds": 1.78,
+      "isError": false,
+      "status": "PARTIAL",
+      "code": null,
+      "classification": "RETURNED_WITH_SCOPE",
+      "receipt": {
+        "request_id": "9e5ed04f428040c1afe9",
+        "tool": "council_recurring_issues",
+        "server_version": "4.1.5-public.2",
+        "returned_at": "2026-10-05T23:18:11.853203+09:00",
+        "elapsed_ms": 1614,
+        "result_reuse": "fresh",
+        "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+      },
+      "arguments": {
+        "keyword": "소규모 공동주택",
+        "council": "수원시",
+        "years": 2,
+        "include_current_year": true,
+        "as_of": "2026-10-05",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "min_years": 2,
+        "top": 1,
+        "max_docs_per_year": 1,
+        "source": "auto"
+      },
+      "response_file": "calls/council_recurring_issues.json"
+    },
+    {
+      "id": "council_peer_cases",
+      "tool": "council_peer_cases",
+      "purpose": "서로 다른 지방의회 실제 질문 사례 중 최소 1건을 제한적으로 조회",
+      "seconds": 5.59,
+      "isError": false,
+      "status": "PARTIAL",
+      "code": null,
+      "classification": "RETURNED_WITH_SCOPE",
+      "receipt": {
+        "request_id": "52b2c89430c24745bae7",
+        "tool": "council_peer_cases",
+        "server_version": "4.1.5-public.2",
+        "returned_at": "2026-10-05T23:18:17.456277+09:00",
+        "elapsed_ms": 5435,
+        "result_reuse": "fresh",
+        "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+      },
+      "arguments": {
+        "topic": "소규모 공동주택",
+        "years": 1,
+        "case_count": 1,
+        "max_details": 3
+      },
+      "response_file": "calls/council_peer_cases.json"
+    },
+    {
+      "id": "council_department_session_brief",
+      "tool": "council_department_session_brief",
+      "purpose": "부서 기준 회기 준비의 최소 1년 입력 확인",
+      "seconds": 0.94,
+      "isError": false,
+      "status": "PARTIAL",
+      "code": null,
+      "classification": "RETURNED_WITH_SCOPE",
+      "receipt": {
+        "request_id": "7dd025ef25084291ab68",
+        "tool": "council_department_session_brief",
+        "server_version": "4.1.5-public.2",
+        "returned_at": "2026-10-05T23:18:18.400286+09:00",
+        "elapsed_ms": 830,
+        "result_reuse": "fresh",
+        "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+      },
+      "arguments": {
+        "department": "건축과",
+        "council": "수원시",
+        "purpose": "업무보고",
+        "years": 1,
+        "max_docs_per_year": 1
+      },
+      "response_file": "calls/council_department_session_brief.json"
+    },
+    {
+      "id": "council_finance_context",
+      "tool": "council_finance_context",
+      "purpose": "공개 인자의 관련 검색어가 실제 재검색에 전달되는지와 최근 제공 기준일 확인",
+      "seconds": 14.46,
+      "isError": false,
+      "status": "COMPLETE",
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": {
+        "request_id": "54049eae06004a90b8ca",
+        "tool": "council_finance_context",
+        "server_version": "4.1.5-public.2",
+        "returned_at": "2026-10-05T23:18:32.859102+09:00",
+        "elapsed_ms": 14343,
+        "result_reuse": "fresh",
+        "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+      },
+      "arguments": {
+        "topic": "빌라가꿈관리소",
+        "council": "수원시",
+        "fiscal_year": 2026,
+        "snapshot_date": "20261005",
+        "budget_stage": "current",
+        "search_terms": [
+          "소규모 공동주택"
+        ],
+        "limit": 3
+      },
+      "response_file": "calls/council_finance_context.json",
+      "expected_checks": {
+        "budget_basis.same_project_verified": true,
+        "budget_basis.amount_verified": true,
+        "budget_basis.requested_stage": true
+      }
+    },
+    {
+      "id": "budget_fetch_api",
+      "tool": "budget_fetch_api",
+      "purpose": "카탈로그에서 확인한 필드와 직전 실제 제공일·지자체코드로 공식 API 1행 조회",
+      "seconds": 0.81,
+      "isError": false,
+      "status": "PAGE_ONLY",
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": {
+        "tool": "budget_fetch_api",
+        "server_version": "4.1.5-public.2",
+        "request_id": "197b72051e4c4b0fac5a",
+        "elapsed_ms": 676,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "arguments": {
+        "api_id": "lofin_projects",
+        "params": {
+          "fyr": "2026",
+          "exe_ymd": "20261004",
+          "laf_cd": "4111000",
+          "dbiz_nm": "소규모 공동주택"
+        },
+        "page_size": 1
+      },
+      "response_file": "calls/budget_fetch_api.json"
+    },
+    {
+      "id": "budget_search_similar_projects",
+      "tool": "budget_search_similar_projects",
+      "purpose": "같은 제공일·지자체에서 이름이 유사한 사업 후보 1행 조회",
+      "seconds": 0.11,
+      "isError": false,
+      "status": "PAGE_ONLY",
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": {
+        "tool": "budget_search_similar_projects",
+        "server_version": "4.1.5-public.2",
+        "request_id": "5286d40b585643bd90a8",
+        "elapsed_ms": 4,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "arguments": {
+        "query": "소규모 공동주택",
+        "fiscal_year": 2026,
+        "execution_date": "20261004",
+        "local_gov_code": "4111000",
+        "page_size": 1
+      },
+      "response_file": "calls/budget_search_similar_projects.json"
+    },
+    {
+      "id": "council_legislation_context",
+      "tool": "council_legislation_context",
+      "purpose": "명시된 상위법의 공식 ID를 정확 제명으로 먼저 확인",
+      "seconds": 1.1,
+      "isError": false,
+      "status": "PARTIAL",
+      "code": null,
+      "classification": "RETURNED_WITH_SCOPE",
+      "receipt": {
+        "request_id": "d0565a1840ed4259ab48",
+        "tool": "council_legislation_context",
+        "server_version": "4.1.5-public.2",
+        "returned_at": "2026-10-05T23:18:34.889881+09:00",
+        "elapsed_ms": 983,
+        "result_reuse": "fresh",
+        "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+      },
+      "arguments": {
+        "topic": "공동주택관리법",
+        "council": "수원시",
+        "jurisdiction": "경기도 수원시",
+        "include_articles": false
+      },
+      "response_file": "calls/council_legislation_context.json"
+    },
+    {
+      "id": "ordinance_search",
+      "tool": "ordinance_search",
+      "purpose": "수원시 소규모 공동주택 조례의 공식 식별자 확보",
+      "seconds": 1.57,
+      "isError": false,
+      "status": "complete",
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": {
+        "tool": "ordinance_search",
+        "server_version": "4.1.5-public.2",
+        "request_id": "fa1bb19e07404f109369",
+        "elapsed_ms": 1455,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "arguments": {
+        "query": "소규모 공동주택",
+        "kind": "ordinance",
+        "jurisdiction": "경기도 수원시",
+        "limit": 1,
+        "max_pages": 1
+      },
+      "response_file": "calls/ordinance_search.json"
+    },
+    {
+      "id": "ordinance_get_document",
+      "tool": "ordinance_get_document",
+      "purpose": "실제 검색 식별자로 공동 관리소 조문·버전 해시·원문 링크 확인",
+      "seconds": 1.08,
+      "isError": false,
+      "status": "retrieved",
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": {
+        "tool": "ordinance_get_document",
+        "server_version": "4.1.5-public.2",
+        "request_id": "5a04fd7147c8419c8756",
+        "elapsed_ms": 965,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "arguments": {
+        "reference": {
+          "kind": "ordinance",
+          "document_id": "2209592",
+          "mst": "2102111",
+          "title_hint": "수원시 소규모 공동주택관리 지원 조례"
+        },
+        "keyword": "공동 관리소",
+        "section": "articles",
+        "limit": 1,
+        "max_chars": 2000
+      },
+      "response_file": "calls/ordinance_get_document.json"
+    },
+    {
+      "id": "ordinance_linked",
+      "tool": "ordinance_linked",
+      "purpose": "실제 상위법 ID·조번호로 공식 연결 조례 조회 경로 확인",
+      "seconds": 0.94,
+      "isError": false,
+      "status": "complete",
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": {
+        "tool": "ordinance_linked",
+        "server_version": "4.1.5-public.2",
+        "request_id": "6051f7d3fea141f58b39",
+        "elapsed_ms": 817,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "arguments": {
+        "law_id": "012345",
+        "article": "제1조",
+        "max_pages": 1
+      },
+      "response_file": "calls/ordinance_linked.json"
+    },
+    {
+      "id": "dependency_peer_ordinance_search",
+      "tool": "ordinance_search",
+      "purpose": "타 지자체 비교 도구에 전달할 실제 비교 조례 1건 확보",
+      "seconds": 0.69,
+      "isError": false,
+      "status": "complete",
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": {
+        "tool": "ordinance_search",
+        "server_version": "4.1.5-public.2",
+        "request_id": "b241efb778714f3f9f8d",
+        "elapsed_ms": 561,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "arguments": {
+        "query": "소규모 공동주택",
+        "kind": "ordinance",
+        "jurisdiction": "경기도 성남시",
+        "limit": 1,
+        "max_pages": 1
+      },
+      "response_file": "calls/dependency_peer_ordinance_search.json"
+    },
+    {
+      "id": "ordinance_compare",
+      "tool": "ordinance_compare",
+      "purpose": "실제 검색에서 확보한 수원·성남 조례 각 1개의 기능 차이 비교",
+      "seconds": 2.85,
+      "isError": false,
+      "status": "PARTIAL",
+      "code": null,
+      "classification": "RETURNED_WITH_SCOPE",
+      "receipt": {
+        "tool": "ordinance_compare",
+        "server_version": "4.1.5-public.2",
+        "request_id": "e60c0fb41b2741a4b275",
+        "elapsed_ms": 2733,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "arguments": {
+        "baseline": {
+          "kind": "ordinance",
+          "document_id": "2209592",
+          "mst": "2102111",
+          "title_hint": "수원시 소규모 공동주택관리 지원 조례"
+        },
+        "comparisons": [
+          {
+            "kind": "ordinance",
+            "document_id": "2182991",
+            "mst": "2092005",
+            "title_hint": "성남시 소규모 공동주택관리에 관한 지원 조례"
+          }
+        ],
+        "as_of": "2026-10-05"
+      },
+      "response_file": "calls/ordinance_compare.json",
+      "expected_checks": {
+        "legal_approval": true,
+        "equivalence_verified": true,
+        "ready_for_submission": true
+      }
+    },
+    {
+      "id": "dependency_compare_next_page",
+      "tool": "ordinance_compare",
+      "purpose": "실제 첫 비교 응답의 이어읽기 인자와 원문 해시를 사용하여 다음 조문 행을 회수",
+      "seconds": 1.5,
+      "isError": false,
+      "status": "PARTIAL",
+      "code": null,
+      "classification": "RETURNED_WITH_SCOPE",
+      "receipt": {
+        "tool": "ordinance_compare",
+        "server_version": "4.1.5-public.2",
+        "request_id": "c6b631fce1464bd183ce",
+        "elapsed_ms": 1383,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "arguments": {
+        "baseline": {
+          "kind": "ordinance",
+          "document_id": "2209592",
+          "mst": "2102111",
+          "title_hint": "수원시 소규모 공동주택관리 지원 조례"
+        },
+        "comparisons": [
+          {
+            "kind": "ordinance",
+            "document_id": "2182991",
+            "mst": "2092005",
+            "title_hint": "성남시 소규모 공동주택관리에 관한 지원 조례"
+          }
+        ],
+        "as_of": "2026-10-05",
+        "offset": 2,
+        "limit": 3,
+        "max_chars": 400,
+        "expected_hashes": [
+          "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210",
+          "9455684861eeb94c4d6ddda006acf75634ece3fbf3ec9898364ffa7837515a59"
+        ]
+      },
+      "response_file": "calls/dependency_compare_next_page.json",
+      "expected_checks": {
+        "legal_approval": true,
+        "equivalence_verified": true,
+        "ready_for_submission": true
+      }
+    },
+    {
+      "id": "ordinance_diff_versions",
+      "tool": "ordinance_diff_versions",
+      "purpose": "같은 공식 버전을 양쪽에 넣은 무변경 대조 시험",
+      "seconds": 0.2,
+      "isError": false,
+      "status": null,
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": {
+        "tool": "ordinance_diff_versions",
+        "server_version": "4.1.5-public.2",
+        "request_id": "840965ed7ad6490297c7",
+        "elapsed_ms": 41,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "arguments": {
+        "old": {
+          "kind": "ordinance",
+          "document_id": "2209592",
+          "mst": "2102111",
+          "title_hint": "수원시 소규모 공동주택관리 지원 조례"
+        },
+        "new": {
+          "kind": "ordinance",
+          "document_id": "2209592",
+          "mst": "2102111",
+          "title_hint": "수원시 소규모 공동주택관리 지원 조례"
+        }
+      },
+      "response_file": "calls/ordinance_diff_versions.json",
+      "expected_checks": {
+        "changes": true,
+        "supplementary_changed": true,
+        "annexes_changed": true,
+        "metadata_changed": true
+      }
+    },
+    {
+      "id": "ordinance_review_project",
+      "tool": "ordinance_review_project",
+      "purpose": "실제 기준조례를 선택한 검토 초안의 미확인 항목과 승인 불가 상태 확인",
+      "seconds": 0.71,
+      "isError": false,
+      "status": "review_completed",
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": {
+        "tool": "ordinance_review_project",
+        "server_version": "4.1.5-public.2",
+        "request_id": "67f771906cc440128a2f",
+        "elapsed_ms": 597,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "arguments": {
+        "params": {
+          "project": "[기능검증용 예시] 수원시 소규모 공동주택 공동 관리소의 설치·운영 근거를 검토한다. 실제 신규사업·개정안·지출 승인 요청이 아니다.",
+          "jurisdiction": "경기도 수원시",
+          "as_of": "2026-10-05",
+          "topic": "소규모 공동주택",
+          "baseline": {
+            "kind": "ordinance",
+            "document_id": "2209592",
+            "mst": "2102111",
+            "title_hint": "수원시 소규모 공동주택관리 지원 조례"
+          },
+          "auto_search": false,
+          "reasoning": "rules",
+          "allow_external_llm": false,
+          "budget_calls": 1
+        },
+        "detail_level": "summary",
+        "max_evidence": 1
+      },
+      "response_file": "calls/ordinance_review_project.json",
+      "expected_checks": {
+        "quality_gate.legal_approval": true,
+        "quality_gate.submission_ready": true,
+        "draft.submission_ready": true,
+        "usage.llm_calls": true
+      }
+    },
+    {
+      "id": "ordinance_verify_references",
+      "tool": "ordinance_verify_references",
+      "purpose": "실제 법령 ID에서 예시 인용의 조문 존재만 대조",
+      "seconds": 3.68,
+      "isError": false,
+      "status": null,
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": {
+        "tool": "ordinance_verify_references",
+        "server_version": "4.1.5-public.2",
+        "request_id": "529f76c430de47ec9819",
+        "elapsed_ms": 3545,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "arguments": {
+        "text": "[기능검증용 예시] 「공동주택관리법」 제1조를 인용한다.",
+        "parents": [
+          {
+            "kind": "law",
+            "document_id": "012345",
+            "title_hint": "공동주택관리법"
+          }
+        ],
+        "as_of": "2026-10-05"
+      },
+      "response_file": "calls/ordinance_verify_references.json"
+    },
+    {
+      "id": "ordinance_draft_amendment",
+      "tool": "ordinance_draft_amendment",
+      "purpose": "실제 원문 해시와 정확한 조문 전체 일치 후 공개 검증용 일부개정 초안만 생성",
+      "seconds": 0.21,
+      "isError": false,
+      "status": "mechanical_working_draft",
+      "code": null,
+      "classification": "RETURNED",
+      "receipt": {
+        "tool": "ordinance_draft_amendment",
+        "server_version": "4.1.5-public.2",
+        "request_id": "0dd30503bb3f440cb9c5",
+        "elapsed_ms": 99,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "arguments": {
+        "baseline": {
+          "kind": "ordinance",
+          "document_id": "2209592",
+          "mst": "2102111",
+          "title_hint": "수원시 소규모 공동주택관리 지원 조례"
+        },
+        "operations": [
+          {
+            "operation": "replace_article",
+            "article": "제5조의2",
+            "expected_text": "제5조의2(공동 관리소 설치 등) 시장은 소규모 공동주택을 대상으로 청소, 안전 등 주거환경 개선을 위한 공동 관리소를 설치 및 운영할 수 있다.",
+            "new_text": "제5조의2(검증용 예시) 이 문안은 기능 검증을 위한 예시이며 실제 개정·공포·집행에 사용하지 않는다.",
+            "reason": "기능검증용 가상 문안의 기계적 대체 시험. 실제 개정 제안·제출·공포 또는 법적 승인 아님."
+          }
+        ],
+        "expected_hash": "87998bc47f96736101a3b22cda562ac858711ec9e3d06aae68a4f2788458a210"
+      },
+      "response_file": "calls/ordinance_draft_amendment.json",
+      "expected_checks": {
+        "status": true,
+        "submission_ready": true
+      }
+    },
+    {
+      "id": "local_evidence_review",
+      "tool": "local_evidence_review",
+      "purpose": "실제 조회한 조례 원문의 제한된 열람범위를 메타데이터로 점검",
+      "seconds": 0.11,
+      "isError": false,
+      "status": "METADATA_REVIEW_ONLY",
+      "code": null,
+      "classification": "RETURNED_WITH_SCOPE",
+      "receipt": {
+        "tool": "local_evidence_review",
+        "server_version": "4.1.5-public.2",
+        "request_id": "089a551533f243bc8824",
+        "elapsed_ms": 0,
+        "meaning": "서버 실행 기록. 실제 출처 조회 여부는 결과 상태로 확인하세요."
+      },
+      "arguments": {
+        "evidence": [
+          {
+            "domain": "ordinance",
+            "source_ref": "https://www.law.go.kr/ordinInfoP.do?ordinSeq=2102111",
+            "jurisdiction": "경기도 수원시",
+            "as_of": "2026-10-05",
+            "state": "partial",
+            "claim": "공식 조례의 공동 관리소 설치 조문 1개를 조회함. 전체 조문·적법성·동일사업은 확정하지 않음."
+          }
+        ],
+        "jurisdiction": "경기도 수원시",
+        "required_domains": [
+          "ordinance"
+        ]
+      },
+      "response_file": "calls/local_evidence_review.json",
+      "expected_checks": {
+        "status": true,
+        "verified_facts": true
+      }
+    },
+    {
+      "id": "council_context_pack",
+      "tool": "council_context_pack",
+      "purpose": "사업명→공식 회의록의 대상 구절→조례·재정 후보 연결과 통합 상태 확인",
+      "seconds": 6.67,
+      "isError": false,
+      "status": "PARTIAL",
+      "code": null,
+      "classification": "RETURNED_WITH_SCOPE",
+      "receipt": null,
+      "arguments": {
+        "topic": "빌라가꿈관리소",
+        "council": "수원시",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "fiscal_year": 2026,
+        "max_docs": 1,
+        "include_legal": true,
+        "include_finance": true,
+        "include_public_data": false,
+        "include_member_records": false,
+        "include_policy_background": false
+      },
+      "response_file": "calls/council_context_pack.json",
+      "expected_checks": {
+        "ready_for_submission": true,
+        "linked_review.legal_approval": true,
+        "linked_review.same_project_verified": true
+      }
+    },
+    {
+      "id": "council_session_ready_pack",
+      "tool": "council_session_ready_pack",
+      "purpose": "실제 회기 목적에서 의회·예산·조례 근거와 담당자 확인사항 연결",
+      "seconds": 1.64,
+      "isError": false,
+      "status": "PARTIAL",
+      "code": null,
+      "classification": "RETURNED_WITH_SCOPE",
+      "receipt": null,
+      "arguments": {
+        "topic": "빌라가꿈관리소",
+        "council": "수원시",
+        "purpose": "행정사무감사",
+        "date_from": "2025-01-01",
+        "date_to": "2026-10-05",
+        "fiscal_year": 2026,
+        "max_docs": 1,
+        "need_public_data": false
+      },
+      "response_file": "calls/council_session_ready_pack.json",
+      "expected_checks": {
+        "ready_for_submission": true
+      }
+    }
+  ],
+  "checks": {
+    "forty_advertised_tools": true,
+    "finance_search_terms_exposed": true,
+    "background_default_off": true,
+    "compare_pagination_exposed": true,
+    "sdk_reconnect_and_zero_base": true,
+    "all_advertised_tools_returned": true,
+    "inputs_and_transport_valid": true,
+    "declared_case_expectations": true,
+    "release_manifest_matches": true,
+    "expected_version": true,
+    "expected_commit": true,
+    "comparison_continuation_preserves_source": true,
+    "followup_candidates_not_empty": true,
+    "default_background_skipped": true,
+    "relationships_not_certified": true
+  },
+  "protocol_version": "2025-11-25",
+  "tool_count": 40,
+  "unique_tools_returned": 40,
+  "classifications": {
+    "RETURNED": 26,
+    "RETURNED_WITH_SCOPE": 16
+  },
+  "tool_errors_require_review": [],
+  "observed_version": "4.1.5-public.2",
+  "observed_commit": "541cd09b95fa233d5bed003045a5b49a28dd5c31",
+  "status": "PASS"
+}

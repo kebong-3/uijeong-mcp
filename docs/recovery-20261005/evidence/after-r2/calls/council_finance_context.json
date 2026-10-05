@@ -1,0 +1,369 @@
+{
+  "call": {
+    "id": "council_finance_context",
+    "tool": "council_finance_context",
+    "purpose": "공개 인자의 관련 검색어가 실제 재검색에 전달되는지와 최근 제공 기준일 확인",
+    "seconds": 14.46,
+    "isError": false,
+    "status": "COMPLETE",
+    "code": null,
+    "classification": "RETURNED",
+    "receipt": {
+      "request_id": "54049eae06004a90b8ca",
+      "tool": "council_finance_context",
+      "server_version": "4.1.5-public.2",
+      "returned_at": "2026-10-05T23:18:32.859102+09:00",
+      "elapsed_ms": 14343,
+      "result_reuse": "fresh",
+      "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+    },
+    "arguments": {
+      "topic": "빌라가꿈관리소",
+      "council": "수원시",
+      "fiscal_year": 2026,
+      "snapshot_date": "20261005",
+      "budget_stage": "current",
+      "search_terms": [
+        "소규모 공동주택"
+      ],
+      "limit": 3
+    },
+    "response_file": "calls/council_finance_context.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "상태: COMPLETE\n이번 요청 범위 확인 완료(기관 전체 전수 아님)\n대상: {'id': '031014', 'name': '경기도 수원시의회'}\n내용: items 3건\n확인 범위:\n  · 출처\n주요 근거:\n  ·  []\n  ·  []\n  ·  []\n한계: 미발견·날짜 미제공·조회 오류는 예산 없음이나 0원이 아닙니다. / 같은 기준일의 사업·회계별 행만 반환합니다. 다른 날짜나 관련 사업을 자동 합산하지 않습니다.\n전체 구조화 결과는 structuredContent에 있습니다.",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "COMPLETE",
+      "source": "행정안전부 지방재정365 세부사업별 세출현황",
+      "service_code": "QWGJK",
+      "dataset_url": "https://www.lofin365.go.kr/portal/LF5120000.do?pdtaId=0GAR4HBB8LWEBSL4NIHZ817053",
+      "source_url": "https://www.data.go.kr/data/15138857/openapi.do",
+      "query": {
+        "topic": "빌라가꿈관리소",
+        "council": "경기도 수원시의회",
+        "fiscal_year": 2026,
+        "requested_snapshot_date": "20261005",
+        "snapshot_date": "20261004",
+        "budget_stage": "current"
+      },
+      "items": [
+        {
+          "fiscal_year": "2026",
+          "execution_date": "20261004",
+          "local_government": "경기수원시",
+          "local_government_code": "4111000",
+          "account": "일반회계",
+          "department_code": "1035030",
+          "project_code": "37400002016300FF",
+          "project_name": "소규모 공동주택 안전점검 지원(도비)",
+          "field": "국토및지역개발",
+          "part": "지역및도시",
+          "budget_current_amount": 73000000,
+          "national_fund": 0,
+          "province_fund": 7300000,
+          "district_fund": 65700000,
+          "other_fund": 0,
+          "expenditure": 0,
+          "appropriated_amount": null,
+          "unverified_fields": {
+            "cpl_amt": 73000000
+          },
+          "execution_rate_percent": 0.0,
+          "budget_stage": "current",
+          "amount_unit": "SOURCE_CONFIRMATION_REQUIRED",
+          "matched_query": "소규모 공동주택",
+          "same_project_verified": false,
+          "match_status": "RELATED_PROJECT_CANDIDATE",
+          "unspent_current_amount": 73000000,
+          "source_link": {
+            "url": "https://www.lofin365.go.kr/portal/LF5120000.do?pdtaId=0GAR4HBB8LWEBSL4NIHZ817053",
+            "label": "지방재정365 세부사업별 세출현황(공식 데이터셋)",
+            "kind": "OFFICIAL_DATASET",
+            "status": "DATASET_REFERENCE",
+            "direct_document": false,
+            "markdown": "[지방재정365 세부사업별 세출현황](https://www.lofin365.go.kr/portal/LF5120000.do?pdtaId=0GAR4HBB8LWEBSL4NIHZ817053)",
+            "lookup": {
+              "fiscal_year": "2026",
+              "execution_date": "20261004",
+              "local_government": "경기수원시",
+              "local_government_code": "4111000",
+              "account": "일반회계",
+              "project_name": "소규모 공동주택 안전점검 지원(도비)",
+              "project_code": "37400002016300FF"
+            },
+            "note": "데이터셋 안내 링크입니다. 특정 사업 예산서 원문이 아닙니다. 조회조건으로 대조하세요."
+          }
+        },
+        {
+          "fiscal_year": "2026",
+          "execution_date": "20261004",
+          "local_government": "경기수원시",
+          "local_government_code": "4111000",
+          "account": "일반회계",
+          "department_code": "1035030",
+          "project_code": "3740000202230134",
+          "project_name": "노후 소규모 공동주택 유지관리(도비)",
+          "field": "국토및지역개발",
+          "part": "지역및도시",
+          "budget_current_amount": 200000000,
+          "national_fund": 0,
+          "province_fund": 60000000,
+          "district_fund": 140000000,
+          "other_fund": 0,
+          "expenditure": 0,
+          "appropriated_amount": null,
+          "unverified_fields": {
+            "cpl_amt": 200000000
+          },
+          "execution_rate_percent": 0.0,
+          "budget_stage": "current",
+          "amount_unit": "SOURCE_CONFIRMATION_REQUIRED",
+          "matched_query": "소규모 공동주택",
+          "same_project_verified": false,
+          "match_status": "RELATED_PROJECT_CANDIDATE",
+          "unspent_current_amount": 200000000,
+          "source_link": {
+            "url": "https://www.lofin365.go.kr/portal/LF5120000.do?pdtaId=0GAR4HBB8LWEBSL4NIHZ817053",
+            "label": "지방재정365 세부사업별 세출현황(공식 데이터셋)",
+            "kind": "OFFICIAL_DATASET",
+            "status": "DATASET_REFERENCE",
+            "direct_document": false,
+            "markdown": "[지방재정365 세부사업별 세출현황](https://www.lofin365.go.kr/portal/LF5120000.do?pdtaId=0GAR4HBB8LWEBSL4NIHZ817053)",
+            "lookup": {
+              "fiscal_year": "2026",
+              "execution_date": "20261004",
+              "local_government": "경기수원시",
+              "local_government_code": "4111000",
+              "account": "일반회계",
+              "project_name": "노후 소규모 공동주택 유지관리(도비)",
+              "project_code": "3740000202230134"
+            },
+            "note": "데이터셋 안내 링크입니다. 특정 사업 예산서 원문이 아닙니다. 조회조건으로 대조하세요."
+          }
+        },
+        {
+          "fiscal_year": "2026",
+          "execution_date": "20261004",
+          "local_government": "경기수원시",
+          "local_government_code": "4111000",
+          "account": "일반회계",
+          "department_code": "1035048",
+          "project_code": "37400002025302B6",
+          "project_name": "소규모 공동주택 활성화",
+          "field": "국토및지역개발",
+          "part": "지역및도시",
+          "budget_current_amount": 627780000,
+          "national_fund": 0,
+          "province_fund": 0,
+          "district_fund": 627780000,
+          "other_fund": 0,
+          "expenditure": 443022560,
+          "appropriated_amount": null,
+          "unverified_fields": {
+            "cpl_amt": 627780000
+          },
+          "execution_rate_percent": 70.6,
+          "budget_stage": "current",
+          "amount_unit": "SOURCE_CONFIRMATION_REQUIRED",
+          "matched_query": "소규모 공동주택",
+          "same_project_verified": false,
+          "match_status": "RELATED_PROJECT_CANDIDATE",
+          "unspent_current_amount": 184757440,
+          "source_link": {
+            "url": "https://www.lofin365.go.kr/portal/LF5120000.do?pdtaId=0GAR4HBB8LWEBSL4NIHZ817053",
+            "label": "지방재정365 세부사업별 세출현황(공식 데이터셋)",
+            "kind": "OFFICIAL_DATASET",
+            "status": "DATASET_REFERENCE",
+            "direct_document": false,
+            "markdown": "[지방재정365 세부사업별 세출현황](https://www.lofin365.go.kr/portal/LF5120000.do?pdtaId=0GAR4HBB8LWEBSL4NIHZ817053)",
+            "lookup": {
+              "fiscal_year": "2026",
+              "execution_date": "20261004",
+              "local_government": "경기수원시",
+              "local_government_code": "4111000",
+              "account": "일반회계",
+              "project_name": "소규모 공동주택 활성화",
+              "project_code": "37400002025302B6"
+            },
+            "note": "데이터셋 안내 링크입니다. 특정 사업 예산서 원문이 아닙니다. 조회조건으로 대조하세요."
+          }
+        }
+      ],
+      "upstream_total": 110,
+      "matched_local_government_count": 3,
+      "date_resolution": {
+        "strategy": "LATEST_AVAILABLE_ON_OR_BEFORE_REQUESTED",
+        "fallback_used": true,
+        "date_attempts": [
+          {
+            "snapshot_date": "20261005",
+            "data_available": false,
+            "response_code": "INFO-200"
+          },
+          {
+            "snapshot_date": "20261004",
+            "data_available": true,
+            "response_code": "INFO-000"
+          }
+        ],
+        "max_lookback_days": 7,
+        "mixed_dates": false
+      },
+      "search_strategy": {
+        "exact_first": true,
+        "progressive_widening": true,
+        "requested_search_terms": [
+          "소규모 공동주택"
+        ],
+        "planned_queries": [
+          "빌라가꿈관리소",
+          "소규모 공동주택"
+        ],
+        "omitted_search_terms": [],
+        "max_search_expressions": 4,
+        "omission_reason": null,
+        "unattempted_queries": [],
+        "stop_reason": "FIRST_CANDIDATE_FOUND",
+        "attempts": [
+          {
+            "term": "빌라가꿈관리소",
+            "match_kind": "EXACT_TEXT",
+            "snapshot_date": "20261004",
+            "upstream_total": 0,
+            "rows_received": 0,
+            "matched_local_government": 0,
+            "response_code": "INFO-200"
+          },
+          {
+            "term": "소규모 공동주택",
+            "match_kind": "RELATED_TERM",
+            "snapshot_date": "20261004",
+            "upstream_total": 110,
+            "rows_received": 110,
+            "matched_local_government": 3,
+            "response_code": "INFO-000"
+          }
+        ],
+        "request_count": 4
+      },
+      "budget_basis": {
+        "requested_stage": "current",
+        "requested_stage_label": "조회일 예산현액",
+        "returned_stage": "current",
+        "returned_stage_label": "조회일 예산현액",
+        "requested_stage_supported": true,
+        "requested_stage_verified": true,
+        "amount_verified": false,
+        "same_project_verified": false,
+        "basis_date": "20261004",
+        "amount_unit": "SOURCE_CONFIRMATION_REQUIRED",
+        "field_meanings": {
+          "budget_current_amount": "bdg_cash_amt: 조회일 예산현액",
+          "expenditure": "ep_amt: 조회일 기준 지출액",
+          "cpl_amt": "필드 의미 미검증. 본예산·확정예산으로 사용 금지"
+        },
+        "document_checks": [
+          "의결된 본예산서",
+          "해당 추경 예산서",
+          "결산서(결산 질문 시)"
+        ],
+        "rules": [
+          "회의록의 예산안 설명액은 의결된 최종 본예산의 증거가 아닙니다.",
+          "조회일 예산현액에는 변경·이월 등이 반영될 수 있어 본예산과 같다고 가정하지 않습니다.",
+          "사업코드·지자체·회계·연도를 대조하기 전 관련 사업을 합산하지 않습니다.",
+          "사업의 국비·시도비·구비는 재원 구성이며 지자체 전체 세입명세가 아닙니다.",
+          "단위는 공식 명세·예산서에서 확인한 뒤 원·천원·백만원을 변환합니다."
+        ]
+      },
+      "coverage": {
+        "limited": false,
+        "is_exhaustive": false,
+        "search_terms_omitted": false,
+        "scanned_pages_per_query": 1,
+        "has_unread_pages": false,
+        "date_data_available": true,
+        "requested_stage_complete": true
+      },
+      "errors": [],
+      "configured": true,
+      "answer_guidance": [
+        "결론에 실제 반환된 예산 단계와 기준일을 표시하세요.",
+        "각 수치 뒤에 source_links 또는 source_link의 markdown을 붙이세요.",
+        "데이터셋 링크를 특정 사업 예산서 원문 링크라고 소개하지 마세요.",
+        "requested_stage_verified가 false이면 요청한 본예산·추경·예산안·결산 금액은 미확인이라고 표시하세요."
+      ],
+      "limitations": [
+        "미발견·날짜 미제공·조회 오류는 예산 없음이나 0원이 아닙니다.",
+        "같은 기준일의 사업·회계별 행만 반환합니다. 다른 날짜나 관련 사업을 자동 합산하지 않습니다.",
+        "단위·확정 본예산·추경·결산은 공식 명세·예산서에서 대조하세요.",
+        "전국 첫 1,000건만 확인했으면 누락 가능성을 PARTIAL로 표시합니다."
+      ],
+      "council": {
+        "id": "031014",
+        "name": "경기도 수원시의회"
+      },
+      "execution_trace": {
+        "mcp_tool": "council_finance_context",
+        "source": "FINANCE365",
+        "used": true
+      },
+      "mcp_receipt": {
+        "request_id": "54049eae06004a90b8ca",
+        "tool": "council_finance_context",
+        "server_version": "4.1.5-public.2",
+        "returned_at": "2026-10-05T23:18:32.859102+09:00",
+        "elapsed_ms": 14343,
+        "result_reuse": "fresh",
+        "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+      },
+      "source_links": [
+        {
+          "url": "https://www.data.go.kr/data/15138857/openapi.do",
+          "label": "공식 자료 설명·제공범위",
+          "markdown": "[공식 자료 설명·제공범위](https://www.data.go.kr/data/15138857/openapi.do)",
+          "kind": "CATALOG_METADATA",
+          "status": "REFERENCE_PROVIDED",
+          "direct_document": false
+        },
+        {
+          "url": "https://www.lofin365.go.kr/portal/LF5120000.do?pdtaId=0GAR4HBB8LWEBSL4NIHZ817053",
+          "label": "공식 데이터셋 확인",
+          "markdown": "[공식 데이터셋 확인](https://www.lofin365.go.kr/portal/LF5120000.do?pdtaId=0GAR4HBB8LWEBSL4NIHZ817053)",
+          "kind": "OFFICIAL_DATASET",
+          "status": "REFERENCE_PROVIDED",
+          "direct_document": false,
+          "lookup": {
+            "fiscal_year": "2026",
+            "execution_date": "20261004",
+            "local_government": "경기수원시",
+            "local_government_code": "4111000",
+            "account": "일반회계",
+            "project_name": "소규모 공동주택 안전점검 지원(도비)",
+            "project_code": "37400002016300FF"
+          }
+        }
+      ],
+      "link_guidance": {
+        "display": "각 핵심 사실·수치 뒤에 해당 source_links.markdown을 붙이고 자료별로 연결하세요.",
+        "scope": "DOCUMENT_REFERENCE=원문 주소, OFFICIAL_DATASET=데이터셋 안내, CATALOG_METADATA=자료 설명, OFFICIAL_SEARCH=검색 화면.",
+        "verification": "링크 제공과 페이지 본문 조회·대조는 다릅니다. status와 열람 범위를 유지하세요.",
+        "links_omitted": false
+      },
+      "response_budget": {
+        "max_chars": 30000,
+        "original_chars": 8193,
+        "response_chars": 8193,
+        "truncated": false
+      }
+    },
+    "isError": false
+  }
+}

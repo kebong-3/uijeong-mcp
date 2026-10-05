@@ -1,0 +1,215 @@
+{
+  "call": {
+    "id": "council_legislation_context",
+    "tool": "council_legislation_context",
+    "purpose": "명시된 상위법의 공식 ID를 정확 제명으로 먼저 확인",
+    "seconds": 1.1,
+    "isError": false,
+    "status": "PARTIAL",
+    "code": null,
+    "classification": "RETURNED_WITH_SCOPE",
+    "receipt": {
+      "request_id": "d0565a1840ed4259ab48",
+      "tool": "council_legislation_context",
+      "server_version": "4.1.5-public.2",
+      "returned_at": "2026-10-05T23:18:34.889881+09:00",
+      "elapsed_ms": 983,
+      "result_reuse": "fresh",
+      "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+    },
+    "arguments": {
+      "topic": "공동주택관리법",
+      "council": "수원시",
+      "jurisdiction": "경기도 수원시",
+      "include_articles": false
+    },
+    "response_file": "calls/council_legislation_context.json"
+  },
+  "result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"PARTIAL\", \"query\": \"공동주택관리법\", \"jurisdiction\": \"경기도 수원시\", \"jurisdiction_resolution\": {\"input\": \"경기도 수원시\", \"institution_type\": \"local_government\", \"state\": \"resolved\", \"normalized\": \"경기도 수원시\", \"council_id\": \"031014\", \"candidates\": [{\"council_id\": \"031014\", \"name\": \"경기도 수원시\", \"registry_status\": \"current_code_table\", \"match_basis\": \"EXACT_REGISTRY_NAME_OR_ALIAS\"}], \"source\": \"https://clik.nanet.go.kr/potal/guide/resourceCenter.do\", \"checked_at\": \"2026-09-17\", \"validity\": \"dated_source_registry_not_legal_administrative_boundary_verification\"}, \"query_plan\": {\"question\": \"공동주택관리법\", \"jurisdiction\": \"경기도 수원시\", \"law_names\": [\"공동주택관리법\"], \"article_refs\": [], \"named_policy_terms\": [], \"target_entities\": [], \"budget_stages\": [], \"fiscal_year_mentions\": [], \"meeting_period_candidates\": [], \"functional_axes\": [], \"core_terms\": [], \"search_terms\": [], \"exhaustive_intent\": false, \"coverage_contract\": {\"query_terms_complete\": false, \"semantic_exhaustive\": false, \"national_exhaustive\": false, \"rule\": \"생성된 검색어는 규칙 기반 후보이며 의미상 전체 표현을 보장하지 않습니다.\"}, \"law_queries\": [\"공동주택관리법\"], \"ordinance_queries\": []}, \"laws\": [{\"kind\": \"law\", \"document_id\": \"012345\", \"mst\": \"284009\", \"title\": \"공동주택관리법\", \"jurisdiction\": \"\", \"effective_date\": \"20260701\", \"promulgation_date\": \"20260305\", \"amendment_type\": \"타법개정\", \"document_type\": \"법률\", \"source_url\": \"https://www.law.go.kr/lsInfoP.do?lsiSeq=284009\", \"matched_query\": \"공동주택관리법\", \"match_status\": \"EXACT_LAW_TITLE\"}, {\"kind\": \"law\", \"document_id\": \"012644\", \"mst\": \"287261\", \"title\": \"공동주택관리법 시행령\", \"jurisdiction\": \"\", \"effective_date\": \"20260701\", \"promulgation_date\": \"20260623\", \"amendment_type\": \"타법개정\", \"document_type\": \"대통령령\", \"source_url\": \"https://www.law.go.kr/lsInfoP.do?lsiSeq=287261\", \"matched_query\": \"공동주택관리법\", \"match_status\": \"RELATED_LAW_CANDIDATE\"}, {\"kind\": \"law\", \"document_id\": \"012648\", \"mst\": \"288369\", \"title\": \"공동주택관리법 시행규칙\", \"jurisdiction\": \"\", \"effective_date\": \"20260730\", \"promulgation_date\": \"20260730\", \"amendment_type\": \"일부개정\", \"document_type\": \"국토교통부령\", \"source_url\": \"https://www.law.go.kr/lsInfoP.do?lsiSeq=288369\", \"matched_query\": \"공동주택관리법\", \"match_status\": \"RELATED_LAW_CANDIDATE\"}], \"local_ordinances\": [], \"nationwide_ordinance_candidates\": [], \"ordinances\": [], \"coverage\": {\"attempts\": [{\"kind\": \"law\", \"query\": \"공동주택관리법\", \"status\": \"COMPLETE\", \"returned\": 3, \"jurisdiction_match\": null}], \"exact_law_candidates\": 1, \"related_law_candidates\": 2, \"local_ordinance_candidates\": 0, \"nationwide_functional_candidates\": 0, \"local_ordinance_match_found\": false, \"national_exhaustive\": false, \"semantic_coverage_complete\": false}, \"errors\": [], \"limitations\": [\"명시된 법령명이 있으면 정확 제명 일치를 우선하고 유사 제명 법령은 별도 관련 후보로 취급합니다.\", \"대상 지자체 조례와 전국 기능 유사 조례를 분리합니다. 전국 후보는 대상 지자체의 직접 근거가 아닙니다.\", \"복합 자연어는 법령명·조문·정책기능 검색어로 분해해 조회합니다.\", \"검색 후보는 법적 적용·적법성 결론이 아닙니다. 시행일·부칙·위임범위를 공식 원문에서 최종 확인하세요.\", \"전수 요청을 감지해도 national_exhaustive=false인 동안 전국 전체라고 표현하지 않습니다.\"], \"council\": {\"id\": \"031014\", \"name\": \"경기도 수원시의회\"}, \"usage_note\": \"의회 답변의 법적 근거 후보 확인용입니다. 조문 적법성·위임범위·개정안 작성은 ordinance_review_project 등 전문 입법검토에서 심화하세요.\", \"mcp_receipt\": {\"request_id\": \"d0565a1840ed4259ab48\", \"tool\": \"council_legislation_context\", \"server_version\": \"4.1.5-public.2\", \"returned_at\": \"2026-10-05T23:18:34.889881+09:00\", \"elapsed_ms\": 983, \"result_reuse\": \"fresh\", \"meaning\": \"서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요.\"}, \"source_links\": [{\"url\": \"https://www.law.go.kr/lsInfoP.do?lsiSeq=284009\", \"label\": \"공동주택관리법\", \"markdown\": \"[공동주택관리법](https://www.law.go.kr/lsInfoP.do?lsiSeq=284009)\", \"kind\": \"DOCUMENT_REFERENCE\", \"status\": \"REFERENCE_PROVIDED\", \"direct_document\": true}, {\"url\": \"https://www.law.go.kr/lsInfoP.do?lsiSeq=287261\", \"label\": \"공동주택관리법 시행령\", \"markdown\": \"[공동주택관리법 시행령](https://www.law.go.kr/lsInfoP.do?lsiSeq=287261)\", \"kind\": \"DOCUMENT_REFERENCE\", \"status\": \"REFERENCE_PROVIDED\", \"direct_document\": true}, {\"url\": \"https://www.law.go.kr/lsInfoP.do?lsiSeq=288369\", \"label\": \"공동주택관리법 시행규칙\", \"markdown\": \"[공동주택관리법 시행규칙](https://www.law.go.kr/lsInfoP.do?lsiSeq=288369)\", \"kind\": \"DOCUMENT_REFERENCE\", \"status\": \"REFERENCE_PROVIDED\", \"direct_document\": true}], \"link_guidance\": {\"display\": \"각 핵심 사실·수치 뒤에 해당 source_links.markdown을 붙이고 자료별로 연결하세요.\", \"scope\": \"DOCUMENT_REFERENCE=원문 주소, OFFICIAL_DATASET=데이터셋 안내, CATALOG_METADATA=자료 설명, OFFICIAL_SEARCH=검색 화면.\", \"verification\": \"링크 제공과 페이지 본문 조회·대조는 다릅니다. status와 열람 범위를 유지하세요.\", \"links_omitted\": false}, \"response_budget\": {\"max_chars\": 30000, \"original_chars\": 4177, \"response_chars\": 4177, \"truncated\": false}}",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "PARTIAL",
+      "query": "공동주택관리법",
+      "jurisdiction": "경기도 수원시",
+      "jurisdiction_resolution": {
+        "input": "경기도 수원시",
+        "institution_type": "local_government",
+        "state": "resolved",
+        "normalized": "경기도 수원시",
+        "council_id": "031014",
+        "candidates": [
+          {
+            "council_id": "031014",
+            "name": "경기도 수원시",
+            "registry_status": "current_code_table",
+            "match_basis": "EXACT_REGISTRY_NAME_OR_ALIAS"
+          }
+        ],
+        "source": "https://clik.nanet.go.kr/potal/guide/resourceCenter.do",
+        "checked_at": "2026-09-17",
+        "validity": "dated_source_registry_not_legal_administrative_boundary_verification"
+      },
+      "query_plan": {
+        "question": "공동주택관리법",
+        "jurisdiction": "경기도 수원시",
+        "law_names": [
+          "공동주택관리법"
+        ],
+        "article_refs": [],
+        "named_policy_terms": [],
+        "target_entities": [],
+        "budget_stages": [],
+        "fiscal_year_mentions": [],
+        "meeting_period_candidates": [],
+        "functional_axes": [],
+        "core_terms": [],
+        "search_terms": [],
+        "exhaustive_intent": false,
+        "coverage_contract": {
+          "query_terms_complete": false,
+          "semantic_exhaustive": false,
+          "national_exhaustive": false,
+          "rule": "생성된 검색어는 규칙 기반 후보이며 의미상 전체 표현을 보장하지 않습니다."
+        },
+        "law_queries": [
+          "공동주택관리법"
+        ],
+        "ordinance_queries": []
+      },
+      "laws": [
+        {
+          "kind": "law",
+          "document_id": "012345",
+          "mst": "284009",
+          "title": "공동주택관리법",
+          "jurisdiction": "",
+          "effective_date": "20260701",
+          "promulgation_date": "20260305",
+          "amendment_type": "타법개정",
+          "document_type": "법률",
+          "source_url": "https://www.law.go.kr/lsInfoP.do?lsiSeq=284009",
+          "matched_query": "공동주택관리법",
+          "match_status": "EXACT_LAW_TITLE"
+        },
+        {
+          "kind": "law",
+          "document_id": "012644",
+          "mst": "287261",
+          "title": "공동주택관리법 시행령",
+          "jurisdiction": "",
+          "effective_date": "20260701",
+          "promulgation_date": "20260623",
+          "amendment_type": "타법개정",
+          "document_type": "대통령령",
+          "source_url": "https://www.law.go.kr/lsInfoP.do?lsiSeq=287261",
+          "matched_query": "공동주택관리법",
+          "match_status": "RELATED_LAW_CANDIDATE"
+        },
+        {
+          "kind": "law",
+          "document_id": "012648",
+          "mst": "288369",
+          "title": "공동주택관리법 시행규칙",
+          "jurisdiction": "",
+          "effective_date": "20260730",
+          "promulgation_date": "20260730",
+          "amendment_type": "일부개정",
+          "document_type": "국토교통부령",
+          "source_url": "https://www.law.go.kr/lsInfoP.do?lsiSeq=288369",
+          "matched_query": "공동주택관리법",
+          "match_status": "RELATED_LAW_CANDIDATE"
+        }
+      ],
+      "local_ordinances": [],
+      "nationwide_ordinance_candidates": [],
+      "ordinances": [],
+      "coverage": {
+        "attempts": [
+          {
+            "kind": "law",
+            "query": "공동주택관리법",
+            "status": "COMPLETE",
+            "returned": 3,
+            "jurisdiction_match": null
+          }
+        ],
+        "exact_law_candidates": 1,
+        "related_law_candidates": 2,
+        "local_ordinance_candidates": 0,
+        "nationwide_functional_candidates": 0,
+        "local_ordinance_match_found": false,
+        "national_exhaustive": false,
+        "semantic_coverage_complete": false
+      },
+      "errors": [],
+      "limitations": [
+        "명시된 법령명이 있으면 정확 제명 일치를 우선하고 유사 제명 법령은 별도 관련 후보로 취급합니다.",
+        "대상 지자체 조례와 전국 기능 유사 조례를 분리합니다. 전국 후보는 대상 지자체의 직접 근거가 아닙니다.",
+        "복합 자연어는 법령명·조문·정책기능 검색어로 분해해 조회합니다.",
+        "검색 후보는 법적 적용·적법성 결론이 아닙니다. 시행일·부칙·위임범위를 공식 원문에서 최종 확인하세요.",
+        "전수 요청을 감지해도 national_exhaustive=false인 동안 전국 전체라고 표현하지 않습니다."
+      ],
+      "council": {
+        "id": "031014",
+        "name": "경기도 수원시의회"
+      },
+      "usage_note": "의회 답변의 법적 근거 후보 확인용입니다. 조문 적법성·위임범위·개정안 작성은 ordinance_review_project 등 전문 입법검토에서 심화하세요.",
+      "mcp_receipt": {
+        "request_id": "d0565a1840ed4259ab48",
+        "tool": "council_legislation_context",
+        "server_version": "4.1.5-public.2",
+        "returned_at": "2026-10-05T23:18:34.889881+09:00",
+        "elapsed_ms": 983,
+        "result_reuse": "fresh",
+        "meaning": "서버 도구 실행/결과 반환 기록입니다. 각 외부 API의 성공이나 근거 완전성은 별도 status·coverage를 확인하세요."
+      },
+      "source_links": [
+        {
+          "url": "https://www.law.go.kr/lsInfoP.do?lsiSeq=284009",
+          "label": "공동주택관리법",
+          "markdown": "[공동주택관리법](https://www.law.go.kr/lsInfoP.do?lsiSeq=284009)",
+          "kind": "DOCUMENT_REFERENCE",
+          "status": "REFERENCE_PROVIDED",
+          "direct_document": true
+        },
+        {
+          "url": "https://www.law.go.kr/lsInfoP.do?lsiSeq=287261",
+          "label": "공동주택관리법 시행령",
+          "markdown": "[공동주택관리법 시행령](https://www.law.go.kr/lsInfoP.do?lsiSeq=287261)",
+          "kind": "DOCUMENT_REFERENCE",
+          "status": "REFERENCE_PROVIDED",
+          "direct_document": true
+        },
+        {
+          "url": "https://www.law.go.kr/lsInfoP.do?lsiSeq=288369",
+          "label": "공동주택관리법 시행규칙",
+          "markdown": "[공동주택관리법 시행규칙](https://www.law.go.kr/lsInfoP.do?lsiSeq=288369)",
+          "kind": "DOCUMENT_REFERENCE",
+          "status": "REFERENCE_PROVIDED",
+          "direct_document": true
+        }
+      ],
+      "link_guidance": {
+        "display": "각 핵심 사실·수치 뒤에 해당 source_links.markdown을 붙이고 자료별로 연결하세요.",
+        "scope": "DOCUMENT_REFERENCE=원문 주소, OFFICIAL_DATASET=데이터셋 안내, CATALOG_METADATA=자료 설명, OFFICIAL_SEARCH=검색 화면.",
+        "verification": "링크 제공과 페이지 본문 조회·대조는 다릅니다. status와 열람 범위를 유지하세요.",
+        "links_omitted": false
+      },
+      "response_budget": {
+        "max_chars": 30000,
+        "original_chars": 4177,
+        "response_chars": 4177,
+        "truncated": false
+      }
+    },
+    "isError": false
+  }
+}

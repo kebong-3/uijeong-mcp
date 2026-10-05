@@ -1,76 +1,69 @@
-# 2026-10-05 결함 및 수정 추적
+# 결함·수정·검증 최종 기록
 
-1차 배포: `4.1.5-public.1`, commit `de2e6f5a7c35448609a22985108515c00dc17d5f`
-1차 고정시험: **791개 통과**. 전체 공개 도구의 1차 실호출에서 추가 문제를 발견했다.
-후속 예정 버전: `4.1.5-public.2`; 최종 commit / 시험 / 배포: **PENDING**
+최종 버전 `4.1.5-public.2`, 코드 commit `541cd09b95fa233d5bed003045a5b49a28dd5c31`. 고정 회귀시험 **833개**와 실제 40종 도구의 **42회 호출·수용조건 15개**가 통과했다. 근거는 [최종 시험 로그](evidence/pytest-r2-final.txt), [최종 운영 검증](evidence/after-r2/summary.json), [실제 코드 diff](evidence/code-changes.patch)다.
 
-아래 심각도는 이번 작업의 우선순위다. P0는 발언·금액·출처의 오귀속 또는 잘못된 확정으로 이어질 수 있는 문제, P1은 조회 누락·호출 낭비·결과 오독을 일으키는 문제다. 과거 수정 내용과 이번 수정 대상을 구분한다.
+P0는 발언·금액·출처·지역의 잘못된 귀속으로 이어질 수 있는 문제, P1은 조회 누락·호출 낭비·중단·결과 오독을 일으키는 문제로 분류했다. VFY-01은 제품 기능과 구분한 검증기 결함이다.
 
-## 이번에 확인한 결함
+## 수정 추적
 
-| ID / 심각도 | 관측과 재현 조건 | 업무 영향 | 수정·회귀 합격 기준 | 수정 위치 / 최종 상태 |
-|---|---|---|---|---|
-| REC-01 / P1 | 내부 재정 조회의 `search_terms`가 공개 schema에 없고 실행에 전달되지 않음. 오늘 운영 재현에서도 추가 필드를 보냈지만 실제 검색 시도는 원명 1개뿐 | 정책 브랜드명 0건 이후의 공식 사업명 탐색이 끊김 | 공개 schema에 optional `search_terms`를 선언하고 내부 함수에 전달. 생략 호출은 기존과 동일. 타입·길이를 일관되게 검증하고 전체 표현 한도로 미실행한 부분은 REC-08 기준으로 표시 | `council_extensions.py`; 1차 고정시험 통과 |
-| REC-02 / P1 | 후속 조회로 법규·재정 후보를 발견해도 `linked_review` 요약 `status`에 최초 `EMPTY`가 남음 | 정상적으로 확보한 후보를 자료 없음으로 오독 | 최초 조회 상태와 통합 후 최종 상태를 구분. 후보가 있으면 발견 사실을 표시하되 단위·동일사업·적용 검증 false를 보존. 응답 축약 후에도 상태·후보수·식별자 일치 | 통합 결과 조립·축약 경로; 1차 구현·고정시험 통과 |
-| REC-03 / P1 | 기본 `council_context_pack`에서 요청하지 않은 `member_record_discovery`, `policy_background` 단계가 실행됨 | 조회 지연과 불필요한 출처 호출, 질문 범위 확대 | 기본 통합 요청은 필요한 경로만 실행. 생략한 단계는 상태와 사유를 표시. 의회·법규·재정의 요청된 근거 탐색은 유지 | `v3_reliability.py` 등 실제 통합 경로; 1차 구현·고정시험 통과 |
-| REC-04 / P1 | 법규 첫 페이지에 해당 지역 후보가 없지만 다음 페이지가 남은 상황에서 `EMPTY`를 반환. 구형 조회와 공개 검색의 페이지 크기가 다르면 같은 페이지 번호로 복구할 때 자료 누락 가능 | 검색을 끝까지 확인하지 않은 결과가 조례 부재로 읽히거나, 복구 중 중간 후보를 빠뜨림 | 남은 페이지를 `PARTIAL`로 표시. 복구는 `RESTART_WITH_PUBLIC_SEARCH`로 공개 검색의 1페이지부터 시작함을 명시. 서로 다른 페이지 크기의 페이지 번호를 직접 변환하지 않음. 다른 지역을 대신 채택하지 않음 | `legal_context.py`, `v3_reliability.py`; 1차 고정시험 통과 |
-| REC-05 / P0 | 통합 후보 요약에서 재정자료의 회계·실제 자료 기준일이 빠짐 | 다른 회계·기준일의 금액 비교 또는 중복 합산 위험 | 원천이 제공한 회계·요청일·실제 기준일·사업코드·연도·단계·단위와 확인상태를 요약·재조회 경로에 보존. 없는 값은 미확인으로 남김 | 후보 요약·`v3_reliability.py` 등; 1차 구현·고정시험 통과 |
-| REC-06 / P0 | 독립적인 정식 업무보고가 앞 의원 질문의 집행부 답변으로 연결됨 | 실제 답변 취지·약속·책임부서의 오귀속 | 질문 뒤 정식보고가 시작되면 앞 QA 답변의 수집을 종료. 정식보고 자체와 원문 위치는 별도 보존. 정상적인 후속 답변은 유지 | `evidence_core.py`; 1차 구현·고정시험 통과 |
-| REC-07 / P0 | `council_legislation_context`가 응답 전체의 `jurisdiction_match`를 각 조례에 적용. 제명 검색의 수원 조례와 본문 검색의 용인 조례가 함께 오면 모두 현지 조례로 분류될 수 있음 | 다른 지자체의 조례를 해당 사업의 법적 근거로 오인 | shared `same_jurisdiction`으로 매 행의 관할 대조. 외지 조례는 비교 후보로만 분류. `중구` 등 모호한 명시 관할은 검색 전에 후보·오류 반환 | 법규 맥락 조립 경로; 1차 고정시험 통과 |
-| REC-08 / P1 | 추가 검색어 3개를 수용하지만 원명·띄어쓰기 변형을 포함한 총 4개 표현 한도에서 마지막 추가 검색어가 제외됨. 제외 사실이 없으면 요청 전체를 검색한 것으로 보임 | 실제 미검색 용어를 검색 0건으로 오인, 후속 재조회 기회 소실 | 4개 호출 한도는 유지. 요청·계획·실제 시도·제외·미시도 용어를 구분하고 `SEARCH_EXPRESSION_LIMIT` 사유, `PARTIAL`, coverage를 반환. 미검색을 자료 없음으로 바꾸지 않음 | 재정 제한 검색 경로; 1차 고정시험 통과 |
-
-최종 검증 기록에는 각 행에 대응하는 테스트 파일·함수, 실호출 request_id, 실제 결과를 기록한다. 고정시험 통과를 실제 원천자료 확인으로 대체하지 않는다.
-
-## 1차 운영 검증에서 추가 발견
-
-| ID / 분류 | 실제 관측·원인 확인 | 후속 수정 기준 | 현재 판정 |
+| ID / 우선순위 | 재현·관측 | 실제 수정 | 회귀·운영 확인 |
 |---|---|---|---|
-| REC-09 / P1, 원천 오류의 제한된 복구 | `council_recurring_issues`와 `council_peer_cases`가 `소규모 공동주택` 조회에서 `ERROR`. 같은 수원·기간 조건의 직접 대조에서 전체검색은 상류 855건, 공백 포함 내용검색은 `MINTS_HTML`에 `CLIK_ERRORS ERROR11` 문구, 공백 제거 내용검색은 상류 842건 반환 | 원본 조회가 특정 `ERROR11` 조합으로 실패했을 때 공백 제거 검색을 1회만 추가. 원래 질의·실제 질의·실패·재시도·조회범위를 보존하고 `PARTIAL` 표시. 인증·쿼터·네트워크 오류에는 이 복구를 적용하지 않음 | 원인 대조 완료, 후속 최종 검증 PENDING |
-| REC-10 / P1, 조례 비교 출력한도 | 실제 검색한 수원·성남 조례 각 1개를 비교했지만 50,409자 결과가 `OUTPUT_LIMIT`로 반환. 최소 비교 입력에서도 내용을 읽을 수 없음 | 공개 비교의 `offset`·`limit`·`max_chars`와 이어읽기·원문 재조회 경로 제공. 비교 항목을 생략하면 생략범위와 복구방법을 표시. 단순 문자열 절단으로 조문·판본·근거를 훼손하지 않음 | 후속 구현·최종 검증 PENDING |
-| VFY-01 / 검증기 결함 | 원문 도구가 전체 조문을 정상 반환하여 선택적 `excerpt_location`이 없었는데 검사기가 추출 조건 불충족으로 취급. 개정안·근거검토 2개 후속 호출의 ID/hash가 전달되지 않아 미실행 | 선택 필드 부재를 false로 허용하는 명시 조건에 한정해 처리. 정확한 조문 전체·문서 hash·원문 근거 확인은 유지하고 실제 읽기 실패를 통과시키지 않음 | 검증기 수정·별도 5개 고정시험 통과. 최종 전체 실행 PENDING |
+| REC-01 / P1 | 공개 재정 schema에 `search_terms`가 없어 추가 필드를 보내도 원명만 검색 | `council_extensions.py`에 선택 인자·동일 입력검증·내부 전달. 최대 3개, 각 1~100자 | `test_finance_public_search_terms.py`; 실제 추가어로 관련 사업 3개 발견 |
+| REC-02 / P1 | 후속 법규·재정 후보 각 3개를 찾고도 대표 요약 `EMPTY` | 초기 상태·발견 단계·최종 `PARTIAL`·`CANDIDATES_FOUND`를 구분하고 축약 뒤에도 유지 | `test_recovery_context_summary.py`; 최종 통합 결과와 수용조건 확인 |
+| REC-03 / P1 | 기본 통합 요청에서 의원자료·정책배경 자동 조회 | 두 부가조회 선택 인자를 기본 false로 두고 생략 사유·trace 반환 | 같은 테스트의 opt-in/기본 생략 조건; 실제 두 단계 `SKIPPED` |
+| REC-04 / P1 | 법규 첫 페이지에 해당 지역이 없고 뒤 페이지가 남아도 `EMPTY`. 페이지 크기 변경 시 복구 누락 가능 | 부분범위·남은 페이지를 표시. 다른 페이지 크기의 공개 검색은 `RESTART_WITH_PUBLIC_SEARCH`로 1페이지부터 시작 | `test_recovery_contract_edges.py`의 페이지 미완료·복구 테스트 통과 |
+| REC-05 / P0 | 재정 후보 축약에서 회계·실제 기준일·기관 식별자가 누락 | 사업코드·연도·기관·회계·실제 기준일을 식별·요약·재조회 인자에 보존 | 같은 테스트에서 다른 회계 2개와 축약 결과 보존. 실제 일반회계·20261004 확인 |
+| REC-06 / P0 | 독립 정식 업무보고를 앞 의원 질문의 답변에 연결 | `evidence_core.py`에서 정식보고 시작 시 앞 QA 연결을 종료. 보고 원문과 정상 답변은 보존 | `test_recovery_speech_boundaries.py`; 보고·답변·답변 뒤 새 보고의 경계 테스트 |
+| REC-07 / P0 | 법규 응답 전체의 지역 일치값이 각 행에 적용되어 수원·용인 조례가 모두 현지 조례로 분류될 수 있음 | `council_extensions.py`에서 shared `same_jurisdiction`으로 행별 대조. 외지 조례는 비교 후보, 모호 관할은 검색 전 거절 | `test_legislation_jurisdiction_boundaries.py`의 혼합 관할·모호지역 테스트 통과 |
+| REC-08 / P1 | 원명·표기 변형 포함 4개 표현 한도에서 추가어 일부가 제외되지만 미검색 사실을 알리지 않음 | 요청·계획·시도·제외·미시도 용어와 `SEARCH_EXPRESSION_LIMIT` 사유·`PARTIAL`·coverage 표시 | `test_recovery_fiscal_search_scope.py`; 한도·미검색·빈 결과의 구분 확인 |
+| REC-09 / P1 | 실제 CLIK 공백 포함 내용검색의 `ERROR11`로 반복쟁점·타 의회 사례 도구가 `ERROR` | public 프로필의 해당 조합만 원본 실패 후 공백 제거 표현 1회 재시도. 원본·실제 질의·실패·부분범위·자원 한도 보존 | `test_recovery_clik_query.py`; 같은 운영 입력 두 도구가 `PARTIAL`로 근거·실패 범위를 반환 |
+| REC-10 / P1 | 실제 수원·성남 조례 2개 비교가 50,409자 결과 때문에 `OUTPUT_LIMIT` | 비교 결과 페이지·발췌 길이·생략범위·원문 복구를 제공. 판본 hash가 다른 다음 페이지는 차단 | `test_recovery_ordinance_compare.py`; 실제 첫 구간과 다음 구간의 동일 판본·연속 위치 확인 |
+| VFY-01 / 검증기 | 전체 조문에서 선택적 `excerpt_location`이 없다는 이유로 후속 ID/hash 추출을 보류해 2개 도구 미실행 | 선택 필드 부재 허용을 명시 조건에만 적용. 원문 전체·정확한 조번호·본문·hash 가드는 유지 | `test_recovery_verifier_preconditions.py` 5개 조건. 실제 개정 초안·메타데이터 검토 호출 성공 |
 
-REC-09의 855건과 842건은 서로 다른 검색방식의 상류 건수다. 같은 결과집합, 독립 질의 수 또는 공백이 있는 모든 질의의 보편적 장애 규칙을 의미하지 않는다. 제한된 세 호출의 원시 진단은 [native-clik-space.json](evidence/after-r1/diagnostics/native-clik-space.json)에 보존한다.
+위 테스트 파일은 모두 저장소의 `tests/`에 있다. 구체적 변경 경로와 최종 파일별 hash는 [code-change-index.json](evidence/code-change-index.json)에 기록했다. 고정 fixture와 실제 원천 응답의 확인 수준은 구분한다.
 
-1차 전체 계획은 41회였고 39회 응답·38종 도구 반환으로 끝났다. 응답 내 도구 오류 3회와 검증기 의존성 미실행 2회를 분리한다. 후속 수정 뒤에는 같은 검증 입력을 다시 실행하되 [첫 결과](evidence/after-r1/summary.json)를 덮어쓰지 않는다.
+## 실제 수정 전·후 대조
 
-## 오늘 수정 전 실호출 증거
+### 재정 검색어 전달
 
-- REC-01: `/workspace/scratch/0f8070660f49/verification-before/council_finance_context.json`. `4.1.4-public.4`, 2026-10-05 22:43:07 KST, request_id `6e815c1e9b904c39a877`. 추가어 `소규모 공동주택`은 시도 목록에 없고 `빌라가꿈관리소`만 조회됨.
-- REC-02·03: `/workspace/scratch/0f8070660f49/verification-before/council_context_pack.json`. 법규·재정 `initial_candidates=0`, `discovered_candidates=3`, `status=EMPTY`. `member_record_discovery=COMPLETE`, `policy_background=EMPTY`로 불필요 경로 실행 확인.
-- REC-04~08의 분리 재현은 아래 고정시험으로 확인한다. 특히 REC-07의 수원·용인 식별자는 합성 fixture이며 실제 해당 조례 검색을 수행한 기록이 아니다.
+수정 전 [운영 응답](evidence/before/council_finance_context.json)은 2026-10-05 22:43:07 KST, request_id `6e815c1e9b904c39a877`이다. `search_terms=["소규모 공동주택"]`를 보냈지만 실제 시도는 `빌라가꿈관리소` 1개이고 결과는 `EMPTY`였다.
 
-## 이전 수정의 유지 조건
+최종 [운영 응답](evidence/after-r2/calls/council_finance_context.json)은 원명 0건 이후 추가어를 실제 조회하여 수원 관련 사업 3개를 반환했다. 원천 단위·동일사업 확인은 false로 보존했다. 인자를 선언한 것만으로 완료 판정하지 않고 실제 시도 배열을 대조했다.
 
-| 이전 결함 | 이미 확인한 수정 | 이번 회귀에서 유지할 조건 |
+### 통합 상태와 부가조회
+
+수정 전 [통합 응답](evidence/before/council_context_pack.json)은 후속 후보를 찾았지만 법규·재정 요약이 `EMPTY`였고 의원자료·정책배경을 실행했다. 최종 [통합 응답](evidence/after-r2/calls/council_context_pack.json)은 각 분야 `initial_status=EMPTY`, 최종 `status=PARTIAL`, `candidate_status=CANDIDATES_FOUND`를 함께 보존했다. 부가조회 두 단계는 `SKIPPED`다. `same_project_verified`, 적용·금액 검증, 제출완료는 근거 없이 참으로 바꾸지 않았다.
+
+### CLIK 공백 오류와 제한된 복구
+
+1차 운영본의 [직접 대조 진단](evidence/after-r1/diagnostics/native-clik-space.json)에서 같은 수원·기간에 전체검색 상류 855건, 공백 포함 내용검색 `MINTS_HTML`의 `CLIK_ERRORS ERROR11` 문구, 공백 제거 내용검색 상류 842건을 확인했다. 855와 842는 서로 다른 검색방식의 상류 건수이며 독립 질문수나 같은 결과집합을 뜻하지 않는다.
+
+원천의 오류 자체를 고쳤다고 주장하지 않는다. 확인된 오류 조합에서만 1회 대체 검색하고 원래 실패와 실제 검색어를 공개한다. 인증·쿼터·네트워크·다른 검색범위에는 적용하지 않는다. full/lite/core/work 프로필은 기존 오류 응답을 유지하며 공개 프로필의 복구가 trace 없이 전파되지 않도록 4개 프로필 회귀시험을 추가했다.
+
+최종 같은 입력의 [반복쟁점](evidence/after-r2/calls/council_recurring_issues.json)과 [타 의회 사례](evidence/after-r2/calls/council_peer_cases.json)는 모두 `PARTIAL`로 응답했다. 부분범위를 감춘 완전 성공으로 바꾸지 않았다.
+
+### 조례 비교 이어읽기
+
+1차 [수원·성남 비교](evidence/after-r1/calls/ordinance_compare.json)는 `OUTPUT_LIMIT`였다. 최종 [첫 비교](evidence/after-r2/calls/ordinance_compare.json)는 계산한 대응 후보 12개 중 2개를 반환하고 `next_offset=2`를 제공했다. 해당 continuation을 그대로 사용한 [다음 페이지](evidence/after-r2/calls/dependency_compare_next_page.json)에서 같은 source hash와 이어지는 위치를 확인했다.
+
+계산한 전체 대응 후보와 현재 표시한 구간을 구분한다. 이 실호출은 첫 페이지와 다음 페이지를 확인한 것이며 12개 전 항목의 법적 동등성을 인증한 것이 아니다. 고정시험에서는 전체 페이지의 누락·중복, 정확한 원문 재조회, 판본 변경 차단도 검증했다.
+
+## 실행 중 실패와 최종 판정
+
+| 기록 | 결과 | 처리 |
 |---|---|---|
-| 긴 조문 식별번호를 조번호로 오표기 | 원문 표제 기반 `제5조의2` 식별, 원시번호 별도 보존 | 본문·label·key·근거 조번호 일치, 충돌 시 차단 |
-| 본예산·추경을 핵심 사업명으로 사용 | 핵심 대상과 요청 속성·기간 분해 | 사업명에 포함된 '예산'은 훼손하지 않음 |
-| 지역명 exact match로 적격 조례 누락 | 등록표 기반 고유 지역 정규화 | 동명지역을 임의 선택하지 않음 |
-| 같은 event가 다음 페이지에서 중복 | canonical event 병합·검색경로 보존 | 수정 원문·다른 회의의 독립 발언은 합치지 않음 |
-| 표준 search의 짧은 의회명 누락 | 공통 지역 식별과 실제 ID fetch | 실제 반환 ID 사용, 없는 개별 문서 URL 생성 금지 |
-| 재정 빈 결과의 verified=true | dataset 지원과 실제 금액 확인을 분리 | EMPTY를 0원이나 검증된 금액으로 바꾸지 않음 |
-| 응답 축약이 후속 검색 결과 삭제 | 후보 식별자·관계·원문 위치·재조회 경로 보존 | 상세 표시수와 전체 후보수의 의미 구분 |
+| `.1` 실제 41회 계획 | 응답 39회·38종, 도구 오류 3회, 검증기 의존성 미실행 2회 | [첫 검증](evidence/after-r1/summary.json)을 보존하고 REC-09·10, VFY-01 수정 |
+| `.2` 첫 전체 고정시험 | 3개 실패·826개 통과 | 테스트용 `SimpleNamespace` 후단에 `ClikError`가 없다는 속성 가정 확인 |
+| 오류 처리 경계 보완 | 829개 통과 | `getattr` 가드로 원래 오류 의미를 유지 |
+| 구형 프로필 보호 추가 | 833개 통과 | [최종 고정시험](evidence/pytest-r2-final.txt) |
+| `.2` 실제 42회 계획 | 응답 42회·40종, 오류·미실행 0, 수용조건 15개 통과 | [최종 운영 검증 PASS](evidence/after-r2/summary.json) |
 
-## 시험 중 실패 기록의 해석
+시험 중 실패 로그는 [첫 실패](evidence/pytest-r2-first-failure.txt), [829개 중간 결과](evidence/pytest-r2-intermediate-829.txt)에 남아 있다. 이를 운영 DB 장애로 해석하지 않는다. 이전 작업의 재사용 SQLite fixture 손상도 운영 DB 손상의 증거로 확정하지 않았으며 장기간 저장소 평가는 별도 범위다.
 
-이전 작업의 재사용 fixture SQLite에서 `database disk image is malformed` 오류가 17건 발생했다. 별도 isolated DB에서 전체 756개가 통과했으나 최초 손상 원인은 확정하지 못했다. 이 기록만으로 Render 운영 DB가 손상됐다고 결론내리지 않는다. 이전 실패 로그는 `review-pytest-local-state-failure.txt`, 재시험 로그는 `review-pytest-final.txt`다.
+## 기존 기능의 유지와 확인 한계
 
-이번 결과에는 테스트 실패가 있으면 원인, 수정, 재실행 결과를 함께 남긴다. 같은 실패를 숨기기 위해 시험을 제외하거나 과거 통과 수치를 재사용하지 않는다.
+조문 표제·원시번호 구분, 사업명과 본예산·추경 속성의 분리, 지역 별칭·모호성 검사, canonical event 중복 제거, 실제 search ID→fetch, 0기준 증감률, 원문·단위·예산단계·법적 승인 구분을 유지했다. 불확실한 자료 관계를 false로 남긴 것은 결함을 숨긴 표시가 아니라 현재 확보한 근거의 한계다.
 
-## 검증 기록 — 1차 고정시험 통과, 후속 최종 검증 PENDING
+공식 예산서의 일반 자동 수집, 전국 기관코드 효력기간, 모든 계정·클라이언트 설치, 전국 양성자료·장시간 운영은 이번 시험에서 완료했다고 주장하지 않는다. 해당 범위는 [CURRENT_STATE.md](CURRENT_STATE.md)에 구체적으로 적었다.
 
-| 항목 | 증거 파일 / 실행 시각 | 결과 |
-|---|---|---|
-| REC-01 공개 인자·schema·전달 | [test_finance_public_search_terms.py](../../tests/test_finance_public_search_terms.py) — 선언·실제 SDK 전달·생략 호환·잘못된 값 거절 | PASS (1차 고정시험) |
-| REC-02 후속 후보 발견 상태·축약 | [test_recovery_context_summary.py](../../tests/test_recovery_context_summary.py), `test_followup_candidates_survive_initial_empty_or_failure` | PASS (1차 고정시험) |
-| REC-03 요청하지 않은 경로 생략 | 같은 파일의 `test_background_requests_are_opt_in_and_traceable` | PASS (1차 고정시험) |
-| REC-04 법규 페이지 부분범위·복구 | [test_recovery_contract_edges.py](../../tests/test_recovery_contract_edges.py), `test_unread_legal_search_page_does_not_become_empty_local_search`, `test_legal_recovery_does_not_skip_candidates_when_adapter_page_size_changes` | PASS (1차 고정시험) |
-| REC-05 재정 회계·기준일 보존 | 같은 파일의 `test_fiscal_candidates_keep_account_snapshot_and_government_identity` — 서로 다른 회계와 축약 후 식별자 유지 | PASS (1차 고정시험) |
-| REC-06 QA와 정식보고 경계 | [test_recovery_speech_boundaries.py](../../tests/test_recovery_speech_boundaries.py) — 정식보고 보존·QA 제외·정상 답변 유지 | PASS (1차 고정시험) |
-| REC-07 조례 행별 관할·모호지역 | [test_legislation_jurisdiction_boundaries.py](../../tests/test_legislation_jurisdiction_boundaries.py) — 수원·용인 행 구분, 모호지역 상류 요청 전 거절 | PASS (1차 고정시험) |
-| REC-08 제한 검색의 제외어 표시 | [test_recovery_fiscal_search_scope.py](../../tests/test_recovery_fiscal_search_scope.py), `test_accepted_extra_term_is_not_silently_lost_at_expression_limit` | PASS (1차 고정시험) |
-| 기존 전체 고정 회귀시험 | [pytest-final.txt](evidence/pytest-final.txt) | 1차 791개 PASS |
-| 배포본 schema·버전·commit | [council_status](evidence/after-r1/calls/council_status.json), [tools/list](evidence/after-r1/tools-list.json) | 1차 .5 / de2e6f5 / 40 / MATCH |
-| 실제 4분야 예시 | [1차 실호출](evidence/after-r1/summary.json) | 실제 응답 확보, 부서 첫 범위는 0건; 후속 최종판 PENDING |
-
-REC-01~08을 포함한 1차 전체 고정시험 결과는 [pytest-final.txt](evidence/pytest-final.txt)에 있다. REC-09·10과 VFY-01을 추가한 후속 버전의 최종 시험 수는 이 791개와 별도로 기록한다.
+현재 대화에 로드된 호스트 연결의 21개 도구·이전 인자 명세와 실제 서버의 40개 도구·새 명세의 차이도 [별도 관측](evidence/after-r2/host-metadata-scope.json)으로 남겼다. 호스트 Refresh는 이 세션에서 수행하지 않았고, 원인이나 다른 계정 상태를 확정하지 않았다. 서버 수정·검증 완료를 호스트 메타데이터 갱신 완료로 바꾸어 보고하지 않는다.

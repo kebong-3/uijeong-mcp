@@ -1,0 +1,14 @@
+{
+  "commit": {
+    "createdAt": "2026-10-04T14:19:40Z",
+    "id": "305c0468374b44377966870b5cb6b34132de648f",
+    "message": "Fix located-subject discovery for cross-domain council review (4.1.4-public.4)\n\nPrioritize officially located business targets through shared ordinance and fiscal engines; preserve conservative jurisdiction and source gates. 756 isolated regression tests passed. Live semantic acceptance pending deployment."
+  },
+  "createdAt": "2026-10-04T14:19:42.203753Z",
+  "finishedAt": "2026-10-04T14:20:29.809168Z",
+  "id": "dep-db160vgjo6nc73a7on8g",
+  "startedAt": "2026-10-04T14:19:42.178686Z",
+  "status": "live",
+  "trigger": "new_commit",
+  "updatedAt": "2026-10-04T14:20:29.809439Z"
+}
