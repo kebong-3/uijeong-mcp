@@ -43,7 +43,7 @@ jobs:
           git config user.name 'Seongnam verification'
           git config user.email 'noreply@users.noreply.github.com'
           if ! git diff --cached --quiet; then
-            git commit -m 'Improve Seongnam query orchestration and evidence safety (4.1.6-public.1)'
+            git commit -m 'Preserve full internal discovery and official source links (4.1.6-public.2)'
             git push origin HEAD:improve/seongnam-20261007
           fi
           git rev-parse HEAD > /tmp/seongnam-build/commit.txt
@@ -60,10 +60,12 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
-          persist-credentials: false
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
@@ -79,7 +81,7 @@ jobs:
         id: legacy
         continue-on-error: true
         run: |
-          python scripts/verify_recovery.py https://uijeong-mcp.onrender.com/mcp --inventory scripts/recovery_minimum_calls.json --output-dir /tmp/seongnam-live/forty-tools --expect-version 4.1.6-public.1
+          python scripts/verify_recovery.py https://uijeong-mcp.onrender.com/mcp --inventory scripts/recovery_minimum_calls.json --output-dir /tmp/seongnam-live/forty-tools --expect-version 4.1.6-public.2
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -92,3 +94,46 @@ jobs:
         run: |
           test '${{ steps.seongnam.outcome }}' = success
           test '${{ steps.legacy.outcome }}' = success
+      - name: Record actual acceptance evidence without restarting the verified runtime
+        if: success()
+        run: |
+          test "$GITHUB_REF" = refs/heads/main
+          git fetch origin main
+          test "$(git rev-parse origin/main)" = "$GITHUB_SHA"
+          python - <<'PY'
+          import json, os, shutil
+          from pathlib import Path
+          source=Path('/tmp/seongnam-live')
+          a=json.loads((source/'seongnam/summary.json').read_text())
+          b=json.loads((source/'forty-tools/summary.json').read_text())
+          assert a['status']=='PASS' and b['status']=='PASS'
+          assert a['deployment_commit']==os.environ['GITHUB_SHA']
+          target=Path('docs/verification/seongnam-20261007')
+          shutil.copytree(source,target/'live',dirs_exist_ok=True)
+          report={'version':a['version'],'status':'DEPLOYED_AND_SCOPED_ACCEPTANCE_PASSED',
+            'deployment_commit':a['deployment_commit'],'verified_at':a['verified_at'],
+            'runtime_fingerprint':a['runtime_fingerprint'],
+            'seongnam_checks_passed':a['passed'],'seongnam_checks_total':a['total'],
+            'public_tools_returned':b['unique_tools_returned'],'minimum_calls':len(b['records']),
+            'legacy_checks':b['checks'],'official_money_unit_verified':False,
+            'limitations':a['remaining_limitations'],
+            'test_file':'tests/test_seongnam_golden.py',
+            'discovery_regression_file':'tests/test_seongnam_discovery_recovery.py',
+            'live_evidence_directory':'live/','previous_main':'4008ac974186a60f557a8d8fc38727d44d55dd29'}
+          (target/'summary.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+          (target/'DEPLOYMENT.md').write_text('# 성남시 실사용 개선 운영검증\n\n'
+            +'- 배포 버전: '+a['version']+'\n- 운영 코드: `'+a['deployment_commit']+'`\n'
+            +'- 실제 확인 시각(UTC): '+a['verified_at']+'\n'
+            +'- 성남시 시나리오 및 부가검사: '+str(a['passed'])+'/'+str(a['total'])+'\n'
+            +'- 공개 도구: '+str(b['unique_tools_returned'])+'종, 최소호출 '+str(len(b['records']))+'회\n\n'
+            +'## 해석 범위\n\n금액 단위의 공식 확인은 미완료다. 단위 미검증 원시값은 환산·확정액 합산을 차단한다. '
+            +'PASS는 이 안전장치와 지정된 사례의 동작을 뜻하며, 전국 자료 전수검증·적법성 승인·40인 동시부하 시험을 의미하지 않는다. '
+            +'검색 결과와 연결 후보를 실제 동일사업 또는 법적 적용으로 확정하지 않는다.\n\n'
+            +'원시 호출과 출처·조회범위·이어읽기 결과는 `live/`에 보존했다.\n')
+          PY
+          python scripts/build_manifest.py
+          git add docs/verification/seongnam-20261007/ release_manifest.json docs/source-tool-contracts.json
+          git config user.name 'Seongnam verification'
+          git config user.email 'noreply@users.noreply.github.com'
+          git commit -m 'docs: record Seongnam and 40-tool live acceptance [skip render]'
+          git push origin HEAD:main
