@@ -1,14 +1,65 @@
-name: Seongnam verification workspace
+name: Seongnam improvement verification
 on:
   push:
-    branches: ['improve/seongnam-20261007']
-    paths: ['.github/workflows/seongnam-verification.yml', 'scripts/seongnam_patch.py']
+    branches: ['improve/seongnam-20261007', 'main']
+    paths: ['scripts/seongnam_patch.py', '.github/workflows/seongnam-verification.yml', 'release_info.py']
 permissions:
   contents: read
 jobs:
-  verify:
+  checked-source:
+    if: github.ref == 'refs/heads/improve/seongnam-20261007'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Apply hash-checked reviewed changes on the isolated feature branch
+        run: |
+          test "$GITHUB_REF" = refs/heads/improve/seongnam-20261007
+          mkdir -p /tmp/seongnam-build
+          python scripts/seongnam_patch.py
+          python -m pip install -r requirements.txt pytest==8.4.2 jsonschema==4.25.1
+          python scripts/build_manifest.py > /tmp/seongnam-build/manifest.json
+      - name: Full isolated regression suite
+        env:
+          UIJEONG_STATE_DB: /tmp/seongnam-tests.sqlite3
+        run: |
+          set -o pipefail
+          python -m pytest -q 2>&1 | tee /tmp/seongnam-build/tests.log
+          python tests/regression_r0.py > /tmp/seongnam-build/parser.log
+          python tests/offline_check.py > /tmp/seongnam-build/offline.log
+          python scripts/check_config.py --manifest > /tmp/seongnam-build/config.log
+      - name: Commit tested source only to the feature branch
+        run: |
+          python scripts/build_manifest.py > /tmp/seongnam-build/manifest.json
+          python scripts/seongnam_patch.py --stage
+          git add release_manifest.json docs/source-tool-contracts.json
+          git config user.name 'Seongnam verification'
+          git config user.email 'noreply@users.noreply.github.com'
+          if ! git diff --cached --quiet; then
+            git commit -m 'Improve Seongnam query orchestration and evidence safety (4.1.6-public.1)'
+            git push origin HEAD:improve/seongnam-20261007
+          fi
+          git rev-parse HEAD > /tmp/seongnam-build/commit.txt
+          git archive --format=tar --output=/tmp/seongnam-build/source.tar HEAD
+          git diff 4008ac974186a60f557a8d8fc38727d44d55dd29 HEAD > /tmp/seongnam-build/changes.patch
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: seongnam-tested-source
+          path: /tmp/seongnam-build/
+          retention-days: 14
+          if-no-files-found: error
+  production-acceptance:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
@@ -16,52 +67,28 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - name: Archive exact tracked source and download pinned test dependencies
+      - run: python -m pip install -r requirements.txt pytest==8.4.2 jsonschema==4.25.1
+      - name: Observe automatic Render deploy and execute Seongnam acceptance
+        id: seongnam
+        continue-on-error: true
         run: |
-          mkdir -p /tmp/seongnam-evidence/wheelhouse
-          git archive --format=tar --output=/tmp/seongnam-evidence/source.tar HEAD
-          git rev-parse HEAD > /tmp/seongnam-evidence/commit.txt
-          python -m pip download -r requirements.txt pytest==8.4.2 jsonschema==4.25.1 -d /tmp/seongnam-evidence/wheelhouse
-      - name: Capture bounded public baseline and official specification pages
+          mkdir -p /tmp/seongnam-live
+          FP=$(python -c "from pathlib import Path; from release_info import runtime_fingerprint; print(runtime_fingerprint(Path('.')))")
+          python scripts/verify_seongnam.py --output-dir /tmp/seongnam-live/seongnam --expect-fingerprint "$FP" --wait-seconds 360
+      - name: Re-run 40 public tool minimum calls and SDK reconnection
+        id: legacy
+        continue-on-error: true
         run: |
-          python - <<'PY'
-          import json, pathlib, urllib.request, datetime, time
-          out=pathlib.Path('/tmp/seongnam-evidence/baseline');out.mkdir(parents=True,exist_ok=True)
-          url='https://uijeong-mcp.onrender.com/mcp'
-          def rpc(method,params,index):
-              body=json.dumps({'jsonrpc':'2.0','id':index,'method':method,'params':params},ensure_ascii=False).encode()
-              req=urllib.request.Request(url,data=body,headers={'Content-Type':'application/json','Accept':'application/json, text/event-stream'})
-              with urllib.request.urlopen(req,timeout=85) as r: return json.load(r)
-          cases=[('initialize','initialize',{'protocolVersion':'2025-11-25','capabilities':{},'clientInfo':{'name':'seongnam-regression','version':'1'}}),('tools','tools/list',{})]
-          inputs=[
-              ('status','council_status',{'live':False}),
-              ('workflow','local_workflow_plan',{'question':'성남시 스마트도시 관련 조례, 2026년 예산현액·본예산/추경 구분, 2026년 의회 발언을 찾아 서로 연결하고 MCP 품질을 검증한다.','jurisdiction':'성남시','fiscal_year':2026,'as_of':'2026-10-07'}),
-              ('source','council_read_source',{'ref':'CLIKC2912207453426003','keyword':'스마트도시','max_turns':80,'max_chars':24000}),
-              ('department','council_department_brief',{'department':'스마트도시과','council':'성남시','date_from':'2026-01-01','date_to':'2026-10-07','max_docs':6,'limit':3}),
-              ('search','search',{'query':'성남시의회 2026 스마트도시 스마트그린 안전쉼터 이군수'}),
-              ('ordinance-exact','ordinance_search',{'query':'성남시 스마트도시 조성 및 운영 조례','jurisdiction':'성남시','limit':5}),
-              ('ordinance-local','ordinance_search',{'query':'스마트도시','jurisdiction':'성남시','limit':5}),
-              ('finance-city','council_finance_context',{'topic':'스마트도시','council':'성남시','fiscal_year':2026,'snapshot_date':'20261007','limit':10}),
-              ('finance-synonym','council_finance_context',{'topic':'스마트시티','council':'성남시','fiscal_year':2026,'snapshot_date':'20261007','limit':10}),
-              ('finance-catalog','budget_api_catalog',{'query':'lofin_projects'})]
-          cases += [(label,'tools/call',{'name':name,'arguments':arguments}) for label,name,arguments in inputs]
-          for i,(label,method,params) in enumerate(cases,1):
-              try: result=rpc(method,params,i)
-              except Exception as e: result={'error_type':type(e).__name__}
-              (out/(label+'.json')).write_text(json.dumps({'checked_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'request':{'method':method,'params':params},'response':result},ensure_ascii=False,indent=2))
-              print(label, 'captured' if 'error_type' not in result else result['error_type'], flush=True)
-          specs=[('finance-spec','https://www.lofin365.go.kr/portal/LF5120000.do?pdtaId=0GAR4HBB8LWEBSL4NIHZ817053'),('ordinance-spec','https://open.law.go.kr/LSO/openApi/guideResult.do?htmlName=ordinListGuide')]
-          for label,link in specs:
-              try:
-                  req=urllib.request.Request(link,headers={'User-Agent':'public-local-government-api-verification/1.0'})
-                  with urllib.request.urlopen(req,timeout=30) as r: raw=r.read(3000000)
-                  (out/(label+'.html')).write_bytes(raw)
-              except Exception as e: (out/(label+'-error.json')).write_text(json.dumps({'url':link,'error_type':type(e).__name__}))
-          PY
+          python scripts/verify_recovery.py https://uijeong-mcp.onrender.com/mcp --inventory scripts/recovery_minimum_calls.json --output-dir /tmp/seongnam-live/forty-tools --expect-version 4.1.6-public.1
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: seongnam-verification-workspace
-          path: /tmp/seongnam-evidence/
-          retention-days: 7
+          name: seongnam-production-acceptance
+          path: /tmp/seongnam-live/
+          retention-days: 14
           if-no-files-found: error
+      - name: Assert acceptance outcomes
+        if: always()
+        run: |
+          test '${{ steps.seongnam.outcome }}' = success
+          test '${{ steps.legacy.outcome }}' = success
