@@ -1,0 +1,8 @@
+{
+  "version": "4.1.6-public.1",
+  "status": "IMPLEMENTED_PENDING_DEPLOYMENT_ACCEPTANCE",
+  "test_file": "tests/test_seongnam_golden.py",
+  "live_verifier": "scripts/verify_seongnam.py",
+  "official_money_unit_verified": false,
+  "previous_main": "4008ac974186a60f557a8d8fc38727d44d55dd29"
+}

@@ -53,6 +53,7 @@ def install(U):
     # 공유 배포에서는 24시간 안에 한도에 닿으면 모든 이용자의 이어보기가 멈춘다.
     # 가장 오래된 묶음부터 비우고, 비운 사실을 응답 warnings에 남긴다(무성 축출 금지).
     snapshots = R.SnapshotStore(state_path, scope='official-evidence-v2', evict_oldest=True, bind_request_scope=True,
+                                compress_large=True, max_uncompressed_bytes=16 * 1024 * 1024,
                                 max_entries=int(os.environ.get('UIJEONG_SNAPSHOT_MAX_ENTRIES') or 2000),
                                 max_total_bytes=int(os.environ.get('UIJEONG_SNAPSHOT_MAX_TOTAL_BYTES') or 256 * 1024 * 1024))
 
@@ -93,8 +94,19 @@ def install(U):
                                            None,max_docs,offset,'MTG_DE/DESC',3,committee=committee)
         state = dict(U.list_state())
         errors.extend(state.get('errors',[]))
-        meta = {x['DOCID']:x for x in rows if x.get('DOCID')}
+        from evidence_quality import meeting_groups
+        grouped = meeting_groups(rows)
+        meta = {x['DOCID']:x for x in grouped if x.get('DOCID')}
         for docid, detail, error in await U._gather_details(list(meta)):
+            chosen_docid = docid
+            for alternative in meta[docid].get('alternate_docids', []):
+                if not error and detail and detail.get('MINTS_HTML'):
+                    break
+                try:
+                    detail = await U.minutes_detail(alternative)
+                    chosen_docid, error = alternative, None
+                except Exception as exc:
+                    errors.append(safe_failure('CLIK', 'alternate_detail', exc, alternative))
             if error or not detail:
                 errors.append({'source':'CLIK','stage':'detail','ref':docid,'message':error or '본문 응답 없음'})
                 continue
@@ -104,9 +116,13 @@ def install(U):
             if not turns:
                 errors.append({'source':'CLIK','stage':'parse','ref':docid,'message':'본문 미제공 또는 지원하지 않는 발언 형식'})
                 continue
-            records.append(E.make_record({**meta[docid],**detail},turns,source='CLIK',
+            record = E.make_record({**meta[docid], **detail, 'DOCID': chosen_docid},turns,source='CLIK',
                                          source_url=detail.get('ORGINL_FILE_URL') or None,
-                                         body_url='https://clik.nanet.go.kr/openapi/minutes.do',body_url_verified=True))
+                                         body_url='https://clik.nanet.go.kr/openapi/minutes.do',body_url_verified=True)
+            record['alternate_docids'] = [x for x in [docid, *meta[docid].get('alternate_docids', [])] if x != chosen_docid]
+            record['meeting_group_basis'] = meta[docid].get('meeting_group_basis')
+            record['body_equivalence_verified'] = False
+            records.append(record)
         coverage = {'source':'CLIK','council_id':cid,'upstream_total':total,
                     'upstream_total_meaning':'검색어·의회 기준 목록 건수; 질의 건수 아님',
                     'scanned':state.get('scanned',0),'selected':len(meta),'parsed':len(records),
@@ -199,7 +215,8 @@ def install(U):
                 'snapshot_id':snapshot_id,'item_offset':item_offset,'total_items':len(items),'items':items[item_offset:item_offset+limit],
                 'next_item_offset':next_offset,'snapshot_scope':'이번에 수집·파싱한 공개 회의록 근거; 전체 상류 DB 스냅샷 아님'}
         if store_warnings:result['warnings']=store_warnings
-        return result
+        from evidence_quality import compact_bundle
+        return compact_bundle(result)
 
     def format_result(result):
         lines=['상태: '+result['status']]
@@ -586,6 +603,10 @@ def install(U):
         await attach_source_links([record])
         return {**page,'ref':ref,'meta':record['metadata'],'provenance':record['provenance'],
                 'source_link':record['source_link'],
+                'canonical_public_url': record['provenance']['source_url'] if '/recordView.do?' in (record['provenance']['source_url'] or '') else None,
+                'attachment_url': record['provenance']['source_url'] if 'Download.do?' in (record['provenance']['source_url'] or '') else None,
+                'body_api_url': 'https://clik.nanet.go.kr/openapi/minutes.do',
+                'public_url_verification': 'PROVIDED_BY_CLIK_NOT_INDEPENDENTLY_FETCHED',
                 'source_url':record['provenance']['source_url'],'source_kind':'OFFICIAL_FETCHED','fiscal_year':None,
                 'body_hash':hashlib.sha256(json.dumps(turns,ensure_ascii=False,sort_keys=True).encode()).hexdigest()}
 
@@ -630,6 +651,7 @@ def install(U):
                 'response_budget':{'max_chars':B.max_chars(),'text_json_max_chars':B.text_json_max_chars(),
                     'note':'구조화 결과는 이 한도 안으로 축약되며, 축약분은 response_budget.reduced에 남습니다.'},
                 'snapshot_limits':{'max_entries':snapshots.max_entries,'max_total_bytes':snapshots.max_total_bytes,
+                    'lossless_compression':snapshots.compress_large,'max_decoded_bytes_per_snapshot':snapshots.max_uncompressed_bytes,
                     'evict_oldest':snapshots.evict_oldest,'evicted_since_start':snapshots.evicted,
                     'note':'한도 도달 시 가장 오래된 묶음을 비우고 응답 warnings에 알립니다.'},
                 'snapshot_policy':'공개 근거만 SQLite에 저장; 붙여넣기·로컬 비공개자료는 저장하지 않음',

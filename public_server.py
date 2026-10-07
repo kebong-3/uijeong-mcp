@@ -111,6 +111,25 @@ def public_function(fn: Any) -> Any:
                     for p in signature.parameters.values()],
         return_annotation=annotations.get("return", signature.return_annotation))
 
+    from typing import Annotated, get_args, get_origin
+    from pydantic import Field
+    constrained = []
+    for parameter in evaluated.parameters.values():
+        annotation = parameter.annotation
+        if parameter.name in PUBLIC_ARGUMENT_LIMITS:
+            parts = get_args(annotation) if get_origin(annotation) is Annotated else (annotation,)
+            if parts[0] is int:
+                upper = PUBLIC_ARGUMENT_LIMITS[parameter.name]
+                for metadata in parts[1:]:
+                    for constraint in getattr(metadata, "metadata", ()):
+                        value = getattr(constraint, "le", None)
+                        if value is not None:
+                            upper = min(upper, value)
+                annotation = Annotated[annotation, Field(le=upper)]
+                annotations[parameter.name] = annotation
+        constrained.append(parameter.replace(annotation=annotation))
+    evaluated = evaluated.replace(parameters=constrained)
+
     @functools.wraps(fn)
     async def wrapped(*args: Any, **kwargs: Any) -> Any:
         bound = signature.bind(*args, **kwargs)
@@ -145,6 +164,8 @@ def public_function(fn: Any) -> Any:
 
     wrapped.__signature__ = evaluated
     wrapped.__annotations__ = annotations
+    cap_note = ", ".join(f"{name} ≤ {cap}" for name, cap in PUBLIC_ARGUMENT_LIMITS.items() if name in evaluated.parameters)
+    wrapped.__doc__ = (fn.__doc__ or "") + ("\n공개 서버의 실제 입력 상한(스키마 우선): " + cap_note if cap_note else "")
     return wrapped
 
 

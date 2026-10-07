@@ -10,6 +10,8 @@ from jurisdiction_identity import resolve_jurisdiction
 
 INTEGRATED_INSTRUCTIONS = """
 지방의회·예산·조례를 하나의 업무 흐름으로 지원합니다. 단순 질문은 해당 조회 도구를 바로 사용하고,
+최종 답변은 통합 결과의 final_quality_gate.required_answer_qualifiers를 반드시 유지하세요.
+BLOCK_NUMERIC_NORMALIZATION인 수치는 단위 미검증 원시값으로만 표시하고 통화 환산·확정액 합산을 하지 마세요.
 복합 질문은 local_workflow_plan으로 법령명·조문·정책기능·검색어를 먼저 분해한 뒤 필요한 실제 조회 도구를 실행하세요. 긴 자연어 문장 전체를 좁은 검색 API에 그대로 넣지 마세요.
 계획·설정된 API 키·사용자 입력은 공식 조회 증거가 아닙니다. 조회하지 않았으면 조회했다고 말하지 마세요.
 지역을 광주 서구로 임의 가정하지 말고, 회계연도·본예산/추경/결산·금액 단위·조례 시행일을 맞추세요.
@@ -66,6 +68,17 @@ def local_workflow_plan(question: str, jurisdiction: str = '', fiscal_year: int 
         decomposition=decompose(question,jurisdiction,max_terms=6)
     except ValueError as exc:
         return {'status':'INVALID_INPUT','message':str(exc)}
+    if not jurisdiction:
+        candidates = [resolve_jurisdiction(re.sub(r"(?:의|에서)$", "", token)) for token in question.split()]
+        resolved = [c for c in candidates if c.get('state') == 'resolved']
+        if len({str(c.get('council_id')) for c in resolved}) == 1 and resolved:
+            # Use the explicitly present region token; do not substitute defaults.
+            jurisdiction = next(re.sub(r"(?:의|에서)$", "", token) for token in question.split()
+                                if resolve_jurisdiction(re.sub(r"(?:의|에서)$", "", token)).get('state') == 'resolved')
+    years = decomposition.get('time_scope', {}).get('year_mentions', [])
+    if fiscal_year is None and len(years) == 1:
+        fiscal_year = int(years[0])
+    decomposition['jurisdiction'] = jurisdiction
     selected = list(dict.fromkeys(domains or []))
     if not selected:
         words = {'council': ('의회', '의원', '질의', '회의록', '행감', '행정사무감사'),
@@ -113,6 +126,11 @@ def local_workflow_plan(question: str, jurisdiction: str = '', fiscal_year: int 
     # Year-only "2025년부터" means that full calendar year begins January 1;
     # other vague expressions remain planning metadata and require confirmation.
     period_arguments = {}
+    if len(years) == 1 and not re.search(r"부터|까지", question):
+        year = int(years[0])
+        period_arguments = {'date_from': f'{year}-01-01', 'date_to': f'{year}-12-31'}
+        if as_of and as_of[:4] == str(year):
+            period_arguments['date_to'] = as_of
     start_match = re.search(r"(\d{4})년(?:\s*(\d{1,2})월(?:\s*(\d{1,2})일)?)?부터", question)
     end_match = re.search(r"(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일까지", question)
     for field, match in (('date_from',start_match),('date_to',end_match)):
@@ -180,6 +198,8 @@ def local_evidence_review(evidence: list[EvidenceItem], jurisdiction: str = '',
                 problems.append('회계연도 누락 또는 불일치')
             if not item.unit:
                 problems.append('금액 단위 누락')
+            elif item.unit not in ('원', '천원', '백만원', '억원'):
+                problems.append('금액 단위 미검증: BLOCK_NUMERIC_NORMALIZATION')
         if item.domain == 'ordinance' and not item.as_of:
             problems.append('시행일/버전 기준일 누락')
         if problems:

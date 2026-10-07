@@ -27,7 +27,7 @@ def main():
         'runtime_sha256':V.module_hashes(ROOT),'runtime_fingerprint':V.runtime_fingerprint(ROOT),
         'profile_tool_counts':{k:len(v) for k,v in contract['profiles'].items()},
         'files_sha256':files,'integrity_note':'내용 일치 검사이며 제작자 서명·원격 배포 증명은 아닙니다.',
-        'verification_reference':'docs/verification/v250/verification-summary.json',
+        'verification_reference':'docs/verification/seongnam-20261007/summary.json',
         'runtime_protocol_claim':'SEE_VERIFICATION_SUMMARY',
         'deployment_performed_in_this_build':False}
     (ROOT/'release_manifest.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')

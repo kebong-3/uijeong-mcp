@@ -66,9 +66,9 @@ def redact_secrets(value: Any, extra_secrets: Iterable[str] = ()) -> str:
         try:
             parsed = urlsplit(raw)
             pairs = parse_qsl(parsed.query, keep_blank_values=True)
-            if (parsed.scheme == 'https' and parsed.hostname in ('www.gjsc.or.kr', 'gjsc.or.kr')
+            if (parsed.scheme == 'https' and parsed.hostname in ('www.gjsc.or.kr', 'gjsc.or.kr', 'www.sncouncil.go.kr', 'sncouncil.go.kr')
                     and not parsed.username and not parsed.password and parsed.port in (None, 443)
-                    and parsed.path in ('/record/recordView.do', '/record/originalDownload.do')
+                    and parsed.path in ('/record/recordView.do', '/record/originalDownload.do', '/record/HwpDownload.do')
                     and len(pairs) == 1 and pairs[0][0] == 'key'
                     and re.fullmatch(r'[A-Za-z0-9]{1,128}', pairs[0][1])):
                 marker = '__PUBLIC_RECORD_' + secrets.token_hex(16) + '__'
@@ -78,7 +78,7 @@ def redact_secrets(value: Any, extra_secrets: Iterable[str] = ()) -> str:
             pass
         return raw
     text = re.sub(r'https://[^\s\"\'<>\[\]()]+', protect_public_url, text)
-    text = re.sub(r"(?i)([?&](?:key|api_?key|authkey|servicekey|access_token|token|signature|x-amz-signature)=)[^&\s\"'<>]+", r"\1[REDACTED]", text)
+    text = re.sub(r"(?i)([?&](?:key|api_?key|authkey|servicekey|access_token|token|signature|x-amz-signature)=)[^&\s\"'<>\[\]()]+", r"\1[REDACTED]", text)
     text = re.sub(r"(?i)(bearer\s+)[A-Za-z0-9._~+/-]+=*", r"\1[REDACTED]", text)
     for marker, url in public_keys.items():
         text = text.replace(marker, url)
@@ -203,7 +203,8 @@ class SnapshotStore:
     def __init__(self, path: str | Path | None = None, scope: str = "local", *,
                  allow_private: bool = False, max_bytes: int = 4 * 1024 * 1024,
                  max_entries: int = 500, clock: Callable[[], float] = time.time,
-                 evict_oldest: bool = False, max_total_bytes: int = 0, bind_request_scope: bool = False):
+                 evict_oldest: bool = False, max_total_bytes: int = 0, bind_request_scope: bool = False,
+                 compress_large: bool = False, max_uncompressed_bytes: int = 16 * 1024 * 1024):
         """``evict_oldest`` is opt-in and must be reported by the caller.
 
         Refusing to store is the safe default: evicting an unexpired snapshot
@@ -219,6 +220,10 @@ class SnapshotStore:
         self.evict_oldest, self.max_total_bytes = evict_oldest, max_total_bytes
         self.evicted = 0
         self.bind_request_scope = bind_request_scope
+        self.compress_large = compress_large
+        self.max_uncompressed_bytes = max_uncompressed_bytes if compress_large else max_bytes
+        if self.max_uncompressed_bytes < max_bytes:
+            raise ValueError("Decoded snapshot limit cannot be smaller than storage limit")
         with _connect(self.path) as conn:
             conn.execute("CREATE TABLE IF NOT EXISTS snapshots (id TEXT PRIMARY KEY, scope TEXT NOT NULL, created REAL NOT NULL, expires REAL NOT NULL, kind TEXT NOT NULL, payload TEXT NOT NULL)")
             conn.execute("CREATE INDEX IF NOT EXISTS snapshot_expiry ON snapshots(expires)")
@@ -233,7 +238,11 @@ class SnapshotStore:
         if isinstance(ttl_seconds, bool) or not isinstance(ttl_seconds, int) or not 1 <= ttl_seconds <= 7 * 86400:
             raise ValueError("Snapshot TTL must be between one second and seven days")
         raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
-        if len(raw.encode()) > self.max_bytes:
+        raw_bytes = raw.encode('utf-8')
+        if self.compress_large and len(raw_bytes) > self.max_bytes and len(raw_bytes) <= self.max_uncompressed_bytes:
+            import base64, zlib
+            raw = 'ZJ1:' + str(len(raw_bytes)) + ':' + hashlib.sha256(raw_bytes).hexdigest() + ':' + base64.b64encode(zlib.compress(raw_bytes, 6)).decode('ascii')
+        if len(raw_bytes) > self.max_uncompressed_bytes or len(raw.encode()) > self.max_bytes:
             raise SecurityError("증거 묶음이 보관 한도를 초과했습니다. 검색 범위를 줄여주세요.")
         ident, now = secrets.token_hex(32), self.clock()
         conn = _connect(self.path)
@@ -281,7 +290,24 @@ class SnapshotStore:
         with _connect(self.path) as conn:
             conn.execute("DELETE FROM snapshots WHERE expires<=?", (self.clock(),))
             row = conn.execute("SELECT payload FROM snapshots WHERE id=? AND scope=? AND expires>?", (ident, self.effective_scope(), self.clock())).fetchone()
-        return json.loads(row[0]) if row else None
+        if not row:
+            return None
+        raw = row[0]
+        if raw.startswith('ZJ1:'):
+            import base64, zlib
+            try:
+                _, size, expected, data = raw.split(':', 3)
+                if not size.isdigit() or not 1 <= int(size) <= self.max_uncompressed_bytes or len(expected) != 64:
+                    raise ValueError('invalid compressed snapshot header')
+                decoder = zlib.decompressobj()
+                decoded = decoder.decompress(base64.b64decode(data, validate=True), int(size) + 1)
+                if (len(decoded) != int(size) or not decoder.eof or decoder.unconsumed_tail or decoder.unused_data
+                        or hashlib.sha256(decoded).hexdigest() != expected):
+                    raise ValueError('invalid compressed snapshot payload')
+                raw = decoded.decode('utf-8')
+            except (ValueError, zlib.error, UnicodeError) as exc:
+                raise SecurityError('보관된 근거 무결성 검증 실패. 동일 조건으로 다시 조회하세요.') from None
+        return json.loads(raw)
 
     def delete(self, ident: str) -> bool:
         with _connect(self.path) as conn:

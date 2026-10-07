@@ -582,7 +582,7 @@ async def context_pack(U, topic: str, council: str = "광주 서구", date_from:
               "relationships":discoveries,"unresolved":unresolved,"ready_for_submission":False,
               "legal_approval":False,"same_project_verified":False}
     all_stages = {**layers, **{f"discovery_{i}":x["result"] for i,x in enumerate(discoveries)}}
-    return {"status":"PARTIAL" if aggregate_status(all_stages)=="COMPLETE" else aggregate_status(all_stages),
+    result = {"status":"PARTIAL" if aggregate_status(all_stages)=="COMPLETE" else aggregate_status(all_stages),
             "topic":topic.strip(),"council":{"id":cid,"name":cname}, **layers,
             "discovery_candidates":candidates,"linked_review":review,
             "search_strategy":{"exact_first":True,"expanded":bool(discoveries),
@@ -593,6 +593,9 @@ async def context_pack(U, topic: str, council: str = "광주 서구", date_from:
             "execution_trace":{"mcp_tool":"council_context_pack","stages":[{"stage":k,"status":v["status"],"elapsed_ms":v.get("elapsed_ms")} for k,v in all_stages.items()]},
             "interpretation":["report_mentions의 집행부 업무보고는 의원 질의가 아닙니다.","후속 검색의 예산사업·조례는 원문 명칭에서 찾은 후보이며 동일사업·적법성·확정 본예산을 증명하지 않습니다.","각 출처의 오류·미설정·검색범위를 그대로 표시해야 합니다."],
             "ready_for_submission":False}
+    from evidence_quality import final_quality_gate
+    result["final_quality_gate"] = final_quality_gate(result)
+    return result
 
 
 def install(U):
@@ -644,6 +647,8 @@ def install(U):
         for checked in result.get("live_checks",[]):
             if checked.get("check",{}).get("status") in {"ERROR","PARTIAL","NOT_CONFIGURED"}:
                 result["status"] = "PARTIAL"
+        from evidence_quality import integration_health
+        result.update(integration_health(result, _LAST_CHECK))
         return result
 
     old_session = U.council_session_ready_pack

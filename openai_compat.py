@@ -293,12 +293,20 @@ def build_tools(backend: Any) -> dict[str, Any]:
             return cached
 
         council, drop = _best_council(query)
-        keyword = _keyword(query, drop)
+        from query_decomposition import natural_council_query
+        plan = natural_council_query(query, council)
+        # Preserve established council removal (including alias spellings) and
+        # reuse the shared topic parser on the remainder, not a weak second search.
+        stripped = _keyword(query, drop)
+        cleaned = natural_council_query(stripped, council)
+        terms = plan["terms"] if plan["speaker_ranking_candidate"] else cleaned["terms"]
+        keyword = terms[0]
 
         async def run() -> dict[str, Any]:
             return await backend.council_evidence_bundle(
                 keyword=keyword, council=council, mode="발언",
                 max_docs=4, source="auto", limit=20,
+                search_terms=terms[1:] or None, **plan["period"],
             )
 
         try:
@@ -313,7 +321,13 @@ def build_tools(backend: Any) -> dict[str, Any]:
 
         results: list[SearchResult] = []
         seen: set[tuple[str, int]] = set()
-        for event in payload.get("items") or []:
+        events = list(payload.get("items") or [])
+        speaker = plan["speaker_ranking_candidate"]
+        if speaker:
+            # Rank matching *retrieved* labels. Never fabricate the requested
+            # speaker or discard all results when the name candidate is wrong.
+            events.sort(key=lambda event: speaker not in str((_anchor(event) or {}).get("label", "")))
+        for event in events:
             if not isinstance(event, dict):
                 continue
             anchor = _anchor(event)
@@ -330,14 +344,18 @@ def build_tools(backend: Any) -> dict[str, Any]:
             seen.add(key)
             results.append(SearchResult(
                 id=_encode_id(ref, turn, url),
-                title=_title(event.get("metadata") or {}, str(event.get("kind") or "")) + ("" if direct_url else " [CLIK 원문링크 미제공]"),
+                title=_title(event.get("metadata") or {}, str(event.get("kind") or "")) +
+                      (" · " + str(anchor.get("label")) if anchor.get("label") else "") +
+                      (" [일부 검색범위]" if payload.get("status") == "PARTIAL" else "") +
+                      ("" if direct_url else " [CLIK 원문링크 미제공]"),
                 url=url,
             ))
             if len(results) >= _RESULT_LIMIT:
                 break
 
         output = SearchOutput(results=results)
-        _cache_put(query, output)
+        if results or payload.get("status") in ("COMPLETE", "EMPTY"):
+            _cache_put(query, output)
         return output
 
     async def fetch(id: str) -> FetchOutput:

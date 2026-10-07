@@ -15,9 +15,14 @@ MAX_DATE_LOOKBACK = 7
 MAX_TERMS = 4
 
 def search_candidates(topic, extras, normalize):
-    terms = [(topic.strip(), "EXACT_TEXT")]
+    from query_decomposition import search_synonyms
+    from query_decomposition import split_budget_terms
+    core_terms = split_budget_terms(topic)
+    terms = [(core_terms[0], "EXACT_TEXT")]
+    terms += [(term, "TERMINOLOGY_SYNONYM") for term in core_terms[1:] + search_synonyms(core_terms[0])]
+
     compact = re.sub(r"[\s·,，ㆍ()（）]", "", topic.strip())
-    if compact != topic.strip():
+    if len(core_terms) == 1 and compact != topic.strip():
         terms.append((compact, "SPELLING_VARIANT"))
     if "세큰대" in normalize(topic) or "세상에서가장큰대학" in normalize(topic):
         terms.append(("세상에서", "BRAND_CANDIDATE"))
@@ -52,6 +57,8 @@ def fiscal_basis(stage, date, evidence_found=False):
 
 def row_evidence(row, adapter, term, kind):
     item = adapter._public_row(row)
+    from evidence_quality import fiscal_unit_contract
+    item.update({k:v for k,v in fiscal_unit_contract().items() if k in ("unit_verified", "unit_source", "numeric_display_policy", "numeric_normalization")})
     item.update(appropriated_amount=None, unverified_fields={"cpl_amt": row.get("cpl_amt")},
                 budget_stage="current", amount_unit="SOURCE_CONFIRMATION_REQUIRED",
                 matched_query=term, same_project_verified=False)
@@ -97,6 +104,8 @@ async def context(topic, council, fiscal_year, limit, search_terms, snapshot_dat
     seen = set()
     extras = search_terms if search_terms is not None else V.expansions(topic, "finance")
     terms = search_candidates(topic, extras, V.norm)
+    union_queries = {term for term, kind in terms if kind in ("EXACT_TEXT", "TERMINOLOGY_SYNONYM")}
+    use_union = any(kind == "TERMINOLOGY_SYNONYM" for _, kind in terms)
     planned_queries = [term for term, _ in terms]
     requested_search_terms = list(dict.fromkeys(term.strip() for term in extras
                                                 if isinstance(term, str) and term.strip()))
@@ -142,7 +151,7 @@ async def context(topic, council, fiscal_year, limit, search_terms, snapshot_dat
                 if key not in seen:
                     seen.add(key)
                     found.append(row_evidence(row, F, term, kind))
-            if found:
+            if found and (not use_union or union_queries <= {a["term"] for a in attempts}):
                 break
     stage_incomplete = bool(found and budget_stage != "current")
     status = ("ERROR" if errors and not found and not attempts else "PARTIAL"
@@ -160,7 +169,9 @@ async def context(topic, council, fiscal_year, limit, search_terms, snapshot_dat
             "omitted_search_terms": omitted_search_terms, "max_search_expressions": MAX_TERMS,
             "omission_reason": "SEARCH_EXPRESSION_LIMIT" if omitted_search_terms else None,
             "unattempted_queries": [term for term in planned_queries if term not in {a["term"] for a in attempts}],
-            "stop_reason": "FIRST_CANDIDATE_FOUND" if found else "UPSTREAM_OR_LOOKUP_LIMIT" if errors else
+            "combination": "BOUNDED_SYNONYM_UNION" if use_union else "BOUNDED_FALLBACK",
+            "identity_basis": ["local_government_code", "fiscal_year", "execution_date", "account", "project_code"],
+            "stop_reason": "SYNONYM_UNION_COMPLETE" if found and use_union and union_queries <= {a["term"] for a in attempts} else "FIRST_CANDIDATE_FOUND" if found else "UPSTREAM_OR_LOOKUP_LIMIT" if errors else
                            "NO_AVAILABLE_SNAPSHOT" if not used_date else "PLANNED_SEARCH_COMPLETE",
             "attempts": attempts, "request_count": requests},
         "budget_basis": fiscal_basis(budget_stage, used_date, bool(found)),
@@ -177,5 +188,9 @@ async def context(topic, council, fiscal_year, limit, search_terms, snapshot_dat
             "같은 기준일의 사업·회계별 행만 반환합니다. 다른 날짜나 관련 사업을 자동 합산하지 않습니다.",
             "단위·확정 본예산·추경·결산은 공식 명세·예산서에서 대조하세요.",
             "전국 첫 1,000건만 확인했으면 누락 가능성을 PARTIAL로 표시합니다."]}
+    from evidence_quality import fiscal_unit_contract
+    result["unit_metadata"] = fiscal_unit_contract()
+    result["numeric_normalization"] = "BLOCK_NUMERIC_NORMALIZATION"
+    result["answer_guidance"].append("금액 단위가 공식 확인되지 않았으므로 '단위 미검증 원시값'이라고 표시하고 원/천원 환산·합산은 하지 마세요.")
     V._LAST_CHECK["finance365"] = {"status": status, "items": len(found), "snapshot_date": used_date, "checked_at": dt.datetime.now(V.KST).isoformat()}
     return result

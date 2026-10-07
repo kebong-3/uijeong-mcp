@@ -16,7 +16,7 @@ from html.parser import HTMLParser
 from typing import Any, Optional
 from urllib.parse import urlsplit, parse_qsl
 
-SCHEMA_VERSION = "2.1"
+SCHEMA_VERSION = "2.2"
 class EvidenceInputError(ValueError):
     """Invalid input/state; never convert to an empty successful search."""
 
@@ -272,7 +272,7 @@ _NAME = r"[가-힣]{2,5}"
 _SPEECH_WORDS = {"다음은", "그러면", "이어서", "먼저", "네", "예", "감사합니다", "존경하는", "의사일정", "좌석을", "의석을", "성원이"}
 _LABEL_RE = re.compile(
     rf"(?P<label>{_NAME}[ \t]*(?:의원|위원)|"
-    rf"[가-힣·ㆍ()]{{1,28}}(?:위원장직무대리|의장직무대리|전문위원|위원장|의장|의원|위원|청장|시장|군수|지사|교육감|교육장|국장|과장|팀장|실장|소장|단장|담당관|센터장|대표이사|이사장|본부장|원장|관장|처장|계장|사무관|주무관|동장|읍장|면장|사장)[ \t]+{_NAME}|"
+    rf"[가-힣A-Za-z0-9·ㆍ()]{{1,28}}(?:위원장직무대리|의장직무대리|전문위원|위원장|의장|의원|위원|청장|시장|군수|지사|교육감|교육장|국장|과장|팀장|실장|소장|단장|담당관|센터장|대표이사|이사장|본부장|원장|관장|처장|계장|사무관|주무관|동장|읍장|면장|사장)[ \t]+{_NAME}|"
     rf"(?:위원장직무대리|의장직무대리|부위원장|부의장|임시위원장|임시의장|위원장|의장|위원|의원|시장|군수|구청장|전문위원)[ \t]+{_NAME})"
     r"(?=[ \t\n:：]|$)")
 _END_RE = re.compile(r"(?:출석|출사무국|참석|불출석|결석|배석|회의록서명|서명의원|청가|출장|속기사)[^\n]{0,50}")
@@ -317,7 +317,7 @@ def parse_turns(minutes_html: str) -> list[dict]:
     candidates = [x for i, x in enumerate(candidates) if not i or x[0] >= candidates[i - 1][1]]
     turns = []
     agenda = 0
-    for i, (_, a, label) in enumerate(candidates):
+    for i, (marker_start, a, label) in enumerate(candidates):
         b = candidates[i + 1][0] if i + 1 < len(candidates) else len(s)
         label = re.sub(r"\s+", " ", label).strip()
         role = _classify(label)
@@ -337,7 +337,10 @@ def parse_turns(minutes_html: str) -> list[dict]:
             turns.append({"idx": len(turns), "label": segment_label, "role": segment_role,
                           "text": body, "agenda": agenda, "act": classify_act(segment_role, segment_label, body),
                           "char_start": a + segment_start, "char_end": a + segment_end,
-                          "offset_basis": "html_to_plain_text", "classification": "RULE_BASED_CANDIDATE"})
+                          "offset_basis": "html_to_plain_text", "classification": "RULE_BASED_CANDIDATE",
+                          "speaker_marker_span": {"char_start": marker_start, "char_end": a, "basis": "html_to_plain_text"},
+                          "parent_source_span": {"kind": "PLAIN_TEXT_LINE", "char_start": s.rfind("\n", 0, marker_start) + 1,
+                                                  "char_end": s.find("\n", a) if s.find("\n", a) >= 0 else len(s)}})
             if segment_role == "chair" and _AGENDA_CLOSE.search(body):
                 agenda += 1
         for j, heading in enumerate(headings):
@@ -350,6 +353,21 @@ def parse_turns(minutes_html: str) -> list[dict]:
                               "agenda": agenda, "act": "other", "char_start": a + heading.end(),
                               "char_end": a + tail_end, "offset_basis": "html_to_plain_text",
                               "classification": "UNATTRIBUTED_AFTER_AGENDA_BOUNDARY"})
+    section = None
+    for turn in turns:
+        # Carry only an explicitly announced section, ending it at every agenda
+        # transition. Never infer a department from an organizational chart.
+        if section and section["agenda"] != turn["agenda"]:
+            section = None
+        if turn["role"] == "chair":
+            match = re.search(r"(?:다음은\s+)?([가-힣A-Za-z0-9·]{2,30}(?:과|실|담당관))\s*소관", turn["text"])
+            if match:
+                section = {"department": match.group(1), "agenda": turn["agenda"],
+                           "turn_index": turn["idx"], "quote": match.group(0), "basis": "AGENDA_SECTION"}
+        if section:
+            turn["department_context"] = copy.deepcopy(section)
+        turn["source_span"] = {"char_start": turn["char_start"], "char_end": turn["char_end"],
+                               "basis": "html_to_plain_text", "parser_version": SCHEMA_VERSION}
     return turns
 
 
@@ -629,7 +647,9 @@ def turn_evidence(record: dict, turn: dict) -> dict:
     for key in ('citation_url', 'citation_markdown', 'citation_status', 'citation_kind'):
         citation[key] = provenance.get(key)
     return {"turn_index": turn["idx"], "label": turn["label"], "role": turn["role"], "text": turn["text"],
-            "agenda": turn.get("agenda", 0), "act": turn.get("act", "other"), "citation": citation}
+            "agenda": turn.get("agenda", 0), "act": turn.get("act", "other"), "citation": citation,
+            "source_span": copy.deepcopy(turn.get("source_span", {})),
+            "department_context": copy.deepcopy(turn.get("department_context", {}))}
 
 
 MODE_ALIASES = {"질의답변": "질의답변", "qa": "질의답변", "발언": "발언", "speech": "발언",
@@ -648,7 +668,7 @@ def record_events(record: dict, keyword: str = "", mode: str = "질의답변", a
     turns = record.get("turns", [])
     events = []
     def append_event(kind, *, q=None, answers=None, speech=None, commitment=None, linkage=None):
-        alternate_docids = []
+        alternate_docids = list(record.get("alternate_docids") or [])
         for alias in record.get("aliases", []):
             alt = alias.get("docid") if isinstance(alias, dict) else None
             if alt and alt != record.get("docid") and alt not in alternate_docids:
@@ -662,7 +682,8 @@ def record_events(record: dict, keyword: str = "", mode: str = "질의답변", a
                  "matched_query": keyword or None,
                  "evidence_state": "VERIFIED_MATCH" if keyword else "VERIFIED_SOURCE_SCOPE",
                  "alternate_docids": alternate_docids,
-                 "duplicate_reason": record.get("dedup_basis"),
+                 "duplicate_reason": record.get("dedup_basis") or record.get("meeting_group_basis"),
+                 "alternate_body_equivalence_verified": bool(record.get("dedup_basis") == "COMPLETE_MEETING_METADATA_AND_COMPLETE_PARSED_BODY" and not record.get("alternate_docids")),
                  "coverage_note": "상세 회의록 파싱 범위에서 검색어·발언구조를 확인한 근거입니다. 전체 의회 자료의 전수 결과나 이행 확인이 아닙니다.",
                  "linkage": linkage}
         event["event_id"] = "evt_" + _digest({"record": record["record_id"], "kind": kind,

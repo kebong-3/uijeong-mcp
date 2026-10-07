@@ -4,6 +4,7 @@ from jurisdiction_identity import resolve_jurisdiction
 import asyncio
 import copy
 import json
+import re
 import time
 from collections import OrderedDict
 from typing import Any
@@ -194,10 +195,17 @@ class LawClient:
             raise ValueError("sborg를 사용하려면 org도 지정해야 합니다.")
         max_pages, display = max(1,min(max_pages,12)), max(1,min(display,100))
         results, pages, failures, total, raw_count = [], [], [], None, 0
+        upstream_query = query
+        jurisdiction_info = resolve_jurisdiction(jurisdiction)
+        if kind == "ordinance" and jurisdiction and not org and not target:
+            canonical = jurisdiction_info.get("normalized") or jurisdiction
+            locality = canonical.replace("의회", "").split()[-1]
+            if locality not in query and locality.endswith(("시", "군", "구", "도")):
+                upstream_query = locality + " " + query
         next_page, exhausted = page, False
         seen_pages = set()
         params = {"target": target or ("ordin" if kind=="ordinance" else "eflaw"),
-                  "query":query,"display":display,"search":2 if body else 1}
+                  "query":upstream_query,"display":display,"search":2 if body else 1}
         if not target and kind == "ordinance":
             params.update({"nw":2 if history else 1,"org":org,"sborg":sborg,"knd":"30001"})
         params.update(extra or {})
@@ -236,8 +244,19 @@ class LawClient:
         dedup = list({(r["document_id"],r["mst"],r["parent_article"],r["ordinance_article"]):r for r in results}.values())
         orgs = sorted({x["jurisdiction"] for x in dedup if x["jurisdiction"]})
         selected = [r for r in dedup if region_match(r["jurisdiction"], jurisdiction)] if jurisdiction else dedup
+        normalize_title = lambda value: re.sub(r"[\s「」]", "", value or "")
+        for row in selected:
+            exact = normalize_title(row.get("title")) == normalize_title(query)
+            row["match_basis"] = "EXACT_TITLE" if exact else "TITLE_CONTAINS_OR_SEARCH_CANDIDATE"
+            row["title_match_score"] = 100 if exact else 60 if normalize_title(query) in normalize_title(row.get("title")) else 0
+            row["jurisdiction_match"] = bool(jurisdiction and region_match(row.get("jurisdiction", ""), jurisdiction))
+        selected.sort(key=lambda row: -row["title_match_score"])
         status = "complete" if exhausted and not failures else ("partial" if pages else "unavailable")
         return {"query":query,"kind":kind,"status":status,"api_total":total,
+                "search_strategy":{"requested_query":query,"upstream_query":upstream_query,
+                    "jurisdiction_applied_upstream":bool(org or upstream_query != query or (jurisdiction and jurisdiction.split()[-1] in query)),
+                    "basis":"OFFICIAL_ORG_SBORG" if org else "MUNICIPALITY_PREFIX_TITLE_SEARCH",
+                    "national_fallback_used":False,"exact_title_ranked_first":True},
                 "scanned_rows":raw_count,"matched_in_scanned_rows":len(selected),"results":selected,
                 "coverage":{"pages":pages,"next_page":None if exhausted else next_page,
                             "query_exhausted":exhausted,"query_fully_scanned":exhausted and page==1 and not failures,

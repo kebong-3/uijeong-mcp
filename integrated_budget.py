@@ -39,6 +39,10 @@ def invoke(name: str, arguments: dict[str, Any]) -> dict:
     try:
         validate_schema(arguments, spec['inputSchema'])
         result = redact(getattr(service(), spec['method'])(**arguments))
+        if name == 'budget_api_status':
+            checks = result.get('last_checks') or {}
+            result['check_state'] = 'CHECKS_RECORDED' if checks else 'NO_CHECK_SINCE_RESTART'
+            result['check_state_note'] = '점검 기록 없음은 연결 실패가 아닙니다. 설정과 실제 조회를 구분합니다.'
         if result.get('api_id') == 'lofin_projects':
             from budget_evidence import fiscal_basis
             params = result.get('public_params', {})

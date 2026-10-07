@@ -130,7 +130,17 @@ def classify_department_events(events: Iterable[dict], department: str,
                "matched_department_names": list(dict.fromkeys(matched_names + mentioned_names)),
                "alias_basis": "USER_PROVIDED_NOT_INDEPENDENTLY_VERIFIED" if
                    any(n != department for n in matched_names + mentioned_names) else "PRIMARY_LABEL"}
-        if mine:
+        section = (question or {}).get("department_context") or {}
+        section_names = [n for n in names if section.get("department") == n]
+        parent_answers = [a for a in answers if re.search(r"(?:국장|본부장|실장)(?:\s|$)", _speaker(a))]
+        row["department_match_basis"] = ("ANSWERER_TITLE" if mine else "AGENDA_SECTION" if section_names else
+            "PARENT_BUREAU_CONTEXT" if mentioned_names and parent_answers else "TEXT_MENTION_ONLY")
+        row["organizational_relationship_verified"] = False
+        if section_names or (mentioned_names and parent_answers):
+            row["matched_department_names"] = list(dict.fromkeys(row["matched_department_names"] + section_names))
+            row["matched_by"] = "명시된 부서 구간 또는 부서가 명시된 질의에 대한 상급 직함 답변 문맥(조직관계 독립 검증 아님)"
+            (answered if answers else unanswered).append(row)
+        elif mine:
             row["matched_by"] = "답변자 직함이 지정 부서 또는 적용기간 내 사용자 지정 별칭과 일치"
             answered.append(row)
         elif mentioned_names and not answers:
@@ -151,7 +161,8 @@ def event_touches_department(event: dict, department: str, aliases: Optional[lis
     if not isinstance(event, dict) or not department:
         return False
     names, _ = A.applicable_names(event, department, aliases or [])
-    return any(matches_department(_text_of(event.get("question") or event.get("speech")), n) or
+    section = ((event.get("question") or event.get("speech") or {}).get("department_context") or {}).get("department")
+    return any(section == n or matches_department(_text_of(event.get("question") or event.get("speech")), n) or
                any(matches_department(_speaker(a), n) for a in event.get("answers", [])) for n in names)
 
 

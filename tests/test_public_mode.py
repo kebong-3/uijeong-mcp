@@ -142,7 +142,11 @@ def test_tool_signature_and_limit_before_call():
         called.append(True)
         return {'status':'COMPLETE'}
     wrapped=P.public_function(tool)
-    assert inspect.signature(wrapped)==inspect.signature(tool)
+    # Public signatures now expose real upper bounds; parameter names/defaults remain compatible.
+    assert list(inspect.signature(wrapped).parameters) == list(inspect.signature(tool).parameters)
+    assert inspect.signature(wrapped).parameters['max_docs'].default == 6
+    from pydantic import TypeAdapter
+    assert TypeAdapter(inspect.signature(wrapped).parameters['max_docs'].annotation).json_schema()['maximum'] == 6
     assert asyncio.run(wrapped(max_docs=7))['code']=='PUBLIC_QUERY_LIMIT'
     assert not called
     assert asyncio.run(wrapped())['status']=='COMPLETE'

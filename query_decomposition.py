@@ -20,6 +20,17 @@ _QUESTION_WORDS = {
 }
 _ATTRIBUTES = {"본예산", "추경", "추가경정예산", "예산현액", "현액", "집행액", "집행", "지출액", "결산", "예산", "예산안"}
 _NOISE = _QUESTION_WORDS | _ATTRIBUTES | {"의회", "지적사항", "질의", "지적", "내용", "최근", "부터", "까지", "연도", "사업", "부서", "및", "관련된", "찾아주세요", "알려주세요", "검토자료", "작성해줘", "만들어줘"}
+# Commands describe requested operations, never independent policy entities.
+_NOISE |= {"발언", "의회발언", "답변", "업무보고", "구분", "서로", "연결", "MCP", "mcp",
+           "품질", "검증", "정상작동", "확인", "회의록", "기준", "기준으로", "찾아보고",
+           "해당", "대해", "대한", "관해서", "그리고", "함께", "이후", "현재", "또는", "이나"}
+_META_VERB = re.compile(r"^(?:찾|알려|정리|검토|비교|확인|연결|검증|작성|만들|분석)(?:아|어|해|하|한다|하고|해줘|해주세요|줘|주세요|고|보고|해보고|할|하기|하여|한|하기를|는다|는다\.)*$")
+_SEARCH_SYNONYMS = {"스마트도시": ("스마트시티",), "스마트시티": ("스마트도시",)}
+
+def search_synonyms(topic: str) -> list[str]:
+    """Bounded terminology search hints, not legal or project equivalence."""
+    return list(_SEARCH_SYNONYMS.get(re.sub(r"\s+", "", topic), ()))
+
 _STAGE_TERMS = (("original", "본예산"), ("supplementary", "추경"), ("supplementary", "추가경정예산"), ("current", "예산현액"), ("current", "현액"), ("execution", "집행액"), ("settlement", "결산"), ("draft", "예산안"))
 _LAW_PATTERNS = [
     re.compile(r"([가-힣A-Za-z0-9·\s]{2,60}?(?:기본법|특별법|법률|법|시행령|시행규칙))(?=\s|제\d+조|에|의|을|를|,|\.|$)")
@@ -95,6 +106,10 @@ def _quoted_or_named_chunks(question: str) -> list[str]:
 def _entity_terms(question: str, jurisdiction: str, laws: list[str]) -> list[str]:
     """Keep contiguous subject phrases; attributes and request clauses split them."""
     text = question
+    # Recognized policy concepts are independent OR search axes, not a single
+    # concatenated phrase. Preserve the unmodified user question separately.
+    for term in _SEARCH_SYNONYMS:
+        text = re.sub(r"(?<![가-힣A-Za-z0-9])" + term + r"(?=[^가-힣A-Za-z0-9]|$)", " | " + term + " | ", text)
     for law in sorted(laws, key=len, reverse=True):
         text = text.replace(law, " | ")
     tokens = re.findall(r"[가-힣A-Za-z0-9]+|[|,·/;]", text)
@@ -106,10 +121,10 @@ def _entity_terms(question: str, jurisdiction: str, laws: list[str]) -> list[str
         if token in '|,·/;':
             flush(); continue
         # Remove particles only from known request attributes, not policy nouns.
-        plain = re.sub(r"(?:부터|까지|으로|에서|을|를|은|는|와|과|에|의)$", "", token)
-        if token in _NOISE or plain in _NOISE or re.fullmatch(r"\d+(?:년(?:부터|까지)?|월|일(?:까지)?)?", token) or _ARTICLE.fullmatch(token):
+        plain = re.sub(r"(?:부터|까지|으로|에서|이나|이든|이나마|도|을|를|은|는|와|과|에|의)$", "", token)
+        if token in _NOISE or plain in _NOISE or _META_VERB.fullmatch(token) or re.fullmatch(r"\d+(?:년(?:부터|까지)?|월|일(?:까지)?)?", token) or _ARTICLE.fullmatch(token):
             flush(); continue
-        region = resolve_jurisdiction(token)
+        region = resolve_jurisdiction(re.sub(r"(?:의|에서|에)$", "", token))
         if region['state'] in {'resolved', 'ambiguous'} or _norm(token) == _norm(jurisdiction):
             flush(); continue
         if re.search(r"(?:찾아|알려|정리|검토|비교|확인)(?:줘|주세요|해줘|해주세요)$", token):
@@ -140,18 +155,34 @@ def decompose(question: str, jurisdiction: str = "", max_terms: int = 6) -> dict
     articles=_articles(question)
     axes=functional_axes(question)
     subjects=_entity_terms(question,jurisdiction,laws)
-    named=[t for t in _quoted_or_named_chunks(question) if t not in _ATTRIBUTES and re.sub(r"(?:과|와|을|를)$", "", t) not in _ATTRIBUTES]
+    explicit_quotes = re.findall(r'[「“\"]([^」”\"]{2,100})[」”\"]', question)
+    named=[t for t in _quoted_or_named_chunks(question) if t not in _NOISE and re.sub(r"(?:과|와|을|를)$", "", t) not in _NOISE]
+    named = explicit_quotes + named
     named=_unique(named)
-    core=[t for t in extract_terms(question) if t not in _NOISE and not any(_norm(t)==_norm(x) for x in laws)
-          and resolve_jurisdiction(t)['state']=='unresolved']
+    # Extract fallback nouns only from cleaned subject phrases. Extracting from
+    # the original command reintroduced discarded metadata such as MCP/구분.
+    core=[t for t in extract_terms(" ".join(subjects)) if t not in _NOISE and not _META_VERB.fullmatch(t)
+          and not any(_norm(t)==_norm(x) for x in laws) and resolve_jurisdiction(t)['state']=='unresolved']
     generated=[]
     for row in axes:
         generated.extend(row["search_terms"])
-    search_terms=_unique(named+subjects+generated+core)[:max_terms]
+    synonyms = _unique([syn for topic in subjects for syn in search_synonyms(topic)])
+    search_terms=_unique(named+subjects+synonyms+generated+core)[:max_terms]
     exhaustive=any(term in question for term in _EXHAUSTIVE)
     return {
         "question":question.strip(),
         "jurisdiction":jurisdiction.strip(),
+        "topic_entities": _unique(named + subjects),
+        "core_topic": next(iter(_unique(named + subjects)), ""),
+        "search_synonyms": synonyms,
+        "synonym_basis": "TERMINOLOGY_SEARCH_HINT_NOT_PROJECT_EQUIVALENCE",
+        "time_scope": {"year_mentions": _unique(re.findall(r"(?<!\d)((?:19|20)\d{2})(?:년)?(?!\d)", question))},
+        "council_intent": [mode for mode, words in (("speech", ("발언",)), ("question", ("질의", "질문")),
+                           ("business_report", ("업무보고",))) if any(w in question for w in words)],
+        "ordinance_intent": [mode for mode, word in (("search", "조례"), ("compare", "비교"),
+                             ("amend", "개정"), ("enact", "제정")) if word in question],
+        "meta_intent": [mode for mode, words in (("cross_domain_link", ("연결",)),
+                        ("mcp_quality_check", ("MCP", "검증"))) if any(w in question for w in words)],
         "law_names":laws,
         "article_refs":articles,
         "named_policy_terms":named,
@@ -178,12 +209,13 @@ def council_search_terms(question: str, max_terms: int = 3) -> list[str]:
     terms=[question.strip()]
     # Complex questions use preserved entity phrases; retain the entire question
     # separately in decompose.question instead of treating it as a search term.
-    if plan['target_entities'] and (len(question)>60 or any(t in question for t in ('본예산','추경','의회 지적','집행액'))):
+    if plan['target_entities'] and (len(question)>60 or any(t in question for t in ('본예산','추경','의회 지적','집행액','찾아','연결','검증','관련 조례','의회발언'))):
         terms=[t['name'] for t in plan['target_entities']]
     # Multi-word generic questions often fail upstream; prefer functional/core terms
     # as fallbacks but keep the exact query first for traceability.
     for row in plan["functional_axes"]:
         terms.extend(row["search_terms"])
+    terms.extend(plan["search_synonyms"])
     terms.extend(plan["named_policy_terms"])
     terms.extend(plan["core_terms"])
     return _unique(terms)[:max_terms]
@@ -200,3 +232,38 @@ def legal_search_plan(question: str, jurisdiction: str = "", max_terms: int = 6)
     # No explicitly named law: do not send policy or municipality as a law title.
     # Explicit legal citations in retrieved official documents can provide followups.
     return {**plan,"law_queries":law_queries,"ordinance_queries":ordinance_queries}
+
+
+def natural_council_query(question: str, jurisdiction: str = "") -> dict:
+    """Extract explicit years and bounded topics; a name-shaped tail is ranking
+    guidance only, never a verified person or mandatory speaker filter."""
+    from datetime import datetime, timezone, timedelta
+    text = question
+    years = _unique(re.findall(r"(?<!\d)((?:19|20)\d{2})(?:년)?(?!\d)", text))
+    tokens = text.split()
+    speaker = None
+    if "의회" in text and years and len(tokens) >= 5 and re.fullmatch(r"[가-힣]{2,4}", tokens[-1]):
+        candidate = tokens[-1]
+        if candidate not in _NOISE and not _META_VERB.fullmatch(candidate):
+            speaker = candidate
+            text = text[:text.rfind(candidate)].strip()
+    plan = decompose(text, jurisdiction, max_terms=6)
+    terms = _unique(plan["topic_entities"] + plan["search_synonyms"])
+    if not terms:
+        terms = [text.strip()]
+    period = {}
+    today = datetime.now(timezone(timedelta(hours=9))).date()
+    if len(years) == 1 and 1900 <= int(years[0]) <= today.year:
+        year = int(years[0])
+        period = {"date_from": f"{year}-01-01", "date_to": today.isoformat() if year == today.year else f"{year}-12-31"}
+    return {"question": question, "terms": terms[:3], "period": period,
+            "speaker_ranking_candidate": speaker, "speaker_identity_verified": False,
+            "decomposition": plan}
+
+
+def split_budget_terms(topic: str) -> list[str]:
+    """Split explicitly listed synonymous axes, not arbitrary multi-word names."""
+    found = [(match.start(), term) for term in _SEARCH_SYNONYMS
+             for match in re.finditer(r"(?<![가-힣A-Za-z0-9])" + re.escape(term) + r"(?=[^가-힣A-Za-z0-9]|$)", topic)]
+    values = _unique([term for _, term in sorted(found)])
+    return values if len(values) > 1 else [topic.strip()]

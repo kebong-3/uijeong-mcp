@@ -1086,10 +1086,17 @@ async def council_search_minutes(
             tail = "조건에 맞는 회의록이 없습니다(상류 검색 결과를 끝까지 확인)."
             code = "EMPTY"
         return "\n".join([_status(code)] + head + [tail]) + _footer()
+    from evidence_quality import meeting_groups
+    ungrouped_count = len(rows)
+    rows = meeting_groups(rows)
     dup = _dup_note(rows)
     lines = [_status("PARTIAL" if stt["next_pos"] or stt.get('errors') else "COMPLETE")] + head
     if stt.get('errors'): lines.append('일부 목록 확인 실패: '+str(stt['errors']))
+    if ungrouped_count != len(rows):
+        lines.append(f"동일 회의 메타데이터 기준 대표 {len(rows)}건 표시. 판본 원문 동일성은 미검증이며 alternate_docids를 보존합니다.")
     for r in rows:
+        if r.get('alternate_docids'):
+            lines.append('  alternate_docids=' + json.dumps(r['alternate_docids'], ensure_ascii=False))
         note = f" ※{dup[r.get('DOCID')]}" if r.get("DOCID") in dup else ""
         lines.append(f"- {_meta_line(r)} [{meeting_kind(r.get('MTGNM', ''))}] docid={r.get('DOCID')}{note}")
     if stt["next_pos"]:
