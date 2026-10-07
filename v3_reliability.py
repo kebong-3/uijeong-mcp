@@ -533,7 +533,10 @@ async def context_pack(U, topic: str, council: str = "광주 서구", date_from:
     # bounded discovery pass stays within the public tool deadline.
     report = layers["report_mentions"]
     from evidence_discovery import discover_candidates, discover_subjects
-    located = (evidence.get("items") or []) + (report.get("items") or [])
+    from evidence_quality import discovery_input
+    evidence_rows, evidence_reuse = discovery_input(U, evidence)
+    report_rows, report_reuse = discovery_input(U, report)
+    located = evidence_rows + report_rows
     candidates = discover_candidates(located, topic)
     subjects = discover_subjects(located, topic, limit=1)
     candidates['target_subjects'] = subjects
@@ -587,7 +590,8 @@ async def context_pack(U, topic: str, council: str = "광주 서구", date_from:
             "discovery_candidates":candidates,"linked_review":review,
             "search_strategy":{"exact_first":True,"expanded":bool(discoveries),
                 "candidate_source":"LOCATED_OFFICIAL_MEETING_QUOTES", "same_project_verified":False,
-                "report_pass_separate":report.get("status")!="SKIPPED"},
+                "report_pass_separate":report.get("status")!="SKIPPED",
+                "internal_evidence_recovery":{"council":evidence_reuse,"report":report_reuse}},
             "coverage_card":{"date_from":date_from,"date_to":date_to,"search_terms":[topic.strip()],
                 "evidence_coverage":evidence.get("coverage",[]),"coverage_summary":evidence.get("coverage_summary",{}),"is_exhaustive":False},
             "execution_trace":{"mcp_tool":"council_context_pack","stages":[{"stage":k,"status":v["status"],"elapsed_ms":v.get("elapsed_ms")} for k,v in all_stages.items()]},

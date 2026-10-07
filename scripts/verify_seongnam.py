@@ -38,7 +38,7 @@ def normalize(response):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output-dir', required=True)
-    parser.add_argument('--expect-version', default='4.1.6-public.1')
+    parser.add_argument('--expect-version', default='4.1.6-public.2')
     parser.add_argument('--expect-fingerprint', default='')
     parser.add_argument('--wait-seconds', type=int, default=0)
     args = parser.parse_args()
@@ -107,6 +107,7 @@ def main():
     checks['06_jurisdiction_upstream'] = bool(local.get('results')) and local.get('search_strategy', {}).get('jurisdiction_applied_upstream') is True and all('성남시' in r.get('jurisdiction','') for r in local.get('results',[]))
     natural = call('test07-natural-search','search',{'query':NATURAL})
     result = next((r for r in natural.get('results', []) if '이군수' in r.get('title','')), None)
+    checks['search_retains_provided_document_url'] = bool(result) and 'sncouncil.go.kr/' in result.get('url','')
     fetched = call('test07-fetch','fetch',{'id':result['id']}) if result else {}
     checks['07_natural_search_passage'] = bool(result) and DOCUMENT in json.dumps(fetched, ensure_ascii=False) and '20260904' in re.sub(r'[-.]','',json.dumps(fetched,ensure_ascii=False))
     source = call('test08-source','council_read_source',{'ref':DOCUMENT,'keyword':'스마트도시','max_turns':50,'max_chars':16000})

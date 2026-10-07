@@ -222,6 +222,7 @@ def _event_url(event: dict[str, Any], anchor: dict[str, Any] | None) -> str | No
     citation = (anchor or {}).get("citation") if isinstance(anchor, dict) else None
     candidates = [
         (citation or {}).get("citation_url") if isinstance(citation, dict) else None,
+        (citation or {}).get("source_url") if isinstance(citation, dict) else None,
         (event.get("provenance") or {}).get("citation_url"),
         (event.get("provenance") or {}).get("source_url"),
     ]
@@ -321,7 +322,9 @@ def build_tools(backend: Any) -> dict[str, Any]:
 
         results: list[SearchResult] = []
         seen: set[tuple[str, int]] = set()
-        events = list(payload.get("items") or [])
+        from evidence_quality import discovery_input
+        full_events, _recovery = discovery_input(backend, payload)
+        events = list(full_events)
         speaker = plan["speaker_ranking_candidate"]
         if speaker:
             # Rank matching *retrieved* labels. Never fabricate the requested

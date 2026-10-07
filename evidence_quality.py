@@ -39,7 +39,8 @@ def _thin_turn(turn: dict | None, chars: int = 500) -> dict | None:
     citation = turn.get("citation") or {}
     out["citation"] = {k: copy.deepcopy(citation[k]) for k in (
         "record_id", "docid", "turn_index", "source_kind", "body_sha256", "turn_sha256",
-        "source_url", "body_url", "char_start", "char_end", "locator") if k in citation}
+        "source_url", "body_url", "char_start", "char_end", "locator",
+        "citation_url", "citation_markdown", "citation_status", "citation_kind") if k in citation}
     if len(text) > chars:
         out["excerpt"] = {"partial": True, "char_start": 0, "char_end": chars,
                           "original_chars": len(text), "basis": "ORIGINAL_TURN_TEXT"}
@@ -223,3 +224,32 @@ def final_quality_gate(context: dict) -> dict:
             "numeric_normalization": "BLOCK_NUMERIC_NORMALIZATION" if any(i.get("code") == "UNIT_NOT_VERIFIED" for i in issues) else "NOT_CERTIFIED_BY_THIS_GATE",
             "issues": issues[:20], "total_issues": len(issues), "required_answer_qualifiers": required,
             "policy_entity": entity, "ready_for_submission": False}
+
+
+def discovery_input(backend, payload: dict) -> tuple[list[dict], dict]:
+    """Use an existing request-scoped full snapshot for internal discovery only.
+
+    Display excerpts are not the complete research input. No API calls, new
+    storage, weakened scope checks, or expanded public output are performed.
+    A returned snapshot must match the exact server-generated query parameters.
+    """
+    shown = payload.get("items") or []
+    sid = payload.get("snapshot_id")
+    store = (getattr(backend, "V2_SERVICES", None) or {}).get("snapshots")
+    receipt = {"status": "DISPLAY_ONLY", "displayed_events": len(shown),
+               "network_calls": 0, "source_scope_unchanged": True}
+    if not sid or store is None:
+        return shown, receipt
+    try:
+        stored = store.get(sid)
+        if not isinstance(stored, dict) or not isinstance(stored.get("items"), list):
+            raise ValueError("Snapshot unavailable")
+        params = payload.get("parameters")
+        if not isinstance(params, dict) or stored.get("parameters") != params:
+            raise ValueError("Snapshot query mismatch")
+        rows = stored["items"]
+        return rows, {**receipt, "status": "SNAPSHOT_REUSED", "snapshot_id": sid,
+                      "source_events": len(rows), "public_output_expanded": False}
+    except Exception:
+        # No raw exception/credential or inaccessible snapshot is returned.
+        return shown, {**receipt, "status": "PARTIAL", "reason": "SNAPSHOT_UNAVAILABLE_OR_SCOPE_MISMATCH"}
