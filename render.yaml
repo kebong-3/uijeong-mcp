@@ -41,6 +41,12 @@ services:
         value: public
       - key: UIJEONG_PUBLIC_READONLY
         value: "true"
+      # REST bridge for the web app (/api/v1). Same allowlist and limits as /mcp.
+      - key: UIJEONG_REST_ENABLED
+        value: "true"
+      # Optional: 32+ random chars. Put the same value in the web app's server env.
+      - key: UIJEONG_REST_KEY
+        sync: false
       - key: UIJEONG_MAX_RESPONSE_CHARS
         value: "30000"
       - key: UIJEONG_CACHE_MAX_ENTRIES

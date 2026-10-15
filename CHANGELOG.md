@@ -1,3 +1,13 @@
+# 4.1.7-public.1 — 2026-10-15
+
+- 웹 앱용 REST 다리(/api/v1) 추가. `UIJEONG_REST_ENABLED=true`일 때만 열린다.
+  - `GET /api/v1/tools`: 공개 도구 40개와 입력 스키마. `POST /api/v1/tools/{name}`: 인자 JSON → 구조화 결과.
+  - 같은 FastMCP 서버의 call_tool을 부르므로 허용목록·입력 상한·응답 예산·실행 기록이 MCP와 같다.
+  - HTTPGuard(Host/Origin·본문 64KB·분당 한도)와 PublicBoundary(동시 조회 슬롯)를 그대로 거친다.
+  - 브라우저 직접 호출(CORS)은 열지 않는다. 선택 잠금 `UIJEONG_REST_KEY` → `X-Uijeong-Key` 헤더.
+- 시작 전 자체검사(check_config --http --manifest)에 REST 허용목록·실호출·내부도구 차단 확인 추가.
+- 기존 `/mcp` 계약과 도구 40개는 바뀌지 않음. 시험 862 → 881건.
+
 # 2.5.0-rc.1
 
 - Add one-call response preparation, exact citation audit, dimension-aware metric comparison, and side-by-side evidence review.

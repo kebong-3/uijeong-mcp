@@ -725,7 +725,13 @@ class PublicBoundary:
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return
-        if scope.get("path", "").rstrip("/") != "/mcp":
+        # The optional REST bridge (rest_bridge.py) reuses the same allowlisted
+        # server. It is reachable only when explicitly enabled; otherwise /api
+        # paths keep returning 404 exactly as before.
+        import rest_bridge
+        path = scope.get("path", "").rstrip("/")
+        rest = rest_bridge.enabled() and rest_bridge.is_rest_path(path)
+        if path != "/mcp" and not rest:
             await _public_reply(send, 404, {"error": "Not found"})
             return
         # This public server is stateless and responds to POST with JSON. It
@@ -733,11 +739,14 @@ class PublicBoundary:
         # stream. Such idle streams used to retain every query slot forever.
         # MCP permits 405 for an endpoint without a standalone SSE stream.
         # Reject before acquiring a slot, including when the query queue is full.
-        if scope.get("method") not in ("POST","DELETE"):
+        if not rest and scope.get("method") not in ("POST","DELETE"):
             await _public_reply(send, 405, {"authentication": "none", "public_readonly": True,
                 "message": "이 무상태 MCP는 POST로 호출합니다. 별도 GET 이벤트 스트림은 제공하지 않습니다. 상태 확인 주소는 /healthz입니다."})
             return
-        if scope.get("uijeong_control_request"):
+        # REST listings (GET) are as light as MCP tools/list; REST tool calls (POST)
+        # wait for the same query slots as MCP tools/call.
+        light_rest = rest and scope.get("method") in ("GET", "HEAD")
+        if scope.get("uijeong_control_request") or light_rest:
             if self.control_waiting >= 16:
                 await _public_reply(send, 503, {"error": "PUBLIC_CONTROL_BUSY"})
                 return

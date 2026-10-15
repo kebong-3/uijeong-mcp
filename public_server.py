@@ -255,13 +255,17 @@ def run(backend: Any = None) -> None:
     import uvicorn
     server = build_server(backend)
     asyncio.run(verify_surface(server))
-    app = server.streamable_http_app()
-    app.uijeong_public_readonly = True
+    raw = server.streamable_http_app()
+    raw.uijeong_public_readonly = True
+    import rest_bridge as RB
+    # /api/v1 is answered only when UIJEONG_REST_ENABLED=true; /mcp is unchanged.
+    app = RB.RestBridge(raw, server, PUBLIC_TOOLS)
     policy = R.http_policy()
     import finance_context as F
     import legal_context as L
     import public_data_discovery as D
     print(json.dumps({"public_readonly": True, "authentication": "none",
+                      "rest_enabled": RB.enabled(), "rest_key_required": bool(app.key),
                       "tool_count": len(PUBLIC_TOOLS), "transport_max_concurrent": 8,
                       "tool_max_concurrent": TOOL_MAX_CONCURRENT,
                       "requests_per_minute_shared": 360,
@@ -280,7 +284,8 @@ async def self_test() -> dict[str, Any]:
     await verify_surface(server)
     raw = server.streamable_http_app()
     raw.uijeong_public_readonly = True
-    app = R.secure_http_app(raw)
+    import rest_bridge as RB
+    app = R.secure_http_app(RB.RestBridge(raw, server, PUBLIC_TOOLS))
     host = R.http_policy()["hosts"][0]
     headers = {"host": host, "accept": "application/json, text/event-stream",
                "mcp-protocol-version": "2025-11-25"}
@@ -317,6 +322,16 @@ async def self_test() -> dict[str, Any]:
             checks["invalid_host_rejected"] = (await client.get("/healthz", headers={"host": "invalid.example"})).status_code == 403
             checks["invalid_origin_rejected"] = (await client.get("/healthz", headers={"origin": "https://invalid.example"})).status_code == 403
             checks["oversized_body_rejected"] = (await client.post("/mcp", content=b"x" * 65537)).status_code == 413
+            if RB.enabled():
+                rest_headers = {"x-uijeong-key": RB.rest_key()} if RB.rest_key() else {}
+                listed = await client.get("/api/v1/tools", headers=rest_headers)
+                checks["rest_same_allowlist"] = (listed.status_code == 200 and
+                    {row["name"] for row in listed.json().get("tools", [])} == set(PUBLIC_TOOLS))
+                called = await client.post("/api/v1/tools/council_find_council", headers=rest_headers,
+                                           json={"query": "광주 서구"})
+                checks["rest_real_tool"] = called.status_code == 200 and called.json().get("ok") is True
+                checks["rest_private_tool_not_callable"] = (await client.post(
+                    "/api/v1/tools/council_search_local", headers=rest_headers, json={"keyword": "x"})).status_code == 404
     if not all(checks.values()):
         raise R.SecurityError("공개 MCP 자체검사 실패: " + ",".join(k for k, v in checks.items() if not v))
     return {"status": "PASS", "network_called": False, "checks": checks}

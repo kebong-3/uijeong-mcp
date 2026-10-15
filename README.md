@@ -1,3 +1,5 @@
+> **4.1.7-public.1 웹 앱 연결용 REST 다리**: `UIJEONG_REST_ENABLED=true`이면 `/api/v1`에서 같은 공개 도구를 평범한 HTTP JSON으로 부를 수 있습니다. 아래 [웹 앱에서 부르기](#웹-앱에서-부르기-rest)를 보세요.
+
 > **4.1.6-public.1 성남시 재검수 개선**: [변경·검증·미확인 범위](docs/verification/seongnam-20261007/README.md). QWGJK 금액 단위는 미확인 상태를 유지하며 임의 환산을 차단합니다. 배포 상태는 실제 서버 버전·해시와 검증 기록을 대조하세요.
 
 # 지방의회·예산·조례 MCP
@@ -48,6 +50,38 @@
 한 Python 프로세스에서 세 패키지를 직접 실행합니다. 다른 무료 Render 서버를 중계하지 않습니다. 서버에서 Gemini 등 별도 생성형 AI를 호출하지 않으며, 호스트 AI가 실제 조회 근거와 계산 결과로 답변합니다. 큰 결과는 나누어 조회하고, 오류·시간초과·일부 결과를 구분합니다. 서구의회 홈페이지 직접 검색은 비활성입니다.
 
 `render.yaml`은 사용자가 선택한 `0.5c-512mb` 인스턴스를 유지합니다. 기존 API 값은 Render 내부 참조를 통해 한 차례 복사하고 운영 서버에서 설정을 확인한 뒤 `sync: false`로 유지합니다. `LAW_OC`는 조례 서버, `LOFIN_API_KEY`·`DATA_GO_KR_SERVICE_KEY`·`KOSIS_API_KEY`는 예산 서버의 기존 값을 사용합니다. CLIK와 기존 의회 환경변수도 유지합니다. 비밀값은 GitHub·대화에 노출하지 않았습니다. 기존 예산·조례 서비스는 복구용으로 남겨두었으며 통합 서버는 이들 서버를 호출하지 않습니다.
+
+## 웹 앱에서 부르기 (REST)
+
+MCP는 AI 클라이언트용 규격입니다. 직접 만든 웹 앱은 MCP 접속 절차를 흉내 낼 필요 없이
+`/api/v1`을 부르면 됩니다. 새 기능이 아니라 같은 공개 서버로 들어가는 다른 입구입니다.
+
+| 요청 | 내용 |
+|---|---|
+| `GET /api/v1` | 버전, 호출 방법, 키 필요 여부 |
+| `GET /api/v1/tools` | 공개 도구 40개와 입력 스키마 |
+| `POST /api/v1/tools/{도구이름}` | 본문은 도구 인자 JSON. 응답은 `{ok, tool, status, result}` |
+
+- 같은 FastMCP 서버의 `call_tool`을 부르므로 허용목록·입력 상한(`max_docs` ≤ 6 등)·응답 예산·`mcp_receipt`가 MCP와 같습니다.
+- Host/Origin 검사, 본문 64KB, 분당 360회, 동시 조회 슬롯도 MCP와 같이 거칩니다.
+- 허용목록 밖 도구는 404, 인자 스키마 위반은 422, 잘못된 JSON은 400입니다. 도구가 실행된 결과는 `ERROR`·`INVALID_INPUT`이어도 200이며 `ok=false`로 구분합니다.
+- 브라우저 직접 호출(CORS)은 열지 않습니다. 웹 앱의 **서버 함수**에서 부르세요. 그래야 키가 브라우저에 노출되지 않습니다.
+- 선택 잠금: `UIJEONG_REST_KEY`(24자 이상)를 두면 `X-Uijeong-Key` 헤더가 일치해야 합니다.
+
+Vercel 서버 함수 예시(`api/department.js`):
+
+```js
+export default async function handler(req, res) {
+  const r = await fetch(`${process.env.UIJEONG_URL}/api/v1/tools/council_department_brief`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-uijeong-key": process.env.UIJEONG_REST_KEY ?? "" },
+    body: JSON.stringify({ department: req.query.department, council: "광주 서구" }),
+  });
+  res.status(r.status).json(await r.json());
+}
+```
+
+`UIJEONG_URL`은 `https://uijeong-mcp.onrender.com`입니다. `UIJEONG_REST_ENABLED`가 없으면 `/api/v1`은 이전처럼 404입니다.
 
 ## API와 검증 범위
 

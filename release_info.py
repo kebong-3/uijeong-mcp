@@ -4,7 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 
-VERSION = "4.1.6-public.1"
+VERSION = "4.1.7-public.1"
 CAPABILITIES = ["one_call_response_preparation", "exact_source_claim_audit",
                 "dimension_checked_metric_comparison", "side_by_side_evidence_comparison",
                 "date_bounded_department_aliases", "recurring_topic_cues_not_verdicts",
@@ -41,7 +41,8 @@ CAPABILITIES = ["one_call_response_preparation", "exact_source_claim_audit",
 
 CAPABILITIES.extend(["inline_ascii_speaker_labels", "bounded_synonym_union",
     "prebudgeted_evidence_index", "lossless_bounded_snapshot_compression",
-    "automatic_metadata_quality_gate", "public_schema_runtime_caps", "seongnam_golden_regression"])
+    "automatic_metadata_quality_gate", "public_schema_runtime_caps", "seongnam_golden_regression",
+    "rest_bridge_same_public_allowlist"])
 
 def runtime_files(root: Path) -> list[Path]:
     paths = [*root.glob('*.py'), *root.glob('data/*.json')]
