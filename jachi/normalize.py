@@ -63,6 +63,7 @@ def listing_rows(data: Any, kind: str) -> list[dict]:
                            "jurisdiction": pick(n, "지자체기관명"),
                            "effective_date": pick(n, "시행일자"),
                            "promulgation_date": pick(n, "공포일자"),
+                           "promulgation_number": pick(n, "공포번호"),
                            "amendment_type": pick(n, "제개정구분명"),
                            "status_code": pick(n, "현행연혁코드"),
                            "ordinance_type": pick(n, "자치법규종류", "법령구분명"),
@@ -264,3 +265,4 @@ def extract_references(text: str) -> list[dict[str, str]]:
         for m in re.finditer(re.escape(alias)+r"\s*(제\s*\d+\s*조(?:\s*의\s*\d+)?)", text):
             refs.append({"law_title": title, "article": jo_label(m[1]), "paragraph": "", "item": "", "quote": m[0]})
     return list({(x["law_title"],x["article"],x["paragraph"],x["item"]):x for x in refs}.values())
+

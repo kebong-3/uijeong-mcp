@@ -55,7 +55,7 @@
     "jachi/llm.py": "6f76590185bd084a4548d63fcee6fa9026f444332b58d8ac84e912dfcfcaa47e",
     "jachi/models.py": "a3608e6026a59d6a96789e80b9a345b4e5b454570b501771055d98f914c8bfc0",
     "jachi/monitor.py": "15b95c1070b16dcd2f90550318bcbe1d9dc611d0feaacfe6b8c02f8c643a9041",
-    "jachi/normalize.py": "c22af72ef1d15583804a428775b4ed9816fec42deef86abf1d118d47992be069",
+    "jachi/normalize.py": "b5552470b7074bf57b20098ef03aa30ecf3d41ffce29efcba20ee4fe69f2aa29",
     "jachi/procedure.py": "21729097182bc43e2de13dc101946f538170c237c29eae20c76b0a2ef12c4592",
     "jachi/security.py": "2d871f81c9934c5c8981bf9e7ca381291944ce8548b8c3e93e5b13fc7bf5a7ab",
     "jachi/server.py": "252ebec27937cdb555f01a0caf120190ee0f954bafb5d4efeefb8c0416f93e78",
@@ -86,7 +86,7 @@
     "workbench_tools.py": "4c542a2eba57571993ca4b8c0a9339c783f5920e3dd1000c3f9a144f552f4355",
     "workflow_core.py": "180b52f2b2dffb57d7d53625c1f19fe1f779c79a6a24d52c8977a03688c39be8"
   },
-  "runtime_fingerprint": "8355bf31ea0da7fe51e8dd9003c52368ad1c15da3636b4f229a318def88e39b1",
+  "runtime_fingerprint": "3c89fb79732e3542fd848387676e55f342bfc005d131a484147e12c262b6e970",
   "profile_tool_counts": {
     "core": 5,
     "work": 18,
@@ -407,7 +407,7 @@
     "jachi/llm.py": "6f76590185bd084a4548d63fcee6fa9026f444332b58d8ac84e912dfcfcaa47e",
     "jachi/models.py": "a3608e6026a59d6a96789e80b9a345b4e5b454570b501771055d98f914c8bfc0",
     "jachi/monitor.py": "15b95c1070b16dcd2f90550318bcbe1d9dc611d0feaacfe6b8c02f8c643a9041",
-    "jachi/normalize.py": "c22af72ef1d15583804a428775b4ed9816fec42deef86abf1d118d47992be069",
+    "jachi/normalize.py": "b5552470b7074bf57b20098ef03aa30ecf3d41ffce29efcba20ee4fe69f2aa29",
     "jachi/procedure.py": "21729097182bc43e2de13dc101946f538170c237c29eae20c76b0a2ef12c4592",
     "jachi/security.py": "2d871f81c9934c5c8981bf9e7ca381291944ce8548b8c3e93e5b13fc7bf5a7ab",
     "jachi/server.py": "252ebec27937cdb555f01a0caf120190ee0f954bafb5d4efeefb8c0416f93e78",
@@ -562,7 +562,7 @@
     "verification-summary.json": "14d8204e36002eef9426fd7118afac5eb0fd234db5668a622ef97983835e3a69",
     "workbench_tools.py": "4c542a2eba57571993ca4b8c0a9339c783f5920e3dd1000c3f9a144f552f4355",
     "workflow_core.py": "180b52f2b2dffb57d7d53625c1f19fe1f779c79a6a24d52c8977a03688c39be8",
-    "tests/test_ordinance_history_search.py": "ab789fdfce97488dfbae157e4da602f403da86e9086fc5f9bfa8f60374469b01"
+    "tests/test_ordinance_history_search.py": "7d95b93b5f8fe356f166ea167236beebf0294522f360d01a2c3dde59710772a6"
   },
   "integrity_note": "내용 일치 검사이며 제작자 서명·원격 배포 증명은 아닙니다.",
   "verification_reference": "docs/verification/seongnam-20261007/summary.json",

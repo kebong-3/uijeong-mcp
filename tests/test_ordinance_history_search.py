@@ -1,6 +1,16 @@
 import pytest
 import integrated_ordinance as mod
+from jachi.normalize import listing_rows
 from test_integrated_ordinance import Registry
+
+
+def test_promulgation_number_preserved_across_separate_effective_versions():
+    rows=listing_rows({'OrdinSearch':{'ordin':[
+        {'자치법규명':'시험조례','자치법규ID':'1','자치법규일련번호':'10','공포일자':'20260616','공포번호':'제123호'},
+        {'자치법규명':'시험조례','자치법규ID':'1','자치법규일련번호':'11','공포일자':'20260616','공포번호':'제123호'}
+    ]}},'ordinance')
+    assert len(rows)==2
+    assert [r['promulgation_number'] for r in rows]==['제123호','제123호']
 
 
 @pytest.fixture
