@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import copy
 import json
+import re
 from collections import Counter
 from dataclasses import replace
 from datetime import date, datetime
@@ -257,15 +258,34 @@ def register(mcp):
                          '예산 영향은 budget 도구, 실제 의회 논의는 council 도구로 별도 조회한다.'],
                 'external_llm_enabled':False,'credential_configured':bool(_settings().law_oc)}
 
-    @tool('ordinance_search','공식 자치법규·상위법 후보 검색. kind=ordinance 또는 law. 지자체 정식 명칭, 시행일, ID/MST, 검색범위 확인. 0건은 미제정 아님.')
+    @tool('ordinance_search','공식 자치법규·상위법 후보 검색. history=true는 자치법규 연혁. promulgation_from/to는 공포일 범위(YYYY-MM-DD), org/sborg는 확인된 기관코드. 현행·연혁을 함께 확인해야 기간 내 변경 이력을 볼 수 있음. 0건은 미제정 아님.')
     async def ordinance_search(query:str, kind:Literal['ordinance','law']='ordinance', jurisdiction:str='',
-                               body:bool=False, page:int=1, max_pages:int=1, limit:int=10, offset:int=0) -> dict:
+                               body:bool=False, page:int=1, max_pages:int=1, limit:int=10, offset:int=0,
+                               history:bool=False, promulgation_from:str='', promulgation_to:str='',
+                               org:str='', sborg:str='') -> dict:
         async def action(c):
             if not 1<=max_pages<=3 or not 1<=limit<=30 or offset<0: raise ValueError('range')
-            result=await c.search(query,kind=kind,jurisdiction=jurisdiction,body=body,page=page,max_pages=max_pages)
+            if kind!='ordinance' and (history or promulgation_from or promulgation_to or org or sborg):
+                raise ValueError('ordinance_filters_require_ordinance')
+            if bool(promulgation_from)!=bool(promulgation_to): raise ValueError('date_pair_required')
+            extra={}
+            if promulgation_from:
+                if not all(re.fullmatch(r'\d{4}-\d{2}-\d{2}',v) for v in (promulgation_from,promulgation_to)):
+                    raise ValueError('date_format')
+                start,end=date.fromisoformat(promulgation_from),date.fromisoformat(promulgation_to)
+                if start>end: raise ValueError('date_order')
+                extra={'ancYd':f'{start:%Y%m%d}~{end:%Y%m%d}','sort':'ddes'}
+            if any(v and not re.fullmatch(r'\d{7}',v) for v in (org,sborg)) or (sborg and not org):
+                raise ValueError('official_org_codes_required')
+            result=await c.search(query,kind=kind,jurisdiction=jurisdiction,body=body,page=page,max_pages=max_pages,
+                                  history=history,org=org,sborg=sborg,extra=extra)
             rows=result['results']
             return {**result,'results':rows[offset:offset+limit],'output_truncated':offset+limit<len(rows),
                     'output_offset':offset,'next_offset':offset+limit if offset+limit<len(rows) else None,
+                    'history_scope':('historical_versions' if history else 'current_versions') if kind=='ordinance' else None,
+                    'promulgation_filter':{'from':promulgation_from or None,'to':promulgation_to or None,
+                                          'applied':bool(promulgation_from)},
+                    'agency_filter':{'org':org or None,'sborg':sborg or None,'applied':bool(org)},
                     'continuation':'next_offset가 있으면 동일 query/page/max_pages에 offset만 바꿔 재조회; 없으면 coverage.next_page로 진행',
                     'selection_required':True,'law_view':'effective' if kind=='law' else None}
         return await _run(action)
@@ -442,3 +462,4 @@ async def mention_context(query: str, jurisdiction: str) -> dict:
                 'same_project_verified':False,'applicability_verified':False,
                 'failures':found.get('failures',[])}
     return await _run(action)
+
