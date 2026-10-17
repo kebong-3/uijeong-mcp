@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#102a43" />
+  <title>GOV:IMPACT | 법령·제도 변경 행정영향 레이더</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="mast">
+    <div class="brand"><span>GOV:IMPACT</span><h1>법령·제도 변경 행정영향 레이더</h1><p>법이 바뀌면, 우리 행정에서 무엇을 확인해야 하는지 먼저 찾습니다.</p></div>
+    <div class="trust"><b>광주광역시 서구</b><span>공식 연계데이터 우선 · AI 판단 없음</span></div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero card">
+      <div><span class="kicker">AIBLE 지방행정 실험</span><h2>법령 개정 사실을<br><em>“우리 업무의 할 일”</em>로 바꿉니다.</h2><p>법제처 법령 변경이력과 법령↔자치법규 연계정보를 대조해, 서구 조례·규칙의 영향 후보와 확인 체크리스트를 보여줍니다.</p></div>
+      <div class="flow"><div>법령 개정</div><i>→</i><div>공식 연계 확인</div><i>→</i><div>서구 영향 후보</div><i>→</i><div>담당자 검토</div></div>
+    </section>
+
+    <section class="toolbar card">
+      <div class="datebox"><label>변경일</label><input id="changeDate" type="date"/><button id="loadChanges" class="primary">변경 법령 불러오기</button></div>
+      <div class="searchbox"><label>법령 직접 검색</label><div><input id="lawQuery" placeholder="예: 아동복지법, 지방재정법"/><button id="searchLaw">검색</button></div></div>
+    </section>
+
+    <section id="setupBanner" class="setup card hidden"></section>
+
+    <section class="grid">
+      <aside class="card left">
+        <div class="section-head"><div><span class="eyebrow">STEP 1</span><h3>변경 법령</h3></div><span id="changeCount" class="count">0건</span></div>
+        <div id="changeList" class="law-list"><div class="empty">변경일을 선택하고 법령을 불러오세요.</div></div>
+      </aside>
+
+      <section class="card right">
+        <div id="impactEmpty" class="impact-empty"><div class="radar">◎</div><h3>영향을 확인할 법령을 선택하세요.</h3><p>법제처의 공식 법령-자치법규 연계정보를 먼저 사용하고, 자치법규 본문에 법령명이 직접 등장하는 경우를 보조 후보로 표시합니다.</p></div>
+        <div id="impactView" class="hidden">
+          <div class="impact-title"><div><span id="impactBadge" class="impact-badge">검토</span><h2 id="impactLawName"></h2><p id="impactMeta"></p></div><button id="printBtn" class="ghost">검토표 인쇄</button></div>
+          <div class="metrics"><div><b id="ordCount">0</b><span>연계 자치법규</span></div><div><b id="articleCount">0</b><span>변경 조문</span></div><div><b id="dday">-</b><span>시행일까지</span></div></div>
+
+          <div class="block"><div class="block-title"><span>01</span><h3>서구 자치법규 영향 후보</h3></div><div id="ordinanceList"></div></div>
+          <div class="block"><div class="block-title"><span>02</span><h3>확인된 변경 조문</h3></div><div id="articleList"></div></div>
+          <div class="block"><div class="block-title"><span>03</span><h3>행정 조치 체크리스트</h3></div><div id="actionList" class="checklist"></div></div>
+          <div class="caution"><b>중요</b> 이 화면은 법적 판단 결과가 아니라 <strong>검토 대상 후보를 빠르게 찾는 보조도구</strong>입니다. 개정 필요 여부는 반드시 원문과 소관부서 검토를 거쳐 확정하세요.</div>
+        </div>
+      </section>
+    </section>
+
+    <section class="how card">
+      <div><span class="eyebrow">왜 다른가</span><h3>생성형 AI가 법을 해석하지 않습니다.</h3></div>
+      <div class="principles"><article><b>① 공식 데이터 우선</b><p>법제처 변경이력·연계정보를 기준으로 탐지합니다.</p></article><article><b>② 후보만 제시</b><p>“개정 필요”가 아니라 “확인 필요”를 표시합니다.</p></article><article><b>③ 전국 복제 가능</b><p>기관코드만 바꾸면 다른 지자체에도 적용 가능합니다.</p></article><article><b>④ API형 AI 비용 없음</b><p>1차 MVP에는 OpenAI·Claude API를 사용하지 않습니다.</p></article></div>
+    </section>
+  </main>
+  <footer>Developed by 광주광역시 서구 펀온워크 AIBLE · GOV:IMPACT MVP</footer>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
