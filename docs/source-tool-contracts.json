@@ -1979,6 +1979,26 @@
         "offset": {
           "annotation": "int",
           "default": 0
+        },
+        "history": {
+          "annotation": "bool",
+          "default": false
+        },
+        "promulgation_from": {
+          "annotation": "str",
+          "default": ""
+        },
+        "promulgation_to": {
+          "annotation": "str",
+          "default": ""
+        },
+        "org": {
+          "annotation": "str",
+          "default": ""
+        },
+        "sborg": {
+          "annotation": "str",
+          "default": ""
         }
       },
       "required": [
