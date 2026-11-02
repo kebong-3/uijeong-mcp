@@ -129,6 +129,12 @@ def test_entrypoint_public_protocol_and_gateway_boundaries(tmp_path, custom_gate
             "jsonrpc": "2.0", "id": 103, "method": "tools/list", "params": {}})
         assert hybrid_tools.status_code == 200, hybrid_tools.text
         assert len(hybrid_tools.json()["result"]["tools"]) == 40
+        # Standalone server-push GET is optional in MCP 2025-11-25. For FabriX
+        # compatibility it must terminate immediately with the spec-defined 405
+        # instead of holding an idle SSE stream open until the platform timeout.
+        hybrid_get = client.get("/mcp", headers=hybrid_headers)
+        assert hybrid_get.status_code == 405, hybrid_get.text
+        assert "POST" in hybrid_get.headers.get("allow", "")
 
         # A direct no-session tool call still takes the legacy/stateless SSE path.
         called_sse = sse_payload(client.post("/mcp", headers=sse_headers, json={
