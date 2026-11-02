@@ -602,7 +602,7 @@ class HTTPGuard:
                 break
         if self.policy.get("auth_mode") == "public":
             control = False
-            if path.rstrip("/") == "/mcp" and method == "POST":
+            if path.rstrip("/") in ("/mcp", "/mcp-fabrix") and method == "POST":
                 try:
                     message = json.loads(b"".join(e.get("body", b"") for e in events))
                     if isinstance(message, dict):
@@ -617,6 +617,8 @@ class HTTPGuard:
                                        isinstance(arguments, dict) and arguments.get("live", False) is False)
                 except (ValueError, TypeError, UnicodeError):
                     pass  # SDK returns the protocol error; never elevate malformed bodies.
+            if path.rstrip("/") == "/mcp-fabrix" and method == "DELETE":
+                control = True
             scope = dict(scope, uijeong_control_request=control)
             identity = identity + (":control" if control else ":query")
         now = time.monotonic()
@@ -731,17 +733,22 @@ class PublicBoundary:
         import rest_bridge
         path = scope.get("path", "").rstrip("/")
         rest = rest_bridge.enabled() and rest_bridge.is_rest_path(path)
-        if path != "/mcp" and not rest:
+        if path not in ("/mcp", "/mcp-fabrix") and not rest:
             await _public_reply(send, 404, {"error": "Not found"})
             return
-        # This public server is stateless and responds to POST with JSON. It
-        # has no server-initiated events to deliver on a standalone GET SSE
-        # stream. Such idle streams used to retain every query slot forever.
-        # MCP permits 405 for an endpoint without a standalone SSE stream.
-        # Reject before acquiring a slot, including when the query queue is full.
-        if not rest and scope.get("method") not in ("POST","DELETE"):
+        # /mcp remains the bounded stateless endpoint. /mcp-fabrix is a
+        # stateful Streamable HTTP endpoint and therefore supports GET for
+        # the optional server-to-client event stream after a session is issued.
+        if path == "/mcp" and scope.get("method") not in ("POST", "DELETE"):
             await _public_reply(send, 405, {"authentication": "none", "public_readonly": True,
-                "message": "이 무상태 MCP는 POST로 호출합니다. 별도 GET 이벤트 스트림은 제공하지 않습니다. 상태 확인 주소는 /healthz입니다."})
+                "message": "이 무상태 MCP는 POST로 호출합니다. 상태 확인 주소는 /healthz입니다."})
+            return
+        if path == "/mcp-fabrix" and scope.get("method") == "GET":
+            await self.app(scope, receive, send)
+            return
+        if path == "/mcp-fabrix" and scope.get("method") not in ("POST", "DELETE"):
+            await _public_reply(send, 405, {"authentication": "none", "public_readonly": True,
+                "message": "FabriX 전용 MCP는 GET, POST, DELETE를 지원합니다."})
             return
         # REST listings (GET) are as light as MCP tools/list; REST tool calls (POST)
         # wait for the same query slots as MCP tools/call.
