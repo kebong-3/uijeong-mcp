@@ -111,12 +111,26 @@ def test_entrypoint_public_protocol_and_gateway_boundaries(tmp_path, custom_gate
             return json.loads(rows[-1])
 
         sse_headers = {"accept": "application/json, text/event-stream"}
-        initialized_sse = sse_payload(client.post("/mcp", headers=sse_headers, json={
+        hybrid_init = client.post("/mcp", headers=sse_headers, json={
             "jsonrpc": "2.0", "id": 101, "method": "initialize",
             "params": {"protocolVersion": "2025-11-25", "capabilities": {},
-                       "clientInfo": {"name": "fabrix-healthcheck-test", "version": "1"}}}))
-        assert initialized_sse["result"]["protocolVersion"]
+                       "clientInfo": {"name": "fabrix-healthcheck-test", "version": "1"}}})
+        assert hybrid_init.status_code == 200, hybrid_init.text
+        hybrid_session = hybrid_init.headers.get("mcp-session-id")
+        assert hybrid_session
+        hybrid_payload = hybrid_init.json()
+        protocol = hybrid_payload["result"]["protocolVersion"]
+        hybrid_headers = {
+            "accept": "application/json",
+            "mcp-session-id": hybrid_session,
+            "mcp-protocol-version": protocol,
+        }
+        hybrid_tools = client.post("/mcp", headers=hybrid_headers, json={
+            "jsonrpc": "2.0", "id": 103, "method": "tools/list", "params": {}})
+        assert hybrid_tools.status_code == 200, hybrid_tools.text
+        assert len(hybrid_tools.json()["result"]["tools"]) == 40
 
+        # A direct no-session tool call still takes the legacy/stateless SSE path.
         called_sse = sse_payload(client.post("/mcp", headers=sse_headers, json={
             "jsonrpc": "2.0", "id": 102, "method": "tools/call",
             "params": {"name": "council_find_council", "arguments": {"query": "광주 서구"}}}))
