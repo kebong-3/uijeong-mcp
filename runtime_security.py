@@ -736,14 +736,22 @@ class PublicBoundary:
         if path not in ("/mcp", "/mcp-fabrix") and not rest:
             await _public_reply(send, 404, {"error": "Not found"})
             return
-        # /mcp remains the bounded stateless endpoint. /mcp-fabrix is a
-        # stateful Streamable HTTP endpoint and therefore supports GET for
-        # the optional server-to-client event stream after a session is issued.
-        if path == "/mcp" and scope.get("method") not in ("POST", "DELETE"):
-            await _public_reply(send, 405, {"authentication": "none", "public_readonly": True,
-                "message": "이 무상태 MCP는 POST로 호출합니다. 상태 확인 주소는 /healthz입니다."})
+        # /mcp is hybrid: normal no-session requests retain the bounded
+        # stateless behavior, while an established Mcp-Session-Id may use GET
+        # for the optional server-to-client stream. /mcp-fabrix is stateful.
+        method = scope.get("method")
+        has_session = any(
+            key.decode("latin1").lower() == "mcp-session-id" and bool(value)
+            for key, value in scope.get("headers", [])
+        )
+        if path == "/mcp" and method == "GET" and has_session:
+            await self.app(scope, receive, send)
             return
-        if path == "/mcp-fabrix" and scope.get("method") == "GET":
+        if path == "/mcp" and method not in ("POST", "DELETE"):
+            await _public_reply(send, 405, {"authentication": "none", "public_readonly": True,
+                "message": "세션 없는 MCP는 POST로 호출합니다. 상태 확인 주소는 /healthz입니다."})
+            return
+        if path == "/mcp-fabrix" and method == "GET":
             await self.app(scope, receive, send)
             return
         if path == "/mcp-fabrix" and scope.get("method") not in ("POST", "DELETE"):
