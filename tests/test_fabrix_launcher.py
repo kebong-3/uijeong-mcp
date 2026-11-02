@@ -136,6 +136,39 @@ def test_entrypoint_public_protocol_and_gateway_boundaries(tmp_path, custom_gate
         assert hybrid_get.status_code == 405, hybrid_get.text
         assert "POST" in hybrid_get.headers.get("allow", "")
 
+        # MCP 2026-07-28 discovery/modern stateless flow used by current FabriX.
+        modern_meta = {
+            "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+            "io.modelcontextprotocol/clientInfo": {"name": "fabrix-modern-test", "version": "1"},
+            "io.modelcontextprotocol/clientCapabilities": {},
+        }
+        discover = client.post("/mcp", headers={
+            "accept": "application/json, text/event-stream",
+            "mcp-protocol-version": "2026-07-28",
+            "mcp-method": "server/discover",
+        }, json={
+            "jsonrpc": "2.0", "id": 150, "method": "server/discover",
+            "params": {"_meta": modern_meta},
+        })
+        assert discover.status_code == 200, discover.text
+        discover_payload = discover.json()["result"]
+        assert "2026-07-28" in discover_payload["supportedVersions"]
+        assert discover_payload["resultType"] == "complete"
+        assert discover.headers.get("mcp-protocol-version") == "2026-07-28"
+        assert not discover.headers.get("mcp-session-id")
+
+        modern_tools = client.post("/mcp", headers={
+            "accept": "application/json, text/event-stream",
+            "mcp-protocol-version": "2026-07-28",
+            "mcp-method": "tools/list",
+        }, json={
+            "jsonrpc": "2.0", "id": 151, "method": "tools/list",
+            "params": {"_meta": modern_meta},
+        })
+        assert modern_tools.status_code == 200, modern_tools.text
+        assert len(modern_tools.json()["result"]["tools"]) == 40
+        assert not modern_tools.headers.get("mcp-session-id")
+
         # A direct no-session tool call still takes the legacy/stateless SSE path.
         called_sse = sse_payload(client.post("/mcp", headers=sse_headers, json={
             "jsonrpc": "2.0", "id": 102, "method": "tools/call",

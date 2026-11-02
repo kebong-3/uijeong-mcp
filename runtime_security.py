@@ -607,7 +607,7 @@ class HTTPGuard:
                     message = json.loads(b"".join(e.get("body", b"") for e in events))
                     if isinstance(message, dict):
                         rpc_method = message.get("method")
-                        control = rpc_method in ("initialize", "ping", "tools/list", "resources/list",
+                        control = rpc_method in ("server/discover", "initialize", "ping", "tools/list", "resources/list",
                                                  "resources/templates/list", "prompts/list",
                                                  "notifications/initialized", "notifications/cancelled")
                         params = message.get("params")

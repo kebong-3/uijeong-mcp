@@ -358,6 +358,94 @@ def _header_value(scope: Any, name: str) -> str:
     return ""
 
 
+MODERN_PROTOCOL_VERSION = "2026-07-28"
+LEGACY_PROTOCOL_VERSION = "2025-11-25"
+
+
+def _replace_headers(scope: Any, replacements: dict[str, str], *, remove: tuple[str, ...] = ()) -> Any:
+    replace_lower = {key.lower(): value for key, value in replacements.items()}
+    remove_lower = {name.lower() for name in remove}
+    headers = []
+    seen = set()
+    for key, value in scope.get("headers", []):
+        name = key.decode("latin1").lower()
+        if name in remove_lower:
+            continue
+        if name in replace_lower:
+            headers.append((key, replace_lower[name].encode("latin1")))
+            seen.add(name)
+        else:
+            headers.append((key, value))
+    for name, value in replace_lower.items():
+        if name not in seen:
+            headers.append((name.encode("latin1"), value.encode("latin1")))
+    updated = dict(scope)
+    updated["headers"] = headers
+    return updated
+
+
+def _modern_protocol_from_payload(payload: Any) -> str:
+    if not isinstance(payload, dict):
+        return ""
+    params = payload.get("params")
+    if not isinstance(params, dict):
+        return ""
+    meta = params.get("_meta")
+    if not isinstance(meta, dict):
+        return ""
+    value = meta.get("io.modelcontextprotocol/protocolVersion")
+    return str(value or "")
+
+
+def _strip_modern_meta(payload: Any) -> Any:
+    if not isinstance(payload, dict):
+        return payload
+    normalized = dict(payload)
+    params = normalized.get("params")
+    if isinstance(params, dict):
+        params = dict(params)
+        params.pop("_meta", None)
+        if params:
+            normalized["params"] = params
+        else:
+            normalized.pop("params", None)
+    return normalized
+
+
+async def _modern_discover_reply(send: Any, request_id: Any) -> None:
+    from release_info import VERSION
+    result = {
+        "resultType": "complete",
+        "supportedVersions": [MODERN_PROTOCOL_VERSION, LEGACY_PROTOCOL_VERSION],
+        "capabilities": {"tools": {}},
+        "_meta": {
+            "io.modelcontextprotocol/serverInfo": {
+                "name": "uijeong_mcp",
+                "version": VERSION,
+            }
+        },
+        "instructions": "공개 지방의회·예산·조례 근거 조회용 읽기 전용 MCP입니다.",
+        "ttlMs": 3600000,
+        "cacheScope": "public",
+    }
+    body = json.dumps(
+        {"jsonrpc": "2.0", "id": request_id, "result": result},
+        ensure_ascii=False,
+        separators=(",", ":"),
+    ).encode()
+    await send({
+        "type": "http.response.start",
+        "status": 200,
+        "headers": [
+            (b"content-type", b"application/json"),
+            (b"cache-control", b"public, max-age=3600"),
+            (b"mcp-protocol-version", MODERN_PROTOCOL_VERSION.encode()),
+            (b"x-content-type-options", b"nosniff"),
+        ],
+    })
+    await send({"type": "http.response.body", "body": body})
+
+
 class _HybridMCPASGI:
     """Use stateful MCP for initialize/session traffic and stateless MCP otherwise.
 
@@ -404,26 +492,69 @@ class _HybridMCPASGI:
         except (ValueError, TypeError, UnicodeError):
             pass
 
-        use_stateful = bool(session_id) or rpc_method == "initialize"
+        header_version = _header_value(scope, "mcp-protocol-version")
+        payload_version = _modern_protocol_from_payload(payload)
+        is_modern = (header_version == MODERN_PROTOCOL_VERSION or
+                     payload_version == MODERN_PROTOCOL_VERSION)
+
+        if rpc_method == "server/discover":
+            _LOG.info("MCP request route=modern-discover rpc_method=server/discover session=none")
+            await _modern_discover_reply(send, payload.get("id") if isinstance(payload, dict) else None)
+            return
+
+        backend_scope = scope
+        backend_body = body
+        if is_modern:
+            # The v1.30 backend understands the same tools/resources/prompts RPC
+            # shapes but not the 2026 protocol header or per-request _meta envelope.
+            # Normalize only at the transport boundary; tool contracts stay unchanged.
+            normalized_payload = _strip_modern_meta(payload)
+            backend_body = json.dumps(normalized_payload, ensure_ascii=False, separators=(",", ":")).encode()
+            backend_scope = _replace_headers(
+                scope,
+                {
+                    "mcp-protocol-version": LEGACY_PROTOCOL_VERSION,
+                    "accept": "application/json",
+                    "content-length": str(len(backend_body)),
+                },
+                remove=("mcp-method", "mcp-name"),
+            )
+
+        use_stateful = (not is_modern) and (bool(session_id) or rpc_method == "initialize")
         target = self.stateful_app if use_stateful else self.stateless_app
+        route_name = "modern-compat" if is_modern else ("stateful" if use_stateful else "stateless")
         _LOG.info(
-            "MCP request route=%s rpc_method=%s tool=%s session=%s",
-            "stateful" if use_stateful else "stateless",
+            "MCP request route=%s rpc_method=%s tool=%s session=%s protocol=%s",
+            route_name,
             rpc_method or "(unknown)",
             tool_name or "-",
             "present" if session_id else "none",
+            MODERN_PROTOCOL_VERSION if is_modern else (header_version or "legacy"),
         )
+
+        replay_events = []
+        remaining = backend_body
+        if events:
+            # Preserve the original event boundaries only when the body is unchanged.
+            if backend_body == body:
+                replay_events = events
+            else:
+                replay_events = [{
+                    "type": "http.request",
+                    "body": remaining,
+                    "more_body": False,
+                }]
 
         index = 0
         async def replay() -> Any:
             nonlocal index
-            if index < len(events):
-                item = events[index]
+            if index < len(replay_events):
+                item = replay_events[index]
                 index += 1
                 return item
             return await receive()
 
-        await target(scope, replay, send)
+        await target(backend_scope, replay, send)
 
 
 class _ObservedASGI:
@@ -616,6 +747,42 @@ async def self_test() -> dict[str, Any]:
                 hybrid_listing.status_code == 200
                 and len(hybrid_listing.json().get("result", {}).get("tools", [])) == len(PUBLIC_TOOLS)
             )
+
+            modern_meta = {
+                "io.modelcontextprotocol/protocolVersion": MODERN_PROTOCOL_VERSION,
+                "io.modelcontextprotocol/clientInfo": {"name": "fabrix-modern-preflight", "version": "1"},
+                "io.modelcontextprotocol/clientCapabilities": {},
+            }
+            modern_headers = {
+                "accept": "application/json, text/event-stream",
+                "mcp-protocol-version": MODERN_PROTOCOL_VERSION,
+                "mcp-method": "server/discover",
+            }
+            modern_discover = await client.post("/mcp", headers=modern_headers, json={
+                "jsonrpc": "2.0", "id": 21, "method": "server/discover",
+                "params": {"_meta": modern_meta},
+            })
+            modern_discover_payload = modern_discover.json()
+            checks["modern_discover"] = (
+                modern_discover.status_code == 200
+                and MODERN_PROTOCOL_VERSION in modern_discover_payload.get("result", {}).get("supportedVersions", [])
+                and modern_discover.headers.get("mcp-protocol-version") == MODERN_PROTOCOL_VERSION
+                and not modern_discover.headers.get("mcp-session-id")
+            )
+            modern_tools = await client.post("/mcp", headers={
+                "accept": "application/json, text/event-stream",
+                "mcp-protocol-version": MODERN_PROTOCOL_VERSION,
+                "mcp-method": "tools/list",
+            }, json={
+                "jsonrpc": "2.0", "id": 22, "method": "tools/list",
+                "params": {"_meta": modern_meta},
+            })
+            checks["modern_tools_list"] = (
+                modern_tools.status_code == 200
+                and len(modern_tools.json().get("result", {}).get("tools", [])) == len(PUBLIC_TOOLS)
+                and not modern_tools.headers.get("mcp-session-id")
+            )
+
             listing = await client.post("/mcp", json={"jsonrpc": "2.0", "id": 2,
                                                        "method": "tools/list", "params": {}})
             tool_rows = listing.json().get("result", {}).get("tools", [])
