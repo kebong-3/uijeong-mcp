@@ -403,7 +403,9 @@ async def self_test() -> dict[str, Any]:
     import rest_bridge as RB
     app = R.secure_http_app(RB.RestBridge(raw, server, PUBLIC_TOOLS))
     host = R.http_policy()["hosts"][0]
-    headers = {"host": host, "accept": "application/json, text/event-stream",
+    # Keep the deterministic preflight on JSON, then explicitly probe the
+    # FabriX-style SSE response path below.
+    headers = {"host": host, "accept": "application/json",
                "mcp-protocol-version": "2025-11-25"}
     checks: dict[str, bool] = {}
     async with raw.router.lifespan_context(raw):
@@ -435,6 +437,22 @@ async def self_test() -> dict[str, Any]:
                 "params": {"name": "council_search_local", "arguments": {"keyword": "test"}}})
             rejected = forbidden.json()
             checks["private_tool_not_callable"] = bool(rejected.get("error") or rejected.get("result", {}).get("isError"))
+
+            sse_result = await client.post("/mcp", headers={"accept": "application/json, text/event-stream"}, json={
+                "jsonrpc": "2.0", "id": 31, "method": "tools/call",
+                "params": {"name": "council_find_council", "arguments": {"query": "광주 서구"}}})
+            sse_rows = [line[5:].strip() for line in sse_result.text.splitlines() if line.startswith("data:")]
+            try:
+                sse_payload = json.loads(sse_rows[-1]) if sse_rows else {}
+            except (ValueError, TypeError):
+                sse_payload = {}
+            checks["fabrix_sse_tool_response"] = (
+                sse_result.status_code == 200
+                and sse_result.headers.get("content-type", "").startswith("text/event-stream")
+                and bool(sse_payload.get("result", {}).get("content"))
+                and not sse_payload.get("result", {}).get("isError", False)
+            )
+
             checks["invalid_host_rejected"] = (await client.get("/healthz", headers={"host": "invalid.example"})).status_code == 403
             checks["invalid_origin_rejected"] = (await client.get("/healthz", headers={"origin": "https://invalid.example"})).status_code == 403
             checks["oversized_body_rejected"] = (await client.post("/mcp", content=b"x" * 65537)).status_code == 413
