@@ -510,7 +510,7 @@
     "tests/test_evidence_discovery.py": "76bd10d255d0556db700b0ef3d67a7f4c316637ef6e62adb6ccc3a425c20e61f",
     "tests/test_evidence_link_output.py": "a44aaac14a69ff8ccc36853afb2fc475423b1689ac32fd940dab49408718fa98",
     "tests/test_evidence_v2.py": "f9a8f33ae9a40177f89fb3ced9abb18dc5a69ab61f5a4520249a1bf082c0d3f4",
-    "tests/test_fabrix_launcher.py": "1e1d8ea0454b3cc20bbca601ffe80a5b61ffe67e2f997a28dc26bfa8c5ff1203",
+    "tests/test_fabrix_launcher.py": "96ce327f2b7e57e88b5462d0ba9206ad3ac39acdc696c4ffbfebefb643c70769",
     "tests/test_final_hardening.py": "44fc83da0dbaf63ff1622cd6635949f4b49076aff7719f4fcce7f103724b26ec",
     "tests/test_finance_public_search_terms.py": "22a7c7c7189a9a344391e1bae4cce26e165065b45101ca4cf8f897b69eddf416",
     "tests/test_fiscal_evidence.py": "62854d252be6ef2c534548f4b7cc29dbfde13566b77a2b172d5f4096134ff46b",
