@@ -350,6 +350,82 @@ def build_server(backend: Any = None, *, assign_backend: bool = True) -> Any:
     return server
 
 
+def _header_value(scope: Any, name: str) -> str:
+    wanted = name.lower()
+    for key, value in scope.get("headers", []):
+        if key.decode("latin1").lower() == wanted:
+            return value.decode("latin1")
+    return ""
+
+
+class _HybridMCPASGI:
+    """Use stateful MCP for initialize/session traffic and stateless MCP otherwise.
+
+    This keeps direct stateless tool calls working while allowing clients that
+    require Mcp-Session-Id (such as FabriX health checks) to establish a normal
+    stateful Streamable HTTP session on the canonical /mcp path.
+    """
+
+    def __init__(self, stateless_app: Any, stateful_app: Any) -> None:
+        self.stateless_app, self.stateful_app = stateless_app, stateful_app
+
+    async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
+        method = scope.get("method", "POST")
+        session_id = _header_value(scope, "mcp-session-id")
+        rpc_method = ""
+        tool_name = ""
+
+        if method != "POST":
+            target = self.stateful_app if session_id else self.stateless_app
+            _LOG.info("MCP route=%s http_method=%s session=%s",
+                      "stateful" if session_id else "stateless", method,
+                      "present" if session_id else "none")
+            await target(scope, receive, send)
+            return
+
+        events = []
+        body = b""
+        while True:
+            event = await receive()
+            events.append(event)
+            if event.get("type") == "http.disconnect":
+                return
+            body += event.get("body", b"")
+            if not event.get("more_body", False):
+                break
+
+        try:
+            payload = json.loads(body) if body else {}
+            if isinstance(payload, dict):
+                rpc_method = str(payload.get("method") or "")
+                params = payload.get("params")
+                if rpc_method == "tools/call" and isinstance(params, dict):
+                    tool_name = str(params.get("name") or "")
+        except (ValueError, TypeError, UnicodeError):
+            pass
+
+        use_stateful = bool(session_id) or rpc_method == "initialize"
+        target = self.stateful_app if use_stateful else self.stateless_app
+        _LOG.info(
+            "MCP request route=%s rpc_method=%s tool=%s session=%s",
+            "stateful" if use_stateful else "stateless",
+            rpc_method or "(unknown)",
+            tool_name or "-",
+            "present" if session_id else "none",
+        )
+
+        index = 0
+        async def replay() -> Any:
+            nonlocal index
+            if index < len(events):
+                item = events[index]
+                index += 1
+                return item
+            return await receive()
+
+        await target(scope, replay, send)
+
+
 class _ObservedASGI:
     """Log the HTTP-level result without exposing request bodies or secrets."""
 
@@ -358,35 +434,66 @@ class _ObservedASGI:
 
     async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
         started = time.monotonic()
+        status = None
+        content_type = ""
+        response_session = ""
 
         async def observed_send(message: Any) -> None:
+            nonlocal status, content_type, response_session
             if message.get("type") == "http.response.start":
                 headers = {
                     key.decode("latin1").lower(): value.decode("latin1")
                     for key, value in message.get("headers", [])
                 }
+                status = message.get("status")
+                content_type = headers.get("content-type", "")
+                response_session = headers.get("mcp-session-id", "")
                 _LOG.info(
-                    "MCP endpoint=%s method=%s status=%s content_type=%s session=%s latency_ms=%d",
+                    "MCP endpoint=%s method=%s status=%s content_type=%s session=%s first_byte_ms=%d",
                     self.label,
                     scope.get("method", ""),
-                    message.get("status"),
-                    headers.get("content-type", ""),
-                    "issued" if headers.get("mcp-session-id") else
-                    ("present" if any(k.decode("latin1").lower() == "mcp-session-id"
-                                      for k, _ in scope.get("headers", [])) else "none"),
+                    status,
+                    content_type,
+                    "issued" if response_session else
+                    ("present" if _header_value(scope, "mcp-session-id") else "none"),
                     int((time.monotonic() - started) * 1000),
                 )
             await send(message)
 
-        await self.app(scope, receive, observed_send)
+        try:
+            await self.app(scope, receive, observed_send)
+        finally:
+            _LOG.info(
+                "MCP complete endpoint=%s method=%s status=%s session=%s total_ms=%d",
+                self.label,
+                scope.get("method", ""),
+                status,
+                "issued" if response_session else
+                ("present" if _header_value(scope, "mcp-session-id") else "none"),
+                int((time.monotonic() - started) * 1000),
+            )
 
 
 def _build_transport_app(primary: Any, fabrix: Any) -> Any:
-    """Expose the existing stateless endpoint plus a FabriX stateful endpoint."""
+    """Expose a hybrid canonical /mcp plus the explicit FabriX stateful endpoint."""
     _install_negotiating_transport(primary)
     primary_manager = primary.session_manager
 
-    fabrix._session_manager = StreamableHTTPSessionManager(
+    # Canonical /mcp: initialize/session traffic gets state, while direct
+    # no-session tool calls remain compatible with the old stateless behavior.
+    hybrid_stateful_manager = StreamableHTTPSessionManager(
+        app=fabrix._mcp_server,
+        event_store=fabrix._event_store,
+        retry_interval=fabrix._retry_interval,
+        json_response=True,
+        stateless=False,
+        security_settings=fabrix.settings.transport_security,
+        max_request_body_size=fabrix.settings.max_request_body_size,
+        session_idle_timeout=300,
+        max_sessions=1000,
+    )
+    # Explicit endpoint keeps SSE framing for clients that choose it directly.
+    fabrix_stateful_manager = StreamableHTTPSessionManager(
         app=fabrix._mcp_server,
         event_store=fabrix._event_store,
         retry_interval=fabrix._retry_interval,
@@ -397,18 +504,24 @@ def _build_transport_app(primary: Any, fabrix: Any) -> Any:
         session_idle_timeout=300,
         max_sessions=1000,
     )
-    fabrix_manager = fabrix.session_manager
+
+    stateless_app = StreamableHTTPASGIApp(primary_manager)
+    hybrid_stateful_app = StreamableHTTPASGIApp(hybrid_stateful_manager)
+    fabrix_stateful_app = StreamableHTTPASGIApp(fabrix_stateful_manager)
 
     @asynccontextmanager
     async def lifespan(app: Starlette):
         async with primary_manager.run():
-            async with fabrix_manager.run():
-                yield
+            async with hybrid_stateful_manager.run():
+                async with fabrix_stateful_manager.run():
+                    yield
 
     app = Starlette(
         routes=[
-            Route("/mcp", endpoint=_ObservedASGI(StreamableHTTPASGIApp(primary_manager), label="stateless")),
-            Route("/mcp-fabrix", endpoint=_ObservedASGI(StreamableHTTPASGIApp(fabrix_manager), label="fabrix-stateful")),
+            Route("/mcp", endpoint=_ObservedASGI(
+                _HybridMCPASGI(stateless_app, hybrid_stateful_app), label="hybrid")),
+            Route("/mcp-fabrix", endpoint=_ObservedASGI(
+                fabrix_stateful_app, label="fabrix-stateful")),
         ],
         lifespan=lifespan,
     )
@@ -445,7 +558,7 @@ def run(backend: Any = None) -> None:
     raw = _build_transport_app(server, fabrix_server)
     import rest_bridge as RB
     # /api/v1 is answered only when UIJEONG_REST_ENABLED=true.
-    # /mcp remains stateless; /mcp-fabrix provides stateful Streamable HTTP for FabriX.
+    # /mcp is hybrid (stateful initialize/session + stateless direct calls); /mcp-fabrix is stateful SSE.
     app = RB.RestBridge(raw, server, PUBLIC_TOOLS)
     policy = R.http_policy()
     import finance_context as F
@@ -489,6 +602,20 @@ async def self_test() -> dict[str, Any]:
                 "params": {"protocolVersion": "2025-11-25", "capabilities": {},
                            "clientInfo": {"name": "public-preflight", "version": "1"}}})
             checks["no_auth_initialize"] = init.status_code == 200 and "result" in init.json()
+            hybrid_session = init.headers.get("mcp-session-id", "")
+            hybrid_version = init.json().get("result", {}).get("protocolVersion", "2025-11-25")
+            checks["hybrid_session_issued"] = bool(hybrid_session)
+            hybrid_headers = {
+                "accept": "application/json",
+                "mcp-session-id": hybrid_session,
+                "mcp-protocol-version": hybrid_version,
+            }
+            hybrid_listing = await client.post("/mcp", headers=hybrid_headers,
+                json={"jsonrpc": "2.0", "id": 11, "method": "tools/list", "params": {}})
+            checks["hybrid_session_followup"] = (
+                hybrid_listing.status_code == 200
+                and len(hybrid_listing.json().get("result", {}).get("tools", [])) == len(PUBLIC_TOOLS)
+            )
             listing = await client.post("/mcp", json={"jsonrpc": "2.0", "id": 2,
                                                        "method": "tools/list", "params": {}})
             tool_rows = listing.json().get("result", {}).get("tools", [])
