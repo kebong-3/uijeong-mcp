@@ -122,6 +122,32 @@ def test_entrypoint_public_protocol_and_gateway_boundaries(tmp_path, custom_gate
             "params": {"name": "council_find_council", "arguments": {"query": "광주 서구"}}}))
         assert not called_sse["result"].get("isError", False)
 
+        # FabriX dedicated endpoint is stateful and must issue a session ID.
+        stateful_init = client.post("/mcp-fabrix", headers=sse_headers, json={
+            "jsonrpc": "2.0", "id": 201, "method": "initialize",
+            "params": {"protocolVersion": "2025-11-25", "capabilities": {},
+                       "clientInfo": {"name": "fabrix-stateful-test", "version": "1"}}})
+        init_payload = sse_payload(stateful_init)
+        session_id = stateful_init.headers.get("mcp-session-id")
+        assert session_id
+        protocol = init_payload["result"]["protocolVersion"]
+        stateful_headers = {
+            **sse_headers,
+            "mcp-session-id": session_id,
+            "mcp-protocol-version": protocol,
+        }
+        notified = client.post("/mcp-fabrix", headers=stateful_headers, json={
+            "jsonrpc": "2.0", "method": "notifications/initialized", "params": {}})
+        assert notified.status_code == 202, notified.text
+        tools_payload = sse_payload(client.post("/mcp-fabrix", headers=stateful_headers, json={
+            "jsonrpc": "2.0", "id": 202, "method": "tools/list", "params": {}}))
+        assert len(tools_payload["result"]["tools"]) == 40
+        deleted = client.delete("/mcp-fabrix", headers=stateful_headers)
+        assert deleted.status_code == 200, deleted.text
+        expired = client.post("/mcp-fabrix", headers=stateful_headers, json={
+            "jsonrpc": "2.0", "id": 203, "method": "tools/list", "params": {}})
+        assert expired.status_code == 404, expired.text
+
         forbidden = rpc("tools/call", {"name": "council_search_local", "arguments": {"keyword": "x"}})
         assert forbidden.get("isError")
         assert client.get("/healthz", headers={"host": "untrusted.example.test"}).status_code == 403
