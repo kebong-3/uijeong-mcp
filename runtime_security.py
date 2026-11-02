@@ -736,20 +736,19 @@ class PublicBoundary:
         if path not in ("/mcp", "/mcp-fabrix") and not rest:
             await _public_reply(send, 404, {"error": "Not found"})
             return
-        # /mcp is hybrid: normal no-session requests retain the bounded
-        # stateless behavior, while an established Mcp-Session-Id may use GET
-        # for the optional server-to-client stream. /mcp-fabrix is stateful.
+        # Canonical /mcp deliberately does not expose a standalone GET SSE
+        # stream. FabriX health checks open that stream after initialization and
+        # wait for it to finish, turning a healthy long-lived SSE connection into
+        # a platform TIMEOUT. MCP 2025-11-25 explicitly permits 405 when the
+        # server does not offer this optional server-initiated stream.
         method = scope.get("method")
-        has_session = any(
-            key.decode("latin1").lower() == "mcp-session-id" and bool(value)
-            for key, value in scope.get("headers", [])
-        )
-        if path == "/mcp" and method == "GET" and has_session:
-            await self.app(scope, receive, send)
+        if path == "/mcp" and method == "GET":
+            await _public_reply(send, 405, {"authentication": "none", "public_readonly": True,
+                "message": "이 MCP는 standalone GET SSE 스트림을 제공하지 않습니다. POST 연결은 정상 지원합니다."})
             return
         if path == "/mcp" and method not in ("POST", "DELETE"):
             await _public_reply(send, 405, {"authentication": "none", "public_readonly": True,
-                "message": "세션 없는 MCP는 POST로 호출합니다. 상태 확인 주소는 /healthz입니다."})
+                "message": "MCP 요청은 POST를 사용합니다. 상태 확인 주소는 /healthz입니다."})
             return
         if path == "/mcp-fabrix" and method == "GET":
             await self.app(scope, receive, send)
