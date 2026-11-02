@@ -74,7 +74,8 @@ def test_entrypoint_public_protocol_and_gateway_boundaries(tmp_path, custom_gate
     if custom_gateway:
         env.update(PORT=str(port), FABRIX_SERVER_URL="https://fabrix.example.test/mcp")
     with launched(tmp_path, env, port, host) as client:
-        headers = {"accept": "application/json, text/event-stream"}
+        # JSON-only clients keep the existing one-response behavior.
+        headers = {"accept": "application/json"}
 
         def rpc(method, params):
             response = client.post("/mcp", headers=headers, json={
@@ -99,6 +100,28 @@ def test_entrypoint_public_protocol_and_gateway_boundaries(tmp_path, custom_gate
         ]:
             result = rpc("tools/call", {"name": name, "arguments": arguments})
             assert not result.get("isError"), result
+        # FabriX-style Streamable HTTP clients advertise both media types.
+        # The server should answer these requests as a finite SSE response stream,
+        # including direct stateless tool calls used by connection health checks.
+        def sse_payload(response):
+            assert response.status_code == 200, response.text
+            assert response.headers["content-type"].startswith("text/event-stream")
+            rows = [line[5:].strip() for line in response.text.splitlines() if line.startswith("data:")]
+            assert rows, response.text
+            return json.loads(rows[-1])
+
+        sse_headers = {"accept": "application/json, text/event-stream"}
+        initialized_sse = sse_payload(client.post("/mcp", headers=sse_headers, json={
+            "jsonrpc": "2.0", "id": 101, "method": "initialize",
+            "params": {"protocolVersion": "2025-11-25", "capabilities": {},
+                       "clientInfo": {"name": "fabrix-healthcheck-test", "version": "1"}}}))
+        assert initialized_sse["result"]["protocolVersion"]
+
+        called_sse = sse_payload(client.post("/mcp", headers=sse_headers, json={
+            "jsonrpc": "2.0", "id": 102, "method": "tools/call",
+            "params": {"name": "council_find_council", "arguments": {"query": "광주 서구"}}}))
+        assert not called_sse["result"].get("isError", False)
+
         forbidden = rpc("tools/call", {"name": "council_search_local", "arguments": {"keyword": "x"}})
         assert forbidden.get("isError")
         assert client.get("/healthz", headers={"host": "untrusted.example.test"}).status_code == 403
