@@ -9,7 +9,14 @@ import asyncio
 import functools
 import inspect
 import json
+import logging
+import time
 from typing import Any, Optional
+
+import anyio
+from anyio.abc import TaskStatus
+from mcp.server.streamable_http import StreamableHTTPServerTransport
+from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
 
 import runtime_security as R
 import openai_compat as O
@@ -193,6 +200,113 @@ def standard_function(fn: Any) -> Any:
     return wrapped
 
 
+_LOG = logging.getLogger(__name__)
+
+
+def _accept_header(scope: Any) -> str:
+    values = []
+    for key, value in scope.get("headers", []):
+        if key.decode("latin1").lower() == "accept":
+            values.append(value.decode("latin1"))
+    return ",".join(values)
+
+
+def _normalize_accept(scope: Any, *, use_sse: bool) -> Any:
+    """Keep standards-compliant clients unchanged; tolerate narrow/missing Accept headers."""
+    accept = _accept_header(scope)
+    lower = accept.lower()
+    required = ("application/json", "text/event-stream") if use_sse else ("application/json",)
+    if all(item in lower for item in required):
+        return scope
+
+    normalized = "application/json, text/event-stream" if use_sse else "application/json"
+    headers = [(key, value) for key, value in scope.get("headers", [])
+               if key.decode("latin1").lower() != "accept"]
+    headers.append((b"accept", normalized.encode("latin1")))
+    updated = dict(scope)
+    updated["headers"] = headers
+    return updated
+
+
+class _NegotiatingStatelessSessionManager(StreamableHTTPSessionManager):
+    """Stateless MCP transport that negotiates JSON vs SSE per POST request.
+
+    FabriX and some enterprise MCP clients advertise both response media types
+    and wait for an SSE message frame. Other clients prefer the optional JSON
+    response mode. The upstream Python SDK chooses one mode per server; this
+    manager keeps the stateless semantics but selects the response mode from
+    each request's Accept header.
+    """
+
+    async def _handle_stateless_request(self, scope: Any, receive: Any, send: Any) -> None:
+        accept = _accept_header(scope)
+        use_sse = "text/event-stream" in accept.lower()
+        scoped = _normalize_accept(scope, use_sse=use_sse)
+        started = time.monotonic()
+
+        http_transport = StreamableHTTPServerTransport(
+            mcp_session_id=None,
+            is_json_response_enabled=not use_sse,
+            event_store=None,
+            security_settings=self.security_settings,
+        )
+
+        async def run_stateless_server(*, task_status: TaskStatus[None] = anyio.TASK_STATUS_IGNORED):
+            async with http_transport.connect() as streams:
+                read_stream, write_stream = streams
+                task_status.started()
+                try:
+                    await self.app.run(
+                        read_stream,
+                        write_stream,
+                        self.app.create_initialization_options(),
+                        stateless=True,
+                    )
+                except Exception:  # pragma: no cover
+                    _LOG.exception("Stateless MCP request crashed")
+
+        async def observed_send(message: Any) -> None:
+            if message.get("type") == "http.response.start":
+                response_headers = {
+                    key.decode("latin1").lower(): value.decode("latin1")
+                    for key, value in message.get("headers", [])
+                }
+                _LOG.info(
+                    "MCP response mode=%s status=%s content_type=%s control=%s latency_ms=%d",
+                    "sse" if use_sse else "json",
+                    message.get("status"),
+                    response_headers.get("content-type", ""),
+                    bool(scope.get("uijeong_control_request")),
+                    int((time.monotonic() - started) * 1000),
+                )
+            await send(message)
+
+        assert self._task_group is not None
+        try:
+            await self._task_group.start(run_stateless_server)
+            await http_transport.handle_request(scoped, receive, observed_send)
+        finally:
+            with anyio.CancelScope(shield=True):
+                await http_transport.terminate()
+
+
+def _install_negotiating_transport(server: Any) -> None:
+    """Install response negotiation before FastMCP creates its default manager."""
+    if getattr(server, "_session_manager", None) is not None:
+        return
+    server._session_manager = _NegotiatingStatelessSessionManager(
+        app=server._mcp_server,
+        event_store=server._event_store,
+        retry_interval=server._retry_interval,
+        json_response=True,
+        stateless=True,
+        security_settings=server.settings.transport_security,
+        max_request_body_size=server.settings.max_request_body_size,
+        session_idle_timeout=server.settings.session_idle_timeout,
+        max_sessions=server.settings.max_sessions,
+    )
+
+
 def build_server(backend: Any = None) -> Any:
     from mcp.server.fastmcp import FastMCP
     from mcp.types import ToolAnnotations
@@ -255,6 +369,7 @@ def run(backend: Any = None) -> None:
     import uvicorn
     server = build_server(backend)
     asyncio.run(verify_surface(server))
+    _install_negotiating_transport(server)
     raw = server.streamable_http_app()
     raw.uijeong_public_readonly = True
     import rest_bridge as RB
@@ -282,6 +397,7 @@ async def self_test() -> dict[str, Any]:
     import httpx
     server = build_server()
     await verify_surface(server)
+    _install_negotiating_transport(server)
     raw = server.streamable_http_app()
     raw.uijeong_public_readonly = True
     import rest_bridge as RB
