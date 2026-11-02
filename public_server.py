@@ -6,6 +6,7 @@ is not an access-control mechanism. Public results share an anonymous namespace.
 from __future__ import annotations
 
 import asyncio
+from contextlib import asynccontextmanager
 import functools
 import inspect
 import json
@@ -15,8 +16,11 @@ from typing import Any, Optional
 
 import anyio
 from anyio.abc import TaskStatus
+from mcp.server.fastmcp.server import StreamableHTTPASGIApp
 from mcp.server.streamable_http import StreamableHTTPServerTransport
 from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
+from starlette.applications import Starlette
+from starlette.routing import Route
 
 import runtime_security as R
 import openai_compat as O
@@ -307,7 +311,7 @@ def _install_negotiating_transport(server: Any) -> None:
     )
 
 
-def build_server(backend: Any = None) -> Any:
+def build_server(backend: Any = None, *, assign_backend: bool = True) -> Any:
     from mcp.server.fastmcp import FastMCP
     from mcp.types import ToolAnnotations
     from result_contract import wire_result
@@ -341,8 +345,75 @@ def build_server(backend: Any = None) -> Any:
     IO.register(registry)
     IW.register(registry)
     # Status reports the actually exposed schemas, not the legacy registry.
-    backend.mcp, backend.PROFILE = server, "public"
+    if assign_backend:
+        backend.mcp, backend.PROFILE = server, "public"
     return server
+
+
+class _ObservedASGI:
+    """Log the HTTP-level result without exposing request bodies or secrets."""
+
+    def __init__(self, app: Any, *, label: str) -> None:
+        self.app, self.label = app, label
+
+    async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
+        started = time.monotonic()
+
+        async def observed_send(message: Any) -> None:
+            if message.get("type") == "http.response.start":
+                headers = {
+                    key.decode("latin1").lower(): value.decode("latin1")
+                    for key, value in message.get("headers", [])
+                }
+                _LOG.info(
+                    "MCP endpoint=%s method=%s status=%s content_type=%s session=%s latency_ms=%d",
+                    self.label,
+                    scope.get("method", ""),
+                    message.get("status"),
+                    headers.get("content-type", ""),
+                    "issued" if headers.get("mcp-session-id") else
+                    ("present" if any(k.decode("latin1").lower() == "mcp-session-id"
+                                      for k, _ in scope.get("headers", [])) else "none"),
+                    int((time.monotonic() - started) * 1000),
+                )
+            await send(message)
+
+        await self.app(scope, receive, observed_send)
+
+
+def _build_transport_app(primary: Any, fabrix: Any) -> Any:
+    """Expose the existing stateless endpoint plus a FabriX stateful endpoint."""
+    _install_negotiating_transport(primary)
+    primary_manager = primary.session_manager
+
+    fabrix._session_manager = StreamableHTTPSessionManager(
+        app=fabrix._mcp_server,
+        event_store=fabrix._event_store,
+        retry_interval=fabrix._retry_interval,
+        json_response=False,
+        stateless=False,
+        security_settings=fabrix.settings.transport_security,
+        max_request_body_size=fabrix.settings.max_request_body_size,
+        session_idle_timeout=300,
+        max_sessions=1000,
+    )
+    fabrix_manager = fabrix.session_manager
+
+    @asynccontextmanager
+    async def lifespan(app: Starlette):
+        async with primary_manager.run():
+            async with fabrix_manager.run():
+                yield
+
+    app = Starlette(
+        routes=[
+            Route("/mcp", endpoint=_ObservedASGI(StreamableHTTPASGIApp(primary_manager), label="stateless")),
+            Route("/mcp-fabrix", endpoint=_ObservedASGI(StreamableHTTPASGIApp(fabrix_manager), label="fabrix-stateful")),
+        ],
+        lifespan=lifespan,
+    )
+    app.uijeong_public_readonly = True
+    return app
 
 
 async def verify_surface(server: Any) -> None:
@@ -368,12 +439,13 @@ async def verify_surface(server: Any) -> None:
 def run(backend: Any = None) -> None:
     import uvicorn
     server = build_server(backend)
+    fabrix_server = build_server(backend, assign_backend=False)
     asyncio.run(verify_surface(server))
-    _install_negotiating_transport(server)
-    raw = server.streamable_http_app()
-    raw.uijeong_public_readonly = True
+    asyncio.run(verify_surface(fabrix_server))
+    raw = _build_transport_app(server, fabrix_server)
     import rest_bridge as RB
-    # /api/v1 is answered only when UIJEONG_REST_ENABLED=true; /mcp is unchanged.
+    # /api/v1 is answered only when UIJEONG_REST_ENABLED=true.
+    # /mcp remains stateless; /mcp-fabrix provides stateful Streamable HTTP for FabriX.
     app = RB.RestBridge(raw, server, PUBLIC_TOOLS)
     policy = R.http_policy()
     import finance_context as F
@@ -396,10 +468,10 @@ async def self_test() -> dict[str, Any]:
     """Real installed SDK, in-process HTTP; no upstream queries or secrets printed."""
     import httpx
     server = build_server()
+    fabrix_server = build_server(assign_backend=False)
     await verify_surface(server)
-    _install_negotiating_transport(server)
-    raw = server.streamable_http_app()
-    raw.uijeong_public_readonly = True
+    await verify_surface(fabrix_server)
+    raw = _build_transport_app(server, fabrix_server)
     import rest_bridge as RB
     app = R.secure_http_app(RB.RestBridge(raw, server, PUBLIC_TOOLS))
     host = R.http_policy()["hosts"][0]
@@ -452,6 +524,44 @@ async def self_test() -> dict[str, Any]:
                 and bool(sse_payload.get("result", {}).get("content"))
                 and not sse_payload.get("result", {}).get("isError", False)
             )
+
+            fabrix_init = await client.post("/mcp-fabrix",
+                headers={"accept": "application/json, text/event-stream"},
+                json={"jsonrpc": "2.0", "id": 41, "method": "initialize",
+                      "params": {"protocolVersion": "2025-11-25", "capabilities": {},
+                                 "clientInfo": {"name": "fabrix-stateful-preflight", "version": "1"}}})
+            fabrix_session = fabrix_init.headers.get("mcp-session-id", "")
+            fabrix_init_rows = [line[5:].strip() for line in fabrix_init.text.splitlines() if line.startswith("data:")]
+            try:
+                fabrix_init_payload = json.loads(fabrix_init_rows[-1]) if fabrix_init_rows else {}
+            except (ValueError, TypeError):
+                fabrix_init_payload = {}
+            checks["fabrix_stateful_session_issued"] = (
+                fabrix_init.status_code == 200
+                and bool(fabrix_session)
+                and bool(fabrix_init_payload.get("result", {}).get("protocolVersion"))
+            )
+            stateful_headers = {
+                "accept": "application/json, text/event-stream",
+                "mcp-session-id": fabrix_session,
+                "mcp-protocol-version": fabrix_init_payload.get("result", {}).get("protocolVersion", "2025-11-25"),
+            }
+            fabrix_notified = await client.post("/mcp-fabrix", headers=stateful_headers,
+                json={"jsonrpc": "2.0", "method": "notifications/initialized", "params": {}})
+            fabrix_tools = await client.post("/mcp-fabrix", headers=stateful_headers,
+                json={"jsonrpc": "2.0", "id": 42, "method": "tools/list", "params": {}})
+            fabrix_tool_rows = [line[5:].strip() for line in fabrix_tools.text.splitlines() if line.startswith("data:")]
+            try:
+                fabrix_tools_payload = json.loads(fabrix_tool_rows[-1]) if fabrix_tool_rows else {}
+            except (ValueError, TypeError):
+                fabrix_tools_payload = {}
+            checks["fabrix_stateful_followup"] = (
+                fabrix_notified.status_code == 202
+                and fabrix_tools.status_code == 200
+                and len(fabrix_tools_payload.get("result", {}).get("tools", [])) == len(PUBLIC_TOOLS)
+            )
+            fabrix_deleted = await client.delete("/mcp-fabrix", headers=stateful_headers)
+            checks["fabrix_stateful_delete"] = fabrix_deleted.status_code == 200
 
             checks["invalid_host_rejected"] = (await client.get("/healthz", headers={"host": "invalid.example"})).status_code == 403
             checks["invalid_origin_rejected"] = (await client.get("/healthz", headers={"origin": "https://invalid.example"})).status_code == 403
